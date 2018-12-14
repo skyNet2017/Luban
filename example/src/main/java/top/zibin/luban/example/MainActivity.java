@@ -18,6 +18,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.hss01248.lubanturbo.LubanTurbo;
+import com.hss01248.lubanturbo.TurboCompressor;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -147,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
           public List<File> apply(@NonNull List<T> list) throws Exception {
             return Luban.with(MainActivity.this)
                 .setTargetDir(getPath())
+                   // .saver(TurboCompressor.getTurboCompressor())
                 .load(list)
                 .get();
           }
@@ -173,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
   private <T> void withLs(final List<T> photos) {
     Luban.with(this)
         .load(photos)
+            //.saver(TurboCompressor.getTurboCompressor())
         .ignoreBy(100)
         .setTargetDir(getPath())
         .setFocusAlpha(false)

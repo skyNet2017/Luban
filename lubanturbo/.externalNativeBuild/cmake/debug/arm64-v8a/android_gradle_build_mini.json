@@ -1,0 +1,21 @@
+{
+  "buildFiles": [
+    "D:\\projects\\android\\skynet\\Luban\\lubanturbo\\CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "D:\\dev\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\android\\skynet\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\debug\\arm64-v8a --target clean"
+  ],
+  "libraries": {
+    "jpeg-Debug-arm64-v8a": {
+      "artifactName": "jpeg",
+      "abi": "arm64-v8a",
+      "output": "D:\\projects\\android\\skynet\\Luban\\lubanturbo\\libs\\arm64-v8a\\libjpeg-turbo.a"
+    },
+    "luban-Debug-arm64-v8a": {
+      "artifactName": "luban",
+      "buildCommand": "D:\\dev\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\android\\skynet\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\debug\\arm64-v8a --target luban",
+      "abi": "arm64-v8a",
+      "output": "D:\\projects\\android\\skynet\\Luban\\lubanturbo\\build\\intermediates\\cmake\\debug\\obj\\arm64-v8a\\libluban.so"
+    }
+  }
+}

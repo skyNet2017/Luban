@@ -1,0 +1,46 @@
+
+{
+	"buildFiles" : [ "D:/projects/android/skynet/Luban/lubanturbo/CMakeLists.txt" ],
+	"cFileExtensions" : [ "c" ],
+	"cleanCommands" : 
+	[
+		"D:\\dev\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\android\\skynet\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\release\\x86_64 --target clean"
+	],
+	"libraries" : 
+	{
+		"jpeg-Release-x86_64" : 
+		{
+			"abi" : "x86_64",
+			"artifactName" : "jpeg",
+			"buildType" : "release",
+			"output" : "D:/projects/android/skynet/Luban/lubanturbo/libs/x86_64/libjpeg-turbo.a",
+			"toolchain" : "3473974673"
+		},
+		"luban-Release-x86_64" : 
+		{
+			"abi" : "x86_64",
+			"artifactName" : "luban",
+			"buildCommand" : "D:\\dev\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\android\\skynet\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\release\\x86_64 --target luban",
+			"buildType" : "release",
+			"files" : 
+			[
+				
+				{
+					"flags" : "  --target=x86_64-none-linux-android --gcc-toolchain=D:/dev/sdk/ndk-bundle/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=D:/dev/sdk/ndk-bundle/sysroot -Dluban_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\include  -isystem D:/dev/sdk/ndk-bundle/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -O2 -DNDEBUG  -fPIC      -c ",
+					"src" : "D:/projects/android/skynet/Luban/lubanturbo/src/main/cpp/turbo.c",
+					"workingDirectory" : "D:/projects/android/skynet/Luban/lubanturbo/.externalNativeBuild/cmake/release/x86_64"
+				}
+			],
+			"output" : "D:/projects/android/skynet/Luban/lubanturbo/build/intermediates/cmake/release/obj/x86_64/libluban.so",
+			"toolchain" : "3473974673"
+		}
+	},
+	"toolchains" : 
+	{
+		"3473974673" : 
+		{
+			"cCompilerExecutable" : "D:/dev/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe",
+			"cppCompilerExecutable" : "D:/dev/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
+		}
+	}
+}
