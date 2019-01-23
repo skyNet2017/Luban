@@ -55,6 +55,7 @@ public class Luban implements Handler.Callback {
   }
 
   private static IBitmapToFile engine;
+
   public static void init(IBitmapToFile engine){
     Luban.engine = engine;
   }

@@ -76,7 +76,7 @@ class Engine {
     if (Checker.SINGLE.isJPG(srcImg.open())) {
       tagBitmap = rotatingImage(tagBitmap, Checker.SINGLE.getOrientation(srcImg.open()));
     }
-    bitmapToFile.compressToFile(tagBitmap,tagImg,focusAlpha,70);
+    bitmapToFile.compressToFile(tagBitmap,tagImg,focusAlpha,60);
     return tagImg;
   }
 
