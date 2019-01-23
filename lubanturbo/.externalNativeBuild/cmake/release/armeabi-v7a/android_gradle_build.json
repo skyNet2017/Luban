@@ -1,10 +1,10 @@
 
 {
-	"buildFiles" : [ "D:/projects/android/skynet/Luban/lubanturbo/CMakeLists.txt" ],
+	"buildFiles" : [ "D:/projects/Android/sky/Luban/lubanturbo/CMakeLists.txt" ],
 	"cFileExtensions" : [ "c" ],
 	"cleanCommands" : 
 	[
-		"D:\\dev\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\android\\skynet\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\release\\armeabi-v7a --target clean"
+		"D:\\devtool\\android\\android-sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\Android\\sky\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\release\\armeabi-v7a --target clean"
 	],
 	"libraries" : 
 	{
@@ -13,34 +13,34 @@
 			"abi" : "armeabi-v7a",
 			"artifactName" : "jpeg",
 			"buildType" : "release",
-			"output" : "D:/projects/android/skynet/Luban/lubanturbo/libs/armeabi-v7a/libjpeg-turbo.a",
-			"toolchain" : "3473974673"
+			"output" : "D:/projects/Android/sky/Luban/lubanturbo/libs/armeabi-v7a/libjpeg-turbo.a",
+			"toolchain" : "3570740793"
 		},
 		"luban-Release-armeabi-v7a" : 
 		{
 			"abi" : "armeabi-v7a",
 			"artifactName" : "luban",
-			"buildCommand" : "D:\\dev\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\android\\skynet\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\release\\armeabi-v7a --target luban",
+			"buildCommand" : "D:\\devtool\\android\\android-sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\Android\\sky\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\release\\armeabi-v7a --target luban",
 			"buildType" : "release",
 			"files" : 
 			[
 				
 				{
-					"flags" : "  --target=armv7-none-linux-androideabi --gcc-toolchain=D:/dev/sdk/ndk-bundle/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64 --sysroot=D:/dev/sdk/ndk-bundle/sysroot -Dluban_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\include  -isystem D:/dev/sdk/ndk-bundle/sysroot/usr/include/arm-linux-androideabi -D__ANDROID_API__=14 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -fno-integrated-as -mthumb -Wa,--noexecstack -Wformat -Werror=format-security  -Os -DNDEBUG  -fPIC      -c ",
-					"src" : "D:/projects/android/skynet/Luban/lubanturbo/src/main/cpp/turbo.c",
-					"workingDirectory" : "D:/projects/android/skynet/Luban/lubanturbo/.externalNativeBuild/cmake/release/armeabi-v7a"
+					"flags" : "  --target=armv7-none-linux-androideabi --gcc-toolchain=D:/devtool/android/android-sdk/ndk-bundle/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64 --sysroot=D:/devtool/android/android-sdk/ndk-bundle/sysroot -Dluban_EXPORTS -I..\\..\\..\\..\\src\\main\\cpp\\include  -isystem D:/devtool/android/android-sdk/ndk-bundle/sysroot/usr/include/arm-linux-androideabi -D__ANDROID_API__=14 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -fno-integrated-as -mthumb -Wa,--noexecstack -Wformat -Werror=format-security  -Os -DNDEBUG  -fPIC      -c ",
+					"src" : "D:/projects/Android/sky/Luban/lubanturbo/src/main/cpp/turbo.c",
+					"workingDirectory" : "D:/projects/Android/sky/Luban/lubanturbo/.externalNativeBuild/cmake/release/armeabi-v7a"
 				}
 			],
-			"output" : "D:/projects/android/skynet/Luban/lubanturbo/build/intermediates/cmake/release/obj/armeabi-v7a/libluban.so",
-			"toolchain" : "3473974673"
+			"output" : "D:/projects/Android/sky/Luban/lubanturbo/build/intermediates/cmake/release/obj/armeabi-v7a/libluban.so",
+			"toolchain" : "3570740793"
 		}
 	},
 	"toolchains" : 
 	{
-		"3473974673" : 
+		"3570740793" : 
 		{
-			"cCompilerExecutable" : "D:/dev/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe",
-			"cppCompilerExecutable" : "D:/dev/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
+			"cCompilerExecutable" : "D:/devtool/android/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe",
+			"cppCompilerExecutable" : "D:/devtool/android/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
 		}
 	}
 }

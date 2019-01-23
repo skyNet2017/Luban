@@ -17,7 +17,7 @@
 rule C_COMPILER__luban
   depfile = $DEP_FILE
   deps = gcc
-  command = D:\dev\sdk\ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=i686-none-linux-android --gcc-toolchain=D:/dev/sdk/ndk-bundle/toolchains/x86-4.9/prebuilt/windows-x86_64 --sysroot=D:/dev/sdk/ndk-bundle/sysroot $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out   -c $IN_ABS
+  command = D:\devtool\android\android-sdk\ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=i686-none-linux-android --gcc-toolchain=D:/devtool/android/android-sdk/ndk-bundle/toolchains/x86-4.9/prebuilt/windows-x86_64 --sysroot=D:/devtool/android/android-sdk/ndk-bundle/sysroot $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out   -c $IN_ABS
   description = Building C object $out
 
 
@@ -25,7 +25,7 @@ rule C_COMPILER__luban
 # Rule for linking C shared library.
 
 rule C_SHARED_LIBRARY_LINKER__luban
-  command = cmd.exe /C "$PRE_LINK && D:\dev\sdk\ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=i686-none-linux-android --gcc-toolchain=D:/dev/sdk/ndk-bundle/toolchains/x86-4.9/prebuilt/windows-x86_64 --sysroot=D:/dev/sdk/ndk-bundle/sysroot -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
+  command = cmd.exe /C "$PRE_LINK && D:\devtool\android\android-sdk\ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=i686-none-linux-android --gcc-toolchain=D:/devtool/android/android-sdk/ndk-bundle/toolchains/x86-4.9/prebuilt/windows-x86_64 --sysroot=D:/devtool/android/android-sdk/ndk-bundle/sysroot -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
   description = Linking C shared library $TARGET_FILE
   restat = $RESTAT
 
@@ -42,7 +42,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = D:\dev\sdk\cmake\3.6.4111459\bin\cmake.exe -HD:\projects\android\skynet\Luban\lubanturbo -BD:\projects\android\skynet\Luban\lubanturbo\.externalNativeBuild\cmake\release\x86
+  command = D:\devtool\android\android-sdk\cmake\3.6.4111459\bin\cmake.exe -HD:\projects\Android\sky\Luban\lubanturbo -BD:\projects\Android\sky\Luban\lubanturbo\.externalNativeBuild\cmake\release\x86
   description = Re-running CMake...
   generator = 1
 
@@ -51,7 +51,7 @@ rule RERUN_CMAKE
 # Rule for cleaning all built files.
 
 rule CLEAN
-  command = D:\dev\sdk\cmake\3.6.4111459\bin\ninja.exe -t clean
+  command = D:\devtool\android\android-sdk\cmake\3.6.4111459\bin\ninja.exe -t clean
   description = Cleaning all built files...
 
 
@@ -59,6 +59,6 @@ rule CLEAN
 # Rule for printing all primary targets available.
 
 rule HELP
-  command = D:\dev\sdk\cmake\3.6.4111459\bin\ninja.exe -t targets
+  command = D:\devtool\android\android-sdk\cmake\3.6.4111459\bin\ninja.exe -t targets
   description = All primary targets available:
 

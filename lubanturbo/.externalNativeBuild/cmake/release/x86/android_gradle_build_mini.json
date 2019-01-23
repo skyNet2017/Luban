@@ -1,21 +1,21 @@
 {
   "buildFiles": [
-    "D:\\projects\\android\\skynet\\Luban\\lubanturbo\\CMakeLists.txt"
+    "D:\\projects\\Android\\sky\\Luban\\lubanturbo\\CMakeLists.txt"
   ],
   "cleanCommands": [
-    "D:\\dev\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\android\\skynet\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\release\\x86 --target clean"
+    "D:\\devtool\\android\\android-sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\Android\\sky\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\release\\x86 --target clean"
   ],
   "libraries": {
     "luban-Release-x86": {
       "artifactName": "luban",
-      "buildCommand": "D:\\dev\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\android\\skynet\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\release\\x86 --target luban",
+      "buildCommand": "D:\\devtool\\android\\android-sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\Android\\sky\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\release\\x86 --target luban",
       "abi": "x86",
-      "output": "D:\\projects\\android\\skynet\\Luban\\lubanturbo\\build\\intermediates\\cmake\\release\\obj\\x86\\libluban.so"
+      "output": "D:\\projects\\Android\\sky\\Luban\\lubanturbo\\build\\intermediates\\cmake\\release\\obj\\x86\\libluban.so"
     },
     "jpeg-Release-x86": {
       "artifactName": "jpeg",
       "abi": "x86",
-      "output": "D:\\projects\\android\\skynet\\Luban\\lubanturbo\\libs\\x86\\libjpeg-turbo.a"
+      "output": "D:\\projects\\Android\\sky\\Luban\\lubanturbo\\libs\\x86\\libjpeg-turbo.a"
     }
   }
 }

@@ -1,21 +1,21 @@
 {
   "buildFiles": [
-    "D:\\projects\\android\\skynet\\Luban\\lubanturbo\\CMakeLists.txt"
+    "D:\\projects\\Android\\sky\\Luban\\lubanturbo\\CMakeLists.txt"
   ],
   "cleanCommands": [
-    "D:\\dev\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\android\\skynet\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\release\\armeabi-v7a --target clean"
+    "D:\\devtool\\android\\android-sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\Android\\sky\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\release\\armeabi-v7a --target clean"
   ],
   "libraries": {
     "luban-Release-armeabi-v7a": {
       "artifactName": "luban",
-      "buildCommand": "D:\\dev\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\android\\skynet\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\release\\armeabi-v7a --target luban",
+      "buildCommand": "D:\\devtool\\android\\android-sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\Android\\sky\\Luban\\lubanturbo\\.externalNativeBuild\\cmake\\release\\armeabi-v7a --target luban",
       "abi": "armeabi-v7a",
-      "output": "D:\\projects\\android\\skynet\\Luban\\lubanturbo\\build\\intermediates\\cmake\\release\\obj\\armeabi-v7a\\libluban.so"
+      "output": "D:\\projects\\Android\\sky\\Luban\\lubanturbo\\build\\intermediates\\cmake\\release\\obj\\armeabi-v7a\\libluban.so"
     },
     "jpeg-Release-armeabi-v7a": {
       "artifactName": "jpeg",
       "abi": "armeabi-v7a",
-      "output": "D:\\projects\\android\\skynet\\Luban\\lubanturbo\\libs\\armeabi-v7a\\libjpeg-turbo.a"
+      "output": "D:\\projects\\Android\\sky\\Luban\\lubanturbo\\libs\\armeabi-v7a\\libjpeg-turbo.a"
     }
   }
 }

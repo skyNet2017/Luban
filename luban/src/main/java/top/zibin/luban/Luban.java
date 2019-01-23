@@ -46,9 +46,17 @@ public class Luban implements Handler.Callback {
     this.mCompressionPredicate = builder.mCompressionPredicate;
     this.bitmapToFile = builder.bitmapToFile;
     if(bitmapToFile == null){
+      bitmapToFile = engine;
+    }
+    if(bitmapToFile == null){
       bitmapToFile = new DefaultBitmapToFile();
     }
     mHandler = new Handler(Looper.getMainLooper(), this);
+  }
+
+  private static IBitmapToFile engine;
+  public static void init(IBitmapToFile engine){
+    Luban.engine = engine;
   }
 
   public static Builder with(Context context) {
