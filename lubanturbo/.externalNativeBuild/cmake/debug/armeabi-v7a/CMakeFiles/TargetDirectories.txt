@@ -1,3 +1,0 @@
-D:/projects/Android/sky/Luban/lubanturbo/.externalNativeBuild/cmake/debug/armeabi-v7a/CMakeFiles/luban.dir
-D:/projects/Android/sky/Luban/lubanturbo/.externalNativeBuild/cmake/debug/armeabi-v7a/CMakeFiles/edit_cache.dir
-D:/projects/Android/sky/Luban/lubanturbo/.externalNativeBuild/cmake/debug/armeabi-v7a/CMakeFiles/rebuild_cache.dir

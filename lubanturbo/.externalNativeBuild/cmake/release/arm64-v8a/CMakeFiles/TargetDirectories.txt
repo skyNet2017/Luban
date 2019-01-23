@@ -1,3 +1,0 @@
-D:/projects/Android/sky/Luban/lubanturbo/.externalNativeBuild/cmake/release/arm64-v8a/CMakeFiles/luban.dir
-D:/projects/Android/sky/Luban/lubanturbo/.externalNativeBuild/cmake/release/arm64-v8a/CMakeFiles/edit_cache.dir
-D:/projects/Android/sky/Luban/lubanturbo/.externalNativeBuild/cmake/release/arm64-v8a/CMakeFiles/rebuild_cache.dir
