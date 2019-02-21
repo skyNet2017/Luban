@@ -2,11 +2,9 @@ package top.zibin.luban;
 
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import it.sephiroth.android.library.exif2.ExifInterface;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Arrays;
 
 enum Checker {
@@ -21,17 +19,27 @@ enum Checker {
   /**
    * Determine if it is JPG.
    *
-   * @param is image file input stream
+   * @param path image file input stream
    */
-  boolean isJPG(InputStream is) {
-    return isJPG(toByteArray(is));
+  boolean isJPG(String path) {
+    try {
+      return isJPG(toByteArray(new FileInputStream(path)));
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+      return false;
+    }
   }
 
   /**
    * Returns the degrees in clockwise. Values are 0, 90, 180, or 270.
    */
-  int getOrientation(InputStream is) {
-    return getOrientation(toByteArray(is));
+  int getOrientation(String path ) {
+    try {
+      return getOrientation(toByteArray(new FileInputStream(path)));
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+      return 0;
+    }
   }
 
   private boolean isJPG(byte[] data) {
@@ -142,19 +150,38 @@ enum Checker {
     try {
       BitmapFactory.Options options = new BitmapFactory.Options();
       options.inJustDecodeBounds = true;
-      BitmapFactory.decodeStream(input.open(), null, options);
+      BitmapFactory.decodeFile(input.getPath(),  options);
       return options.outMimeType.replace("image/", ".");
     } catch (Exception e) {
       return JPG;
     }
   }
 
-  boolean needCompress(int leastCompressSize, String path) {
-    if (leastCompressSize > 0) {
-      File source = new File(path);
-      return source.exists() && source.length() > (leastCompressSize << 10);
+  boolean needCompress(int leastCompressSize,int quality, String path) {
+    File source = new File(path);
+    if(!source.exists()){
+      return false;
     }
-    return true;
+    if(leastCompressSize <= 0){
+      return true;
+    }
+    if(source.length() < (leastCompressSize << 10)){
+      return false;
+    }
+    ExifInterface exif = new ExifInterface();
+    try {
+      exif.readExif( path, ExifInterface.Options.OPTION_ALL );
+      int quality0 = exif.getQualityGuess();
+      if(quality0 > 0 && quality0 <= quality + 5 && source.length()<= 500 * 1024){//通过质量的判断来避免二次压缩,同时判断文件大小.500k以上,即使质量小,也压.
+        return false;
+      }
+      return true;
+    } catch (Throwable e) {
+      e.printStackTrace();
+      return true;
+
+    }
+
   }
 
   private int pack(byte[] bytes, int offset, int length, boolean littleEndian) {

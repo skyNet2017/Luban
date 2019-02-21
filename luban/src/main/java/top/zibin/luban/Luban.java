@@ -25,6 +25,7 @@ public class Luban implements Handler.Callback {
   private static final int MSG_COMPRESS_SUCCESS = 0;
   private static final int MSG_COMPRESS_START = 1;
   private static final int MSG_COMPRESS_ERROR = 2;
+  public static final int TARGET_QUALITY = 65;
 
   private String mTargetDir;
   private boolean focusAlpha;
@@ -34,6 +35,11 @@ public class Luban implements Handler.Callback {
   private CompressionPredicate mCompressionPredicate;
   private List<InputStreamProvider> mStreamProviders;
   protected IBitmapToFile bitmapToFile;
+
+  /**
+   * 压缩的目标质量,65
+   */
+  private int quality = TARGET_QUALITY;
 
   private Handler mHandler;
 
@@ -45,6 +51,7 @@ public class Luban implements Handler.Callback {
     this.mLeastCompressSize = builder.mLeastCompressSize;
     this.mCompressionPredicate = builder.mCompressionPredicate;
     this.bitmapToFile = builder.bitmapToFile;
+    this.quality = builder.quality;
     if(bitmapToFile == null){
       bitmapToFile = engine;
     }
@@ -58,6 +65,37 @@ public class Luban implements Handler.Callback {
 
   public static void init(IBitmapToFile engine){
     Luban.engine = engine;
+  }
+
+  /**
+   * luban算法核心,计算一个合适的采样率
+   * @param srcWidth
+   * @param srcHeight
+   * @return
+   */
+  public static int computeInSampleSize(int srcWidth,int srcHeight) {
+    srcWidth = srcWidth % 2 == 1 ? srcWidth + 1 : srcWidth;
+    srcHeight = srcHeight % 2 == 1 ? srcHeight + 1 : srcHeight;
+
+    int longSide = Math.max(srcWidth, srcHeight);
+    int shortSide = Math.min(srcWidth, srcHeight);
+
+    float scale = ((float) shortSide / longSide);
+    if (scale <= 1 && scale > 0.5625) {
+      if (longSide < 1664) {
+        return 1;
+      } else if (longSide < 4990) {
+        return 2;
+      } else if (longSide > 4990 && longSide < 10240) {
+        return 4;
+      } else {
+        return longSide / 1280 == 0 ? 1 : longSide / 1280;
+      }
+    } else if (scale <= 0.5625 && scale > 0.5) {
+      return longSide / 1280 == 0 ? 1 : longSide / 1280;
+    } else {
+      return (int) Math.ceil(longSide / (1280.0 / scale));
+    }
   }
 
   public static Builder with(Context context) {
@@ -191,13 +229,13 @@ public class Luban implements Handler.Callback {
 
     if (mCompressionPredicate != null) {
       if (mCompressionPredicate.apply(path.getPath())
-          && Checker.SINGLE.needCompress(mLeastCompressSize, path.getPath())) {
+          && Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath())) {
         result = new Engine(path, outFile, focusAlpha,bitmapToFile).compress();
       } else {
         result = new File(path.getPath());
       }
     } else {
-      result = Checker.SINGLE.needCompress(mLeastCompressSize, path.getPath()) ?
+      result = Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath()) ?
           new Engine(path, outFile, focusAlpha,bitmapToFile).compress() :
           new File(path.getPath());
     }
@@ -233,6 +271,7 @@ public class Luban implements Handler.Callback {
     private CompressionPredicate mCompressionPredicate;
     private List<InputStreamProvider> mStreamProviders;
     private IBitmapToFile bitmapToFile;
+    private int quality  = TARGET_QUALITY;
 
     Builder(Context context) {
       this.context = context;
@@ -250,6 +289,11 @@ public class Luban implements Handler.Callback {
 
     public Builder saver(IBitmapToFile bitmapToFile) {
       this.bitmapToFile = bitmapToFile;
+      return this;
+    }
+
+    public Builder targetQuality(int quality) {
+      this.quality = quality;
       return this;
     }
 

@@ -15,7 +15,7 @@ public class DefaultBitmapToFile implements IBitmapToFile {
     @Override
     public void compressToFile(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality) throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        tagBitmap.compress(focusAlpha ? Bitmap.CompressFormat.PNG : Bitmap.CompressFormat.JPEG, quality, stream);
+        tagBitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);//focusAlpha ? Bitmap.CompressFormat.PNG :
         tagBitmap.recycle();
 
         FileOutputStream fos = new FileOutputStream(tagImg);

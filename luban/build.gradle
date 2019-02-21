@@ -27,4 +27,7 @@ android {
     }
 }
 
-dependencies {}
+dependencies {
+    api 'it.sephiroth.android.exif:library:1.0.1'
+
+}

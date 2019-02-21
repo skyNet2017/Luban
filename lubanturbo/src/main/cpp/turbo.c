@@ -15,7 +15,7 @@
 
 typedef uint8_t BYTE;
 
-int generateJpg(BYTE *data, int width, int height, int quality, const char *outfile) {
+int generateJpg(BYTE *data, int width, int height, int quality, const char *outfile,boolean isRgb565) {
     int component = 3;
 
     struct jpeg_compress_struct jcs;
@@ -36,7 +36,12 @@ int generateJpg(BYTE *data, int width, int height, int quality, const char *outf
     jcs.image_height = (JDIMENSION) height;
     jcs.arith_code = FALSE;
     jcs.input_components = component;
-    jcs.in_color_space = JCS_RGB;
+    if(isRgb565){
+        jcs.in_color_space = JCS_RGB_565;
+    } else{
+        jcs.in_color_space = JCS_RGB;
+    }
+
     jcs.optimize_coding = TRUE;
 
     jpeg_set_defaults(&jcs);
@@ -60,7 +65,7 @@ int generateJpg(BYTE *data, int width, int height, int quality, const char *outf
 
 JNIEXPORT jboolean JNICALL
 Java_com_hss01248_lubanturbo_TurboCompressor_nativeCompress(JNIEnv *env, jclass type,
-                                                          jobject bitmap, jint quality,
+                                                          jobject bitmap, jint quality,jboolean isRGB565,
                                                           jstring outfile) {
     AndroidBitmapInfo bitmapInfo;
     BYTE *pixelColor;
@@ -93,21 +98,29 @@ Java_com_hss01248_lubanturbo_TurboCompressor_nativeCompress(JNIEnv *env, jclass 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             color = *((int *) pixelColor);
-            r = (BYTE) ((color & 0x00FF0000) >> 16);
-            g = (BYTE) ((color & 0x0000FF00) >> 8);
-            b = (BYTE) (color & 0X000000FF);
+            if(isRGB565){
+                r = (BYTE) ((color & 0xF800) >> 11 << 3);
+                g = (BYTE) ((color & 0x07E0) >> 5 << 2);
+                b = (BYTE) (color & 0x001F << 3);
+                pixelColor += 2;
+            } else{
+                r = (BYTE) ((color & 0x00FF0000) >> 16) ;
+                g = (BYTE) ((color & 0x0000FF00) >> 8) ;
+                b = (BYTE) (color & 0X000000FF);
+                pixelColor += 4;
+            }
 
             *data = b;
             *(data + 1) = g;
             *(data + 2) = r;
             data += 3;
-            pixelColor += 4;
+
         }
     }
 
     AndroidBitmap_unlockPixels(env, bitmap);
 
-    int result = generateJpg(tempData, width, height, quality, filepath);
+    int result = generateJpg(tempData, width, height, quality, filepath,isRGB565);
     LOG_I("compress complete, result code is %d", result);
 
     free(tempData);

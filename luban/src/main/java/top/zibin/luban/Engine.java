@@ -28,55 +28,30 @@ class Engine {
     options.inJustDecodeBounds = true;
     options.inSampleSize = 1;
 
-    BitmapFactory.decodeStream(srcImg.open(), null, options);
+    BitmapFactory.decodeFile(srcImg.getPath(), options);
     this.srcWidth = options.outWidth;
     this.srcHeight = options.outHeight;
   }
 
-  private int computeSize() {
-    srcWidth = srcWidth % 2 == 1 ? srcWidth + 1 : srcWidth;
-    srcHeight = srcHeight % 2 == 1 ? srcHeight + 1 : srcHeight;
-
-    int longSide = Math.max(srcWidth, srcHeight);
-    int shortSide = Math.min(srcWidth, srcHeight);
-
-    float scale = ((float) shortSide / longSide);
-    if (scale <= 1 && scale > 0.5625) {
-      if (longSide < 1664) {
-        return 1;
-      } else if (longSide < 4990) {
-        return 2;
-      } else if (longSide > 4990 && longSide < 10240) {
-        return 4;
-      } else {
-        return longSide / 1280 == 0 ? 1 : longSide / 1280;
-      }
-    } else if (scale <= 0.5625 && scale > 0.5) {
-      return longSide / 1280 == 0 ? 1 : longSide / 1280;
-    } else {
-      return (int) Math.ceil(longSide / (1280.0 / scale));
-    }
-  }
-
   private Bitmap rotatingImage(Bitmap bitmap, int angle) {
     Matrix matrix = new Matrix();
-
     matrix.postRotate(angle);
-
     return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
   }
 
   File compress() throws IOException {
     BitmapFactory.Options options = new BitmapFactory.Options();
-    options.inSampleSize = computeSize();
+    options.inSampleSize = Luban.computeInSampleSize(srcWidth,srcHeight);
+    options.inPreferredConfig = Bitmap.Config.RGB_565;//避免oom,解压这一步就会变绿
+    Bitmap tagBitmap = BitmapFactory.decodeFile(srcImg.getPath(), options);
 
-    Bitmap tagBitmap = BitmapFactory.decodeStream(srcImg.open(), null, options);
-
-
-    if (Checker.SINGLE.isJPG(srcImg.open())) {
-      tagBitmap = rotatingImage(tagBitmap, Checker.SINGLE.getOrientation(srcImg.open()));
+    if (Checker.SINGLE.isJPG(srcImg.getPath())) {
+      int oritation = Checker.SINGLE.getOrientation(srcImg.getPath());
+      if(oritation != 0){
+        tagBitmap = rotatingImage(tagBitmap, oritation);
+      }
     }
-    bitmapToFile.compressToFile(tagBitmap,tagImg,focusAlpha,60);
+    bitmapToFile.compressToFile(tagBitmap,tagImg,focusAlpha,Luban.TARGET_QUALITY);
     return tagImg;
   }
 

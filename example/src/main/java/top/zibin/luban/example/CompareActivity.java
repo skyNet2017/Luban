@@ -11,7 +11,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import com.hss01248.lubanturbo.TurboCompressor;
+import id.zelory.compressor.Compressor;
+import it.sephiroth.android.library.exif2.ExifInterface;
 import org.devio.takephoto.wrap.TakeOnePhotoListener;
 import org.devio.takephoto.wrap.TakePhotoUtil;
 import top.zibin.luban.Luban;
@@ -89,7 +90,22 @@ public class CompareActivity extends AppCompatActivity {
         long  size = new File(path).length();
         String sizeStr = formatFileSize(size);
 
-        return srcWidth + "x"+srcHeight+","+sizeStr+","+path;
+        int quality = guessQuality(path);
+
+        return srcWidth + "x"+srcHeight+","+sizeStr+","+path+",Q:"+quality;
+    }
+
+    private int guessQuality(String path) {
+        ExifInterface exif = new ExifInterface();
+        try {
+            exif.readExif( path, ExifInterface.Options.OPTION_ALL );
+            return   exif.getQualityGuess();
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return 0;
+
+        }
     }
 
     private void compress(String path) {
@@ -103,14 +119,15 @@ public class CompareActivity extends AppCompatActivity {
             tvLuban.setText("luban:"+getImgInfo(compress));
 
 
-            List<File> files2 =  Luban.with(this)
+            /*List<File> files2 =  Luban.with(this)
                     .load(path)
                    // .ignoreBy(40)
-                    .saver(TurboCompressor.getTurboCompressor())
-                    .get();
-            String compress2 = files2.get(0).getAbsolutePath();
+                    //.saver(TurboCompressor.getTurboCompressor())//rgb565会导致crash
+                    .get();*/
+            File file  = new Compressor(this).setQuality(Luban.TARGET_QUALITY).compressToFile(new File(path));
+            String compress2 = file.getAbsolutePath();
             ivLubanTurbo.setImage(ImageSource.uri(Uri.fromFile(new File(compress2))));
-            tvLubanTurbo.setText("luban-turbo:"+getImgInfo(compress2));
+            tvLubanTurbo.setText("Compressor:"+getImgInfo(compress2));
 
         } catch (Exception e) {
             e.printStackTrace();
