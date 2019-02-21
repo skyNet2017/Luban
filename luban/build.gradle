@@ -29,5 +29,6 @@ android {
 
 dependencies {
     api 'it.sephiroth.android.exif:library:1.0.1'
+    implementation "com.android.support:exifinterface:27.1.1"
 
 }

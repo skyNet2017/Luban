@@ -1,10 +1,14 @@
 package top.zibin.luban;
 
 import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 import android.util.Log;
 import it.sephiroth.android.library.exif2.ExifInterface;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 enum Checker {
@@ -22,24 +26,63 @@ enum Checker {
    * @param path image file input stream
    */
   boolean isJPG(String path) {
-    try {
+    /*try {
       return isJPG(toByteArray(new FileInputStream(path)));
     } catch (FileNotFoundException e) {
       e.printStackTrace();
       return false;
+    }*/
+    if(TextUtils.isEmpty(path)){
+      return true;
     }
+    if(path.endsWith(".png") || path.endsWith(".PNG")){
+      return false;
+    }
+    return true;
   }
 
   /**
    * Returns the degrees in clockwise. Values are 0, 90, 180, or 270.
    */
   int getOrientation(String path ) {
-    try {
+    /*try {
       return getOrientation(toByteArray(new FileInputStream(path)));
     } catch (FileNotFoundException e) {
       e.printStackTrace();
       return 0;
+    }*/
+   return getBitmapDegree(path);
+  }
+
+  public static int getBitmapDegree(String path) {
+    if (TextUtils.isEmpty(path)) {
+      return 0;
     }
+
+    int degree = 0;
+    try {
+      // 从指定路径下读取图片，并获取其EXIF信息
+      android.media.ExifInterface exifInterface = new android.media.ExifInterface(path);
+      // 获取图片的旋转信息
+      int orientation = exifInterface.getAttributeInt(android.media.ExifInterface.TAG_ORIENTATION,
+              android.media.ExifInterface.ORIENTATION_NORMAL);
+      switch (orientation) {
+        case android.media.ExifInterface.ORIENTATION_ROTATE_90:
+          degree = 90;
+          break;
+        case android.media.ExifInterface.ORIENTATION_ROTATE_180:
+          degree = 180;
+          break;
+        case android.media.ExifInterface.ORIENTATION_ROTATE_270:
+          degree = 270;
+          break;
+        default:
+          break;
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return degree;
   }
 
   private boolean isJPG(byte[] data) {

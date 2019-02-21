@@ -45,4 +45,5 @@ dependencies {
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
 //    implementation 'top.zibin:Luban:1.1.5'
     implementation 'id.zelory:compressor:2.1.0'
+    implementation "com.android.support:exifinterface:27.1.1"
 }

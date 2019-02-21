@@ -3,6 +3,7 @@ package top.zibin.luban.example;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -44,9 +45,23 @@ public class CompareActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
        // Luban.init(TurboCompressor.getTurboCompressor());
+        stickMode();
         setContentView(R.layout.activity_comprare);
         initView();
         initEvent();
+    }
+
+    private void stickMode() {
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectAll()//开启所有的detectXX系列方法
+                //.penaltyDialog()//弹出违规提示框
+                .penaltyLog()//在Logcat中打印违规日志
+                .build());
+
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .build());
     }
 
     private void initEvent() {
