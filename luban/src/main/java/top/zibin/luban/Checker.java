@@ -62,24 +62,24 @@ enum Checker {
     int degree = 0;
     try {
       // 从指定路径下读取图片，并获取其EXIF信息
-      android.media.ExifInterface exifInterface = new android.media.ExifInterface(path);
+      android.support.media.ExifInterface exifInterface = new android.support.media.ExifInterface(path);
       // 获取图片的旋转信息
-      int orientation = exifInterface.getAttributeInt(android.media.ExifInterface.TAG_ORIENTATION,
-              android.media.ExifInterface.ORIENTATION_NORMAL);
+      int orientation = exifInterface.getAttributeInt(android.support.media.ExifInterface.TAG_ORIENTATION,
+              android.support.media.ExifInterface.ORIENTATION_NORMAL);
       switch (orientation) {
-        case android.media.ExifInterface.ORIENTATION_ROTATE_90:
+        case android.support.media.ExifInterface.ORIENTATION_ROTATE_90:
           degree = 90;
           break;
-        case android.media.ExifInterface.ORIENTATION_ROTATE_180:
+        case android.support.media.ExifInterface.ORIENTATION_ROTATE_180:
           degree = 180;
           break;
-        case android.media.ExifInterface.ORIENTATION_ROTATE_270:
+        case android.support.media.ExifInterface.ORIENTATION_ROTATE_270:
           degree = 270;
           break;
         default:
           break;
       }
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
     return degree;
