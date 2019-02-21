@@ -202,7 +202,8 @@ public class Luban implements Handler.Callback {
    * start compress and return the file
    */
   private File get(InputStreamProvider input, Context context) throws IOException {
-    return new Engine(input, getImageCacheFile(context, Checker.SINGLE.extSuffix(input)), focusAlpha,bitmapToFile).compress();
+    //return new Engine(input, getImageCacheFile(context, Checker.SINGLE.extSuffix(input)), focusAlpha,bitmapToFile).compress();
+    return compress(context,input);
   }
 
   private List<File> get(Context context) throws IOException {
