@@ -12,11 +12,15 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
+import java.lang.reflect.Field;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,7 +57,7 @@ public class LubanUtil {
             if (file0.length() <= MIN_IMAGE_COMPRESS_SIZE) {
                 return file0;
             }
-            i(" original filesize:" + formatFileSize(file0.length()));
+            logFile("compressByLuban begin",imgPath);
             long start = System.currentTimeMillis();
             File file = Luban.with(app)
                     .ignoreBy(150)
@@ -61,7 +65,7 @@ public class LubanUtil {
                     .setFocusAlpha(isPng)
                     .get(imgPath);
             i("compressByLuban cost " + (System.currentTimeMillis() - start) + " ms");
-            i(" compressed filesize:" + formatFileSize(file.length()));
+            logFile("compressByLuban end",file.getAbsolutePath());
             if (file.exists()) {
                 return file;
             }
@@ -86,7 +90,7 @@ public class LubanUtil {
             callback.onSuccess(file);
             return;
         }
-        i(" original filesize:" + formatFileSize(file.length()));
+        logFile("compressByLubanAsync begin",imgPath);
         Luban.with(app)
                 .setTargetDir(config.getSaveDir().getAbsolutePath())
                 .setFocusAlpha(isPng)
@@ -100,7 +104,7 @@ public class LubanUtil {
 
                     @Override
                     public void onSuccess(File file) {
-                        i(" compressed filesize:" + formatFileSize(file.length()));
+                        logFile("compressByLubanAsync success",imgPath);
                         callback.onSuccess(file);
                     }
 
@@ -112,6 +116,7 @@ public class LubanUtil {
                                 config.reportException(e);
                                 File file1 =  compressBySubsamling2(imgPath);
                                 callback.onSuccess(file1);
+                                return;
                             }
                             callback.onSuccess(file);
                         } else {
@@ -125,7 +130,7 @@ public class LubanUtil {
 
     private static void i(String s) {
         if(enableLog && !TextUtils.isEmpty(s)){
-            Log.i("luban",s);
+            Log.i("lubanutil",s);
         }
     }
 
@@ -159,13 +164,23 @@ public class LubanUtil {
 
 
     private static File compressBySubsamling2(String imgPath) {
+        logFile("compressBySubsamling2 begin",imgPath);
         Bitmap bitmap = decodeRGB565BitmapFromUri(Uri.fromFile(new File(imgPath)), MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
         String fileName = new File(config.getSaveDir(),System.currentTimeMillis() + "-compressed2.jpg").getAbsolutePath();
+
         boolean success = saveBitmapToFile(fileName, bitmap);
+        logFile("compressBySubsamling2 result",fileName);
         if (success) {
             return new File(fileName);
         }
         return new File(imgPath);
+    }
+
+   static void  logFile(String desc,String file){
+        if(enableLog){
+            i(desc+" :  size:"+ formatFileSize(new File(file).length()) +", "+readExif(file));
+        }
+
     }
 
     /**
@@ -383,5 +398,164 @@ public class LubanUtil {
             }
         }
         return degree;
+    }
+
+     static String readExif(String path) {
+        int degree = 0;
+        try {
+            ExifInterface exifInterface = new ExifInterface(path);
+            int orientation = exifInterface.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    degree = 90;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    degree = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    degree = 270;
+                    break;
+            }
+
+            List<String> tags = getTags();
+            it.sephiroth.android.library.exif2.ExifInterface exifInterface1 = new it.sephiroth.android.library.exif2.ExifInterface();
+            exifInterface1.readExif(path, it.sephiroth.android.library.exif2.ExifInterface.Options.OPTION_ALL);
+            int quality = exifInterface1.getQualityGuess();
+            int[] wh = getImageWidthHeight(path);
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("file info:");
+            sb.append("\n")
+                    .append(path)
+                    .append("\nwh")
+                    .append(wh[0])
+                    .append("x")
+                    .append(wh[1])
+                    .append("\nsize:")
+                    .append(formatFileSize(new File(path).length()))
+                    .append("\ntype:")
+                    .append(getRealType(new File(path)));
+            sb.append("\njpeg quality guess:").append(quality);
+            sb.append("\norientation degree:").append(degree);
+            for (String tag: tags) {
+                String attr = exifInterface.getAttribute(tag);
+                if(!TextUtils.isEmpty(attr)){
+                    sb.append("\n").append(tag)
+                            .append(":")
+                            .append(attr);
+                }
+            }
+            return sb.toString();
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+
+    }
+
+    private static String getRealType(File file) {
+        if(!file.exists()){
+            return "";
+        }
+        if(file.getName().endsWith(".gif")){
+            return "gif";
+        }
+        FileInputStream is = null;
+        try {
+            is = new FileInputStream(file);
+            byte[] b = new byte[4];
+            try {
+                is.read(b, 0, b.length);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "";
+            }
+            String type = bytesToHexString(b).toUpperCase();
+            if (type.contains("FFD8FF")) {
+                return "jpg";
+            } else if (type.contains("89504E47")) {
+                return "png";
+            } else if (type.contains("47494638")) {
+                return "gif";
+            } else if (type.contains("49492A00")) {
+                return "tif";
+            } else if (type.contains("424D")) {
+                return "bmp";
+            }
+            return type;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        } finally {
+            try {
+                if(is != null){
+                    is.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+
+    private static String bytesToHexString(byte[] src) {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (src == null || src.length <= 0) {
+            return null;
+        }
+        for (int i = 0; i < src.length; i++) {
+            int v = src[i] & 0xFF;
+            String hv = Integer.toHexString(v);
+            if (hv.length() < 2) {
+                stringBuilder.append(0);
+            }
+            stringBuilder.append(hv);
+        }
+        return stringBuilder.toString();
+    }
+
+    private static int[] getImageWidthHeight(String path) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+
+        /**
+         * 最关键在此，把options.inJustDecodeBounds = true;
+         * 这里再decodeFile()，返回的bitmap为空，但此时调用options.outHeight时，已经包含了图片的高了
+         */
+        options.inJustDecodeBounds = true;
+        try {
+            Bitmap bitmap = BitmapFactory.decodeFile(path, options); // 此时返回的bitmap为null
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        /**
+         *options.outHeight为原始图片的高
+         */
+        return new int[]{options.outWidth, options.outHeight};
+    }
+
+    static List<String> tags;
+
+    private static List<String> getTags(){
+        if(tags != null && !tags.isEmpty()){
+            return tags;
+        }
+        tags = new ArrayList<>();
+        Class clazz = android.media.ExifInterface.class;
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            if (field.getName().startsWith("TAG_")){
+                try {
+                    field.setAccessible(true);
+                    tags.add(field.get(null).toString());
+                }catch (Throwable e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return tags;
     }
 }

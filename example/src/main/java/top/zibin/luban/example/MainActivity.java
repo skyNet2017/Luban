@@ -26,6 +26,7 @@ import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import top.zibin.luban.CompressionPredicate;
 import top.zibin.luban.Luban;
+import top.zibin.luban.LubanUtil;
 import top.zibin.luban.OnCompressListener;
 import top.zibin.luban.OnRenameListener;
 
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    LubanUtil.init(getApplication(),true,null);
     setContentView(R.layout.activity_main);
 
 
@@ -81,16 +83,29 @@ public class MainActivity extends AppCompatActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
     originPhotos.clear();
     mImageList.clear();
-
+    assetsToFiles();
     switch (item.getItemId()) {
       case R.id.sync_files:
-        withRx(assetsToFiles());
+       // withRx(assetsToFiles());
+        File file = LubanUtil.compressByLuban(originPhotos.get(0).getAbsolutePath(),false);
+
         break;
       case R.id.sync_uris:
         withRx(assetsToUri());
         break;
       case R.id.async_files:
-        withLs(assetsToFiles());
+       // withLs(assetsToFiles());
+        LubanUtil.compressByLubanAsync(originPhotos.get(0).getAbsolutePath(), false, new LubanUtil.CompressCallback() {
+          @Override
+          public void onSuccess(File file) {
+
+          }
+
+          @Override
+          public void onError(Throwable e) {
+
+          }
+        });
         break;
       case R.id.async_uris:
         withLs(assetsToUri());
