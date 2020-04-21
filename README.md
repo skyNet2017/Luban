@@ -12,15 +12,35 @@
 
 
 
-LubanUtil
+# 升级后:
+
+## 使用
+
+```
+com.github.skyNet2017:Luban:1.2.5
+```
+
+Androidx版本:
+
+```
+com.github.skyNet2017:Luban:2.0.0
+```
+
+### LubanUtil
 
 ![snapshot](snapshot.jpg)
 
 
 
+### 有哪些优化
 
 
 
+![优化](优化.jpg)
+
+
+
+# 原库:
 
 
 
