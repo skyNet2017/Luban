@@ -400,7 +400,7 @@ public class LubanUtil {
         return degree;
     }
 
-     static String readExif(String path) {
+   public   static String readExif(String path) {
         int degree = 0;
         try {
             ExifInterface exifInterface = new ExifInterface(path);
