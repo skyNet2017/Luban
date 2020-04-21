@@ -1,7 +1,6 @@
 # Luban
 
-[![Build Status](https://travis-ci.org/Curzibn/Luban.svg?branch=master)](https://travis-ci.org/Curzibn/Luban)
-[ ![Download](https://api.bintray.com/packages/curzibn/maven/Luban/images/download.svg) ](https://bintray.com/curzibn/maven/Luban/_latestVersion)
+
 
 <div align="right">
 <a href="Translation/README-EN.md">:book: English Documentation</a>
@@ -10,6 +9,22 @@
 `Luban`（鲁班） —— `Android`图片压缩工具，仿微信朋友圈压缩策略。
 
 `Luban-turbo` —— 鲁班项目的`turbo`版本，[查看`trubo`分支](https://github.com/Curzibn/Luban/tree/turbo)。
+
+
+
+LubanUtil
+
+![snapshot](snapshot.jpg)
+
+
+
+
+
+
+
+
+
+
 
 # 项目描述
 
