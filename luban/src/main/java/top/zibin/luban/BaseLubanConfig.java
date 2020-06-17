@@ -21,4 +21,9 @@ public class BaseLubanConfig implements ILubanConfig {
     public File getSaveDir() {
         return LubanUtil.app.getExternalFilesDir(Environment.DIRECTORY_DCIM);
     }
+
+    @Override
+    public void trace(long timeCost, int percent, long sizeAfterCompressInK) {
+        LubanUtil.i("filesize after compress:"+sizeAfterCompressInK +" , percent:"+percent);
+    }
 }

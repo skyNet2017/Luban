@@ -49,21 +49,36 @@ public class LubanUtil {
 
 
     public static File compressByLuban(String imgPath, boolean isPng) {
+        File file0 = new File(imgPath);
+        logFile("compressByLuban begin",imgPath);
+        long start = System.currentTimeMillis();
+
+        File file = compressByLubanInternal(imgPath, isPng);
+
+        long duration = System.currentTimeMillis() - start;
+        logFile("compressByLuban end",file.getAbsolutePath());
+        i("compressByLuban cost " + duration + " ms");
+
+        int percent = 0;
+        if(file0.exists() && file.exists() && file0.length() > 0){
+            percent = (int) (file.length() * 100 / file0.length());
+        }
+        config.trace(duration,percent,file.length()/1024);
+        return file0;
+    }
+
+     static File compressByLubanInternal(String imgPath, boolean isPng) {
         File file0 = null;
         try {
             file0 = new File(imgPath);
             if (file0.length() <= MIN_IMAGE_COMPRESS_SIZE) {
                 return file0;
             }
-            logFile("compressByLuban begin",imgPath);
-            long start = System.currentTimeMillis();
             File file = Luban.with(app)
                     .ignoreBy(150)
                     .setTargetDir(config.getSaveDir().getAbsolutePath())
                     .setFocusAlpha(isPng)
                     .get(imgPath);
-            i("compressByLuban cost " + (System.currentTimeMillis() - start) + " ms");
-            logFile("compressByLuban end",file.getAbsolutePath());
             if (file.exists()) {
                 return file;
             }
@@ -78,6 +93,36 @@ public class LubanUtil {
     }
 
     public static void compressByLubanAsync(final String imgPath, boolean isPng,
+                                            final CompressCallback callback) {
+        logFile("compressByLuban begin",imgPath);
+        long start = System.currentTimeMillis();
+        File file0 = new File(imgPath);
+        compressByLubanAsyncInternal(imgPath, isPng, new CompressCallback() {
+            @Override
+            public void onSuccess(File file) {
+                long duration = System.currentTimeMillis() - start;
+                logFile("compressByLuban end",file.getAbsolutePath());
+                i("compressByLuban cost " + duration + " ms");
+                callback.onSuccess(file);
+                int percent = 0;
+                if(file0.exists() && file.exists() && file0.length() > 0){
+                    percent = (int) (file.length() * 100 / file0.length());
+                }
+                config.trace(duration,percent,file.length()/1024);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                long duration = System.currentTimeMillis() - start;
+                logFile("compressByLuban end with fail",imgPath);
+                i("compressByLuban cost " + duration + " ms");
+                callback.onError(e);
+                config.trace(duration,0,0);
+            }
+        });
+    }
+
+     static void compressByLubanAsyncInternal(final String imgPath, boolean isPng,
                                             final CompressCallback callback) {
         final File file = new File(imgPath);
         if (!file.exists()) {
@@ -126,7 +171,7 @@ public class LubanUtil {
 
     }
 
-    private static void i(String s) {
+     static void i(String s) {
         if(enableLog && !TextUtils.isEmpty(s)){
             Log.i("lubanutil",s);
         }
