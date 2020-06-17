@@ -40,6 +40,14 @@ com.github.skyNet2017:Luban:2.0.0
 
 
 
+## 增加了一些trace,外部实现:
+
+```
+public void trace(long timeCost, int percent, long sizeAfterCompressInK, long width, long height) {
+    LubanUtil.i("time cost(ms): "+timeCost+", filesize after compress:"+sizeAfterCompressInK +" , 压缩比:"+percent +"%,  wh:"+width+"-"+height);
+}
+```
+
 # 原库:
 
 

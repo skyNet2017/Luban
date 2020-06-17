@@ -65,7 +65,8 @@ public class LubanUtil {
         if(file0.exists() && file.exists() && file0.length() > 0){
             percent = (int) (file.length() * 100 / file0.length());
         }
-        config.trace(duration,percent,file.length()/1024);
+        int[] wh = getImageWidthHeight(file.getAbsolutePath());
+        config.trace(duration,percent,file.length()/1024,wh[0],wh[1]);
         return file0;
     }
 
@@ -110,7 +111,8 @@ public class LubanUtil {
                 if(file0.exists() && file.exists() && file0.length() > 0){
                     percent = (int) (file.length() * 100 / file0.length());
                 }
-                config.trace(duration,percent,file.length()/1024);
+                int[] wh = getImageWidthHeight(file.getAbsolutePath());
+                config.trace(duration,percent,file.length()/1024,wh[0],wh[1]);
             }
 
             @Override
@@ -119,7 +121,7 @@ public class LubanUtil {
                 logFile("compressByLuban end with fail",imgPath);
                 i("compressByLuban cost " + duration + " ms");
                 callback.onError(e);
-                config.trace(duration,0,0);
+                config.trace(duration,0,0,0,0);
             }
         });
     }
@@ -135,7 +137,6 @@ public class LubanUtil {
             callback.onSuccess(file);
             return;
         }
-        logFile("compressByLubanAsync begin",imgPath);
         Luban.with(app)
                 .setTargetDir(config.getSaveDir().getAbsolutePath())
                 .setFocusAlpha(isPng)
@@ -149,7 +150,6 @@ public class LubanUtil {
 
                     @Override
                     public void onSuccess(File file) {
-                        logFile("compressByLubanAsync success",imgPath);
                         callback.onSuccess(file);
                     }
 

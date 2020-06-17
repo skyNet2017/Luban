@@ -18,5 +18,5 @@ public interface ILubanConfig {
      * @param timeCost
      * @param percent
      */
-    void trace(long timeCost,int percent,long sizeAfterCompressInK);
+    void trace(long timeCost,int percent,long sizeAfterCompressInK,long width,long height);
 }
