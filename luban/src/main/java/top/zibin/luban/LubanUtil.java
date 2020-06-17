@@ -6,8 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
-import androidx.annotation.Nullable;
-import androidx.exifinterface.media.ExifInterface;
+import android.support.annotation.Nullable;
+import android.support.media.ExifInterface;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -16,10 +16,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * by hss
