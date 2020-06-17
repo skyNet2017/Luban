@@ -1,12 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         applicationId "top.zibin.luban.example"
         minSdkVersion 14
-        targetSdkVersion 29
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
     }
@@ -28,9 +29,9 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
 
-    implementation 'com.google.android.material:material:1.1.0'
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
 
     implementation 'com.nineoldandroids:library:2.4.0'
 
@@ -44,5 +45,5 @@ dependencies {
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
 //    implementation 'top.zibin:Luban:1.1.5'
     implementation 'id.zelory:compressor:2.1.0'
-    implementation 'androidx.exifinterface:exifinterface:1.2.0'
+    implementation "com.android.support:exifinterface:27.1.1"
 }

@@ -5,16 +5,17 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 29
+        targetSdkVersion 27
         versionCode 1
 
     }
@@ -32,6 +33,6 @@ android {
 
 dependencies {
     api 'it.sephiroth.android.exif:library:1.0.1'
-    implementation 'androidx.exifinterface:exifinterface:1.2.0'
+    implementation "com.android.support:exifinterface:27.1.1"
 
 }
