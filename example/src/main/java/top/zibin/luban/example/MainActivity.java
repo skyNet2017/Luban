@@ -25,12 +25,15 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import top.zibin.luban.CompressionPredicate;
+import top.zibin.luban.ExifUtil;
 import top.zibin.luban.Luban;
 import top.zibin.luban.LubanUtil;
 import top.zibin.luban.OnCompressListener;
 import top.zibin.luban.OnRenameListener;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    LubanUtil.init(getApplication(),true,null);
     setContentView(R.layout.activity_main);
 
 
@@ -88,7 +90,11 @@ public class MainActivity extends AppCompatActivity {
       case R.id.sync_files:
        // withRx(assetsToFiles());
         File file = LubanUtil.compressByLuban(originPhotos.get(0).getAbsolutePath(),false);
-
+        try {
+          ExifUtil.readExif(new FileInputStream(file));
+        } catch (FileNotFoundException e) {
+          e.printStackTrace();
+        }
         break;
       case R.id.sync_uris:
         withRx(assetsToUri());
@@ -98,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         LubanUtil.compressByLubanAsync(originPhotos.get(0).getAbsolutePath(), false, new LubanUtil.CompressCallback() {
           @Override
           public void onSuccess(File file) {
+
 
           }
 

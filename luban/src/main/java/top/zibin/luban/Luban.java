@@ -27,19 +27,21 @@ public class Luban implements Handler.Callback {
   private static final int MSG_COMPRESS_ERROR = 2;
   public static final int TARGET_QUALITY = 65;
 
-  private String mTargetDir;
-  private boolean focusAlpha;
-  private int mLeastCompressSize;
-  private OnRenameListener mRenameListener;
-  private OnCompressListener mCompressListener;
-  private CompressionPredicate mCompressionPredicate;
-  private List<InputStreamProvider> mStreamProviders;
-  protected IBitmapToFile bitmapToFile;
+   String mTargetDir;
+   boolean focusAlpha;
+   int mLeastCompressSize;
+   OnRenameListener mRenameListener;
+   OnCompressListener mCompressListener;
+   CompressionPredicate mCompressionPredicate;
+   List<InputStreamProvider> mStreamProviders;
+   IBitmapToFile bitmapToFile;
 
   /**
    * 压缩的目标质量,65
    */
-  private int quality = TARGET_QUALITY;
+   int quality = TARGET_QUALITY;
+   boolean useRGB888 = false;
+   boolean keepExif;
 
   private Handler mHandler;
 
@@ -58,6 +60,8 @@ public class Luban implements Handler.Callback {
     if(bitmapToFile == null){
       bitmapToFile = new DefaultBitmapToFile();
     }
+    this.useRGB888 = builder.useRGB888;
+    this.keepExif = builder.keepExif;
     mHandler = new Handler(Looper.getMainLooper(), this);
   }
 
@@ -231,13 +235,13 @@ public class Luban implements Handler.Callback {
     if (mCompressionPredicate != null) {
       if (mCompressionPredicate.apply(path.getPath())
           && Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath())) {
-        result = new Engine(path, outFile, focusAlpha,bitmapToFile).compress();
+        result = new Engine(path, outFile, this).compress();
       } else {
         result = new File(path.getPath());
       }
     } else {
       result = Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath()) ?
-          new Engine(path, outFile, focusAlpha,bitmapToFile).compress() :
+          new Engine(path, outFile, this).compress() :
           new File(path.getPath());
     }
 
@@ -273,6 +277,8 @@ public class Luban implements Handler.Callback {
     private List<InputStreamProvider> mStreamProviders;
     private IBitmapToFile bitmapToFile;
     private int quality  = TARGET_QUALITY;
+    private boolean useRGB888 = LubanUtil.config.useARGB888();
+    private boolean keepExif = LubanUtil.config.keepExif();
 
     Builder(Context context) {
       this.context = context;
@@ -290,6 +296,16 @@ public class Luban implements Handler.Callback {
 
     public Builder saver(IBitmapToFile bitmapToFile) {
       this.bitmapToFile = bitmapToFile;
+      return this;
+    }
+
+    public Builder useRGB888(boolean useRGB888) {
+      this.useRGB888 = useRGB888;
+      return this;
+    }
+
+    public Builder keepExif(boolean keepExif) {
+      this.keepExif = keepExif;
       return this;
     }
 

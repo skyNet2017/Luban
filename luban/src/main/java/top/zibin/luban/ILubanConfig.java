@@ -1,5 +1,8 @@
 package top.zibin.luban;
 
+import android.os.Environment;
+import android.util.Log;
+
 import java.io.File;
 
 /**
@@ -9,14 +12,31 @@ import java.io.File;
  */
 public interface ILubanConfig {
 
-    void reportException(Throwable throwable);
+   default void reportException(Throwable throwable){
+       if(LubanUtil.enableLog){
+           throwable.printStackTrace();
+       }
+   }
 
-    File getSaveDir();
+  default   File getSaveDir(){
+       return LubanUtil.app.getExternalFilesDir(Environment.DIRECTORY_DCIM);
+  }
 
     /**
      * 耗时和压缩百分比,上报到firebase的trace
      * @param timeCost
      * @param percent
      */
-    void trace(long timeCost,int percent,long sizeAfterCompressInK,long width,long height);
+   default void trace(long timeCost,int percent,long sizeAfterCompressInK,long width,long height){
+       Log.d("traceLubann","timeCost:"+timeCost+",compressed percent:"+percent+
+               ",sizeAfterCompressInK:"+sizeAfterCompressInK+",w-h:"+width+"x"+height);
+   }
+
+    default  boolean useARGB888(){
+        return false;
+    }
+
+    default  boolean keepExif(){
+        return false;
+    }
 }

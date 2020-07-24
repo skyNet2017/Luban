@@ -37,7 +37,7 @@ public class LubanUtil {
     private static final long MIN_IMAGE_COMPRESS_SIZE = 150 * 1024;//150k以下,不压缩
     
     static Application app;
-    private static ILubanConfig config;
+     static ILubanConfig config;
      static boolean enableLog;
 
     public static void init(Application app,boolean enableLog,@Nullable  ILubanConfig config){
