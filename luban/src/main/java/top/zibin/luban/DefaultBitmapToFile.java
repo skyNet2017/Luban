@@ -13,9 +13,9 @@ import java.io.IOException;
 
 public class DefaultBitmapToFile implements IBitmapToFile {
     @Override
-    public void compressToFile(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality) throws IOException {
+    public void compressToFile(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality, Luban luban) throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        tagBitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);//focusAlpha ? Bitmap.CompressFormat.PNG :
+        tagBitmap.compress(luban.targetFormat, quality, stream);//focusAlpha ? Bitmap.CompressFormat.PNG :
         tagBitmap.recycle();
 
         FileOutputStream fos = new FileOutputStream(tagImg);

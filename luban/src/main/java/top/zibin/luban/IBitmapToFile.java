@@ -11,5 +11,5 @@ import java.io.IOException;
 
 public interface IBitmapToFile {
 
-    void compressToFile(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality) throws IOException;
+    void compressToFile(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality, Luban luban) throws IOException;
 }

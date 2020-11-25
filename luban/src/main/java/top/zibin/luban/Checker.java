@@ -35,7 +35,7 @@ enum Checker {
     if(TextUtils.isEmpty(path)){
       return true;
     }
-    if(path.endsWith(".png") || path.endsWith(".PNG")){
+    if(path.endsWith(".png") || path.endsWith(".PNG") || path.endsWith(".webp")|| path.endsWith(".gif")){
       return false;
     }
     return true;
