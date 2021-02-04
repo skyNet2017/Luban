@@ -17,6 +17,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+
+
+
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -55,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     LubanUtil.init(getApplication(),true,null);
+   // TakePhotoUtil3.init(this,true,true);
     setContentView(R.layout.activity_main);
 
 
@@ -266,5 +272,40 @@ public class MainActivity extends AppCompatActivity {
     if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
       ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0x0001);
     }
+  }
+
+  private void compress(String path) {
+    Luban.with(getApplicationContext())
+            .load(path)
+            .keepExif(true)
+            .setCompressListener(new OnCompressListener() {
+              @Override
+              public void onStart() {
+
+              }
+
+              @Override
+              public void onSuccess(File file) {
+
+              }
+
+              @Override
+              public void onError(Throwable e) {
+
+              }
+            }).launch();
+
+  }
+
+  public void select(View view) {
+   /* TakePhotoUtil3.pickImage(this, new TakePhotoListener() {
+      @Override
+      public void onSuccess(String path) {
+        compress(path);
+
+      }
+
+
+    });*/
   }
 }

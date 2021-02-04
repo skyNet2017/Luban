@@ -3,13 +3,12 @@ package top.zibin.luban;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.ExifInterface;
 
 import java.io.File;
 import java.io.IOException;
 
 import javax.xml.transform.sax.TemplatesHandler;
-
-import it.sephiroth.android.library.exif2.ExifInterface;
 
 /**
  * Responsible for starting compress and managing active and cached resources.
@@ -48,42 +47,97 @@ class Engine {
   }
 
   File compress() throws IOException {
-    //先预判
-    //先使用双线性采样,oom了再使用单线性采样,还oom就强制压缩到1080p
 
-
-    BitmapFactory.Options options = new BitmapFactory.Options();
-    options.inSampleSize = Luban.computeInSampleSize(srcWidth,srcHeight);//单线性采样
-    options.inPreferredConfig = Bitmap.Config.ARGB_8888;//避免oom,解压这一步就会变绿
-    Bitmap tagBitmap = BitmapFactory.decodeFile(srcImg.getPath(), options);
-
-
-
-
-
-
-
-
-    ExifInterface exifInterface = null;
-    if (Checker.SINGLE.isJPG(srcImg.getPath())) {
-      int oritation = Checker.SINGLE.getOrientation(srcImg.getPath());
-      if(oritation != 0){
-        tagBitmap = rotatingImage(tagBitmap, oritation);
+    try {
+      //先使用双线性采样,oom了再使用单线性采样,还oom就强制压缩到720p, 但最后还是可能抛出oom
+      Bitmap tagBitmap = compressBitmap();
+      it.sephiroth.android.library.exif2.ExifInterface exifInterface = null;
+      //webp也有exif
+      if (Checker.SINGLE.isJPG(srcImg.getPath())) {
+        int oritation = Checker.SINGLE.getOrientation(srcImg.getPath());
+        if(oritation != 0){
+          tagBitmap = rotatingImage(tagBitmap, oritation);
+        }
+        if(luban.keepExif){
+          //是否能读webp的exif?
+          //还是用原生的api吧,兼容性好点?
+          //原生在Android10后 读经纬度还有定位权限要求,否则崩溃.
+          try {
+            exifInterface = new it.sephiroth.android.library.exif2.ExifInterface();
+            exifInterface.readExif(srcImg.getPath(), it.sephiroth.android.library.exif2.ExifInterface.Options.OPTION_ALL);
+          }catch (Throwable throwable){
+            throwable.printStackTrace();
+          }
+        }
       }
-      if(luban.keepExif){
+      bitmapToFile.compressToFile(tagBitmap,tagImg,focusAlpha,quality,luban);
+      if(exifInterface!= null){
+        exifInterface.writeExif(tagImg.getAbsolutePath());
+      }
+    }catch (Throwable throwable){
+      if(LubanUtil.config != null){
+        LubanUtil.config.reportException(throwable);
+      }
+
+      //还TMD不行,老子不压了,返回原图
+      tagImg = new File(srcImg.getPath());
+    }
+    return tagImg;
+  }
+
+
+
+  //先使用双线性采样,oom了再使用单线性采样,还oom就强制压缩到720p
+  private Bitmap compressBitmap() {
+
+    //下限1080p
+    int scale = Luban.computeInSampleSize(srcWidth,srcHeight);
+    Bitmap tagBitmap2 = null;
+
+    //计算个毛线,直接申请内存,oom了就降级:
+    //压缩插值算法效果见: https://cloud.tencent.com/developer/article/1006352
+    try {
+      //使用双线性插值
+      Bitmap tagBitmap = BitmapFactory.decodeFile(srcImg.getPath());
+      tagBitmap2 = Bitmap.createScaledBitmap(tagBitmap,srcWidth/scale,srcHeight/scale,true);
+      //tagBitmap.recycle();
+    }catch (OutOfMemoryError throwable){
+      throwable.printStackTrace();
+
+      try {
+        //使用单线性插值
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = scale;
+        //优先使用888. 因为RGB565在低版本手机上会变绿
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        tagBitmap2 = BitmapFactory.decodeFile(srcImg.getPath(), options);
+      }catch (OutOfMemoryError throwable1){
+        throwable1.printStackTrace();
+
         try {
-          exifInterface = new ExifInterface();
-          exifInterface.readExif(srcImg.getPath(),ExifInterface.Options.OPTION_ALL);
-        }catch (Throwable throwable){
-          throwable.printStackTrace();
+          //使用RGB565将就一下:
+          BitmapFactory.Options options = new BitmapFactory.Options();
+          options.inSampleSize = scale;
+          options.inPreferredConfig = Bitmap.Config.RGB_565;
+          tagBitmap2 = BitmapFactory.decodeFile(srcImg.getPath(), options);
+        }catch (OutOfMemoryError error){
+          error.printStackTrace();
+          //try {
+            //还TMD不行,只能压一把狠的:强制压缩到720p:
+            int w = Math.min(srcHeight,srcWidth);
+            scale =  w/720;
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = scale;
+            options.inPreferredConfig = Bitmap.Config.RGB_565;
+            tagBitmap2 = BitmapFactory.decodeFile(srcImg.getPath(), options);
+          //}catch (OutOfMemoryError error2){
+          //  error2.printStackTrace();
+            //还TMD不行,老子不压了,返回原图: 在外面处理:
+         // }
         }
       }
     }
-    bitmapToFile.compressToFile(tagBitmap,tagImg,focusAlpha,quality,luban);
-    if(exifInterface!= null){
-      exifInterface.writeExif(tagImg.getAbsolutePath());
-    }
-    return tagImg;
+    return tagBitmap2;
   }
 
 

@@ -1,5 +1,6 @@
 package top.zibin.luban.example;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,7 +17,10 @@ import id.zelory.compressor.Compressor;
 import it.sephiroth.android.library.exif2.ExifInterface;
 import org.devio.takephoto.wrap.TakeOnePhotoListener;
 import org.devio.takephoto.wrap.TakePhotoUtil;
+
+import top.zibin.luban.ILubanConfig;
 import top.zibin.luban.Luban;
+import top.zibin.luban.LubanUtil;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -44,8 +48,24 @@ public class CompareActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       // Luban.init(TurboCompressor.getTurboCompressor());
-        stickMode();
+        LubanUtil.init(getApplication(), true, new ILubanConfig() {
+            @Override
+            public void reportException(Throwable throwable) {
+                throwable.printStackTrace();
+
+            }
+
+            @Override
+            public File getSaveDir() {
+                return CompareActivity.this.getFilesDir();
+            }
+
+            @Override
+            public void trace(long timeCost, int percent, long sizeAfterCompressInK, long width, long height) {
+
+            }
+        });
+        //stickMode();
         setContentView(R.layout.activity_comprare);
         initView();
         initEvent();
@@ -127,6 +147,8 @@ public class CompareActivity extends AppCompatActivity {
         try {
           List<File> files =  Luban.with(this)
                     .load(path)
+                  .targetQuality(85)
+                  .targetFormat(Bitmap.CompressFormat.JPEG)
                  // .ignoreBy(40)
                     .get();
           String compress = files.get(0).getAbsolutePath();

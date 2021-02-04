@@ -45,4 +45,6 @@ dependencies {
 //    implementation 'top.zibin:Luban:1.1.5'
     implementation 'id.zelory:compressor:2.1.0'
     implementation 'androidx.exifinterface:exifinterface:1.2.0'
+    //implementation 'com.github.skyNet2017.PictureSelector:api:2.6.1'
+
 }

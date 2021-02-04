@@ -74,7 +74,7 @@ public class Luban implements Handler.Callback {
   }
 
   /**
-   * luban算法核心,计算一个合适的采样率
+   * luban算法核心,计算一个合适的采样率  下限为1080p(长边1208)
    * @param srcWidth
    * @param srcHeight
    * @return
@@ -117,6 +117,13 @@ public class Luban implements Handler.Callback {
     if (TextUtils.isEmpty(mTargetDir)) {
       mTargetDir = getImageCacheDir(context).getAbsolutePath();
     }
+    if(targetFormat == Bitmap.CompressFormat.JPEG){
+      suffix = ".jpg";
+    }else  if(targetFormat == Bitmap.CompressFormat.WEBP){
+      suffix = ".webp";
+    }else if(targetFormat == Bitmap.CompressFormat.PNG){
+      suffix = ".png";
+    }
 
     String cacheBuilder = mTargetDir + "/" +
         System.currentTimeMillis() +
@@ -130,7 +137,13 @@ public class Luban implements Handler.Callback {
     if (TextUtils.isEmpty(mTargetDir)) {
       mTargetDir = getImageCacheDir(context).getAbsolutePath();
     }
-
+    if(targetFormat == Bitmap.CompressFormat.JPEG){
+      filename = filename.substring(0,filename.lastIndexOf("."))+ ".jpg";
+    }else  if(targetFormat == Bitmap.CompressFormat.WEBP){
+      filename = filename.substring(0,filename.lastIndexOf("."))+ ".webp";
+    }else if(targetFormat == Bitmap.CompressFormat.PNG){
+      filename = filename.substring(0,filename.lastIndexOf("."))+ ".png";
+    }
     String cacheBuilder = mTargetDir + "/" + filename;
 
     return new File(cacheBuilder);
@@ -227,8 +240,8 @@ public class Luban implements Handler.Callback {
   private File compress(Context context, InputStreamProvider path) throws IOException {
     File result;
 
-    File outFile = getImageCacheFile(context, Checker.SINGLE.extSuffix(path));
-
+    File outFile = getImageCustomFile(context, new File(path.getPath()).getName());
+    //getImageCacheFile(context, Checker.SINGLE.extSuffix(path));
     if (mRenameListener != null) {
       String filename = mRenameListener.rename(path.getPath());
       outFile = getImageCustomFile(context, filename);
@@ -304,7 +317,7 @@ public class Luban implements Handler.Callback {
       this.quality = quality;
       return this;
     }
-    public Builder targetQuality(Bitmap.CompressFormat targetFormat) {
+    public Builder targetFormat(Bitmap.CompressFormat targetFormat) {
       this.targetFormat = targetFormat;
       return this;
     }
