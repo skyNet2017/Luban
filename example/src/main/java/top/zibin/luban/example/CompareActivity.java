@@ -147,13 +147,13 @@ public class CompareActivity extends AppCompatActivity {
         try {
           List<File> files =  Luban.with(this)
                     .load(path)
-                  .targetQuality(85)
+                  .targetQuality(65)
                   .targetFormat(Bitmap.CompressFormat.JPEG)
                  // .ignoreBy(40)
                     .get();
           String compress = files.get(0).getAbsolutePath();
             ivLuban.setImage(ImageSource.uri(Uri.fromFile(new File(compress))));
-            tvLuban.setText("luban:"+getImgInfo(compress));
+            tvLuban.setText("luban-jpg65:"+getImgInfo(compress));
 
 
             /*List<File> files2 =  Luban.with(this)
@@ -161,10 +161,15 @@ public class CompareActivity extends AppCompatActivity {
                    // .ignoreBy(40)
                     //.saver(TurboCompressor.getTurboCompressor())//rgb565会导致crash
                     .get();*/
-            File file  = new Compressor(this).setQuality(Luban.TARGET_QUALITY).compressToFile(new File(path));
-            String compress2 = file.getAbsolutePath();
+            List<File> files2 =  Luban.with(this)
+                    .load(path)
+                    .targetQuality(65)
+                    .targetFormat(Bitmap.CompressFormat.WEBP)
+                    // .ignoreBy(40)
+                    .get();
+            String compress2 = files2.get(0).getAbsolutePath();
             ivLubanTurbo.setImage(ImageSource.uri(Uri.fromFile(new File(compress2))));
-            tvLubanTurbo.setText("Compressor:"+getImgInfo(compress2));
+            tvLubanTurbo.setText("luban-webp-65:"+getImgInfo(compress2));
 
         } catch (Exception e) {
             e.printStackTrace();
