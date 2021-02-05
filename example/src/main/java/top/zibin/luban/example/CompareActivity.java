@@ -13,16 +13,20 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import id.zelory.compressor.Compressor;
+import com.hss01248.media.metadata.ExifUtil;
+
 import it.sephiroth.android.library.exif2.ExifInterface;
 import org.devio.takephoto.wrap.TakeOnePhotoListener;
 import org.devio.takephoto.wrap.TakePhotoUtil;
+
+
 
 import top.zibin.luban.ILubanConfig;
 import top.zibin.luban.Luban;
 import top.zibin.luban.LubanUtil;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -145,24 +149,31 @@ public class CompareActivity extends AppCompatActivity {
 
     private void compress(String path) {
         try {
+            //ExifUtil.readExif(new FileInputStream(path));
           List<File> files =  Luban.with(this)
                     .load(path)
-                  .targetQuality(65)
+                  .targetQuality(85)
+                  .ignoreBy(1)
+                  //.keepExif(true)
                   .targetFormat(Bitmap.CompressFormat.JPEG)
                  // .ignoreBy(40)
                     .get();
           String compress = files.get(0).getAbsolutePath();
             ivLuban.setImage(ImageSource.uri(Uri.fromFile(new File(compress))));
-            tvLuban.setText("luban-jpg65:"+getImgInfo(compress));
+            tvLuban.setText("luban-jpg85:"+getImgInfo(compress));
+            ExifUtil.readExif(new FileInputStream(files.get(0)));
+            //Log.w("meta",MetaDataUtil.getAllInfo(compress).toString());
 
+            //{ImageWidth=1560, ImageLength=2080, Orientation=0, LightSource=0}
 
             /*List<File> files2 =  Luban.with(this)
                     .load(path)
                    // .ignoreBy(40)
                     //.saver(TurboCompressor.getTurboCompressor())//rgb565会导致crash
                     .get();*/
-            List<File> files2 =  Luban.with(this)
+            /*List<File> files2 =  Luban.with(this)
                     .load(path)
+                    .ignoreBy(5)
                     .targetQuality(65)
                     .targetFormat(Bitmap.CompressFormat.WEBP)
                     // .ignoreBy(40)
@@ -170,6 +181,9 @@ public class CompareActivity extends AppCompatActivity {
             String compress2 = files2.get(0).getAbsolutePath();
             ivLubanTurbo.setImage(ImageSource.uri(Uri.fromFile(new File(compress2))));
             tvLubanTurbo.setText("luban-webp-65:"+getImgInfo(compress2));
+
+            Log.w("exif",ExifUtil.readExif(new FileInputStream(files2.get(0))).toString());*/
+           // Log.w("meta",MetaDataUtil.getAllInfo(compress2).toString());
 
         } catch (Exception e) {
             e.printStackTrace();

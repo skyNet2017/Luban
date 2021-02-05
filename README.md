@@ -23,10 +23,14 @@ com.github.skyNet2017:Luban:1.2.5
 Androidx版本:
 
 ```
-com.github.skyNet2017:Luban:2.0.0
+com.github.skyNet2017:Luban:2.0.2
 ```
 
 ### LubanUtil
+
+> 默认质量85. 不片面追求文件大小.
+>
+> 如果是聊天场景,可以自己设成65,最大可能节省大小.
 
 ![snapshot](snapshot.jpg)
 
@@ -38,7 +42,134 @@ com.github.skyNet2017:Luban:2.0.0
 
 ![优化](优化.jpg)
 
+# 重复压缩问题
 
+质量判断-仅适用于jpg文件,采用量化表计算整张图片像素. 
+
+
+
+# exif处理
+
+```
+默认: boolean keepExif = true;
+```
+
+使用自己写的库ExifUtil 读写exif:
+
+比it.sephiroth.android.exif:library:1.0.1通用性好. 底层基于androidx.exifinterface:exifinterface.
+
+```
+api 'com.github.hss01248:metadata:1.0.1'
+```
+
+>  压缩前读exif,压缩后写exif:
+
+![image-20210205200135616](https://gitee.com/hss012489/picbed/raw/master/picgo/1612526495684-image-20210205200135616.jpg)
+
+
+
+# 尺寸压缩时的损耗
+
+> 尽量使用双线性插值代替默认的单线性插值
+
+压缩插值算法效果对比见: https://cloud.tencent.com/developer/article/1006352
+
+# OOM问题解决:
+
+> 采用多次降级机制:
+
+实现代码:
+
+```java
+//先使用双线性采样,oom了再使用单线性采样,还oom就强制压缩到720p
+  private Bitmap compressBitmap() {
+    //Luban.computeInSampleSize下限1080p
+    int scale = Luban.computeInSampleSize(srcWidth,srcHeight);
+    //获取原图的类型
+    //String mimeType = options.outMimeType;
+    //如果是png,看是否有透明的alpha通道,如果没有,给你压成jpg. 如果有,用白色填充.
+    
+    Bitmap tagBitmap2 = null;
+
+    //计算个毛线,直接申请内存,oom了就降级:
+    //压缩插值算法效果见: https://cloud.tencent.com/developer/article/1006352
+    try {
+      //使用双线性插值
+      Bitmap tagBitmap = BitmapFactory.decodeFile(srcImg.getPath());
+      tagBitmap2 = Bitmap.createScaledBitmap(tagBitmap,srcWidth/scale,srcHeight/scale,true);
+    }catch (OutOfMemoryError throwable){
+      throwable.printStackTrace();
+      try {
+        //使用单线性插值
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = scale;
+        //优先使用888. 因为RGB565在低版本手机上会变绿
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        tagBitmap2 = BitmapFactory.decodeFile(srcImg.getPath(), options);
+      }catch (OutOfMemoryError throwable1){
+        throwable1.printStackTrace();
+
+        //用RGB_565, 如果原图是png,且有透明的alpha通道,那么会变黑. 如何处理?
+        try {
+          //使用RGB565将就一下:
+          BitmapFactory.Options options = new BitmapFactory.Options();
+          options.inSampleSize = scale;
+          options.inPreferredConfig = Bitmap.Config.RGB_565;
+          tagBitmap2 = BitmapFactory.decodeFile(srcImg.getPath(), options);
+          isPngWithTransAlpha = false;
+        }catch (OutOfMemoryError error){
+          error.printStackTrace();
+          //try {
+            //还TMD不行,只能压一把狠的:强制压缩到720p:
+            int w = Math.min(srcHeight,srcWidth);
+            scale =  w/720;
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = scale;
+            options.inPreferredConfig = Bitmap.Config.RGB_565;
+            tagBitmap2 = BitmapFactory.decodeFile(srcImg.getPath(), options);
+            isPngWithTransAlpha = false;
+          //}catch (OutOfMemoryError error2){
+          //  error2.printStackTrace();
+            //还TMD不行,老子不压了,返回原图: 在外面处理:
+         // }
+        }
+      }
+    }
+    return tagBitmap2;
+  }
+```
+
+
+
+# png转jpg变黑问题解决:
+
+> alpha通道值代表不透明度,而非透明度.  完全透明就是0.
+
+### png透明度判断:
+
+![image-20210205171849446](https://gitee.com/hss012489/picbed/raw/master/picgo/1612516729504-image-20210205171849446.jpg)
+
+### 判断算法:
+
+算法性能:
+
+* 限定长边100时,最大耗时400ms
+* 限定50时,最大耗时82ms
+* 最快: 四个角判断是否为0,   1ms即可.
+
+![image-20210205191609366](https://gitee.com/hss012489/picbed/raw/master/picgo/1612523769414-image-20210205191609366.jpg)
+
+
+
+
+
+### 转换算法:
+
+![image-20210205191701186](https://gitee.com/hss012489/picbed/raw/master/picgo/1612523821231-image-20210205191701186.jpg)
+
+### 压缩效果:
+
+![image-20210205191329511](https://gitee.com/hss012489/picbed/raw/master/picgo/1612523609570-image-20210205191329511.jpg)
 
 ## 增加了一些trace,外部实现:
 
@@ -48,11 +179,23 @@ public void trace(long timeCost, int percent, long sizeAfterCompressInK, long wi
 }
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 原库:
-
-
-
-
 
 # 项目描述
 
@@ -143,6 +286,10 @@ Flowable.just(photos)
     .observeOn(AndroidSchedulers.mainThread())
     .subscribe();
 ```
+
+
+
+
 
 ### RELEASE NOTE
 

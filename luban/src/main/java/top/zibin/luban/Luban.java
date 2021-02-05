@@ -293,7 +293,7 @@ public class Luban implements Handler.Callback {
     private IBitmapToFile bitmapToFile;
     private int quality  = TARGET_QUALITY;
     private Bitmap.CompressFormat targetFormat = Bitmap.CompressFormat.JPEG;
-    boolean keepExif;
+    boolean keepExif = true;
     Builder(Context context) {
       this.context = context;
       this.mStreamProviders = new ArrayList<>();

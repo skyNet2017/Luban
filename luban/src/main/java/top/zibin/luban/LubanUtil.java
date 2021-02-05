@@ -37,6 +37,7 @@ public class LubanUtil {
     static Application app;
      static ILubanConfig config;
      static boolean enableLog;
+     static final int TARGET_QUALITY = 85;//默认质量85.
 
     public static void init(Application app,boolean enableLog,@Nullable  ILubanConfig config){
         LubanUtil.app = app;
@@ -77,6 +78,7 @@ public class LubanUtil {
             }
             File file = Luban.with(app)
                     .ignoreBy(150)
+                    .targetQuality(TARGET_QUALITY)
                     .setTargetDir(config.getSaveDir().getAbsolutePath())
                     .setFocusAlpha(isPng)
                     .get(imgPath);
@@ -138,6 +140,7 @@ public class LubanUtil {
         Luban.with(app)
                 .setTargetDir(config.getSaveDir().getAbsolutePath())
                 .setFocusAlpha(isPng)
+                .targetQuality(TARGET_QUALITY)
                 .ignoreBy(150)
                 .load(file)
                 .setCompressListener(new OnCompressListener() {

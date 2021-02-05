@@ -5,7 +5,7 @@ android {
 
     defaultConfig {
         applicationId "top.zibin.luban.example"
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -45,6 +45,7 @@ dependencies {
 //    implementation 'top.zibin:Luban:1.1.5'
     implementation 'id.zelory:compressor:2.1.0'
     implementation 'androidx.exifinterface:exifinterface:1.2.0'
+    implementation 'com.github.hss01248:metadata:1.0.1'
     //implementation 'com.github.skyNet2017.PictureSelector:api:2.6.1'
 
 }

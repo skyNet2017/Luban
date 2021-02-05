@@ -33,5 +33,6 @@ android {
 dependencies {
     api 'it.sephiroth.android.exif:library:1.0.1'
     implementation 'androidx.exifinterface:exifinterface:1.2.0'
+    api 'com.github.hss01248:metadata:1.0.1'
 
 }
