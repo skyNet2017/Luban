@@ -66,7 +66,7 @@ public class LubanUtil {
         }
         int[] wh = getImageWidthHeight(file.getAbsolutePath());
         config.trace(duration,percent,file.length()/1024,wh[0],wh[1]);
-        return file0;
+        return file;
     }
 
      static File compressByLubanInternal(String imgPath, boolean isPng) {
@@ -177,6 +177,12 @@ public class LubanUtil {
      static void i(String s) {
         if(enableLog && !TextUtils.isEmpty(s)){
             Log.i("lubanutil",s);
+        }
+    }
+
+    static void d(String s) {
+        if(enableLog && !TextUtils.isEmpty(s)){
+            Log.d("lubanutil",s);
         }
     }
 
@@ -564,7 +570,7 @@ public class LubanUtil {
         return stringBuilder.toString();
     }
 
-    private static int[] getImageWidthHeight(String path) {
+     static int[] getImageWidthHeight(String path) {
         BitmapFactory.Options options = new BitmapFactory.Options();
 
         /**

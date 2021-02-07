@@ -24,7 +24,7 @@ public class BaseLubanConfig implements ILubanConfig {
 
     @Override
     public void trace(long timeCost, int percent, long sizeAfterCompressInK, long width, long height) {
-        LubanUtil.i("time cost(ms): "+timeCost+", filesize after compress:"+sizeAfterCompressInK +" , 压缩比:"+percent +"%,  wh:"+width+"-"+height);
+        LubanUtil.i("time cost : "+timeCost+"ms, filesize after compress:"+sizeAfterCompressInK +"kB , 压缩比:"+percent +"%,  wh:"+width+"x"+height);
     }
 
 }

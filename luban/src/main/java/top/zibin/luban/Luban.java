@@ -40,7 +40,7 @@ public class Luban implements Handler.Callback {
    IBitmapToFile bitmapToFile;
 
    Bitmap.CompressFormat targetFormat;
-
+   int maxShortDimension;
   /**
    * 压缩的目标质量,65
    */
@@ -67,6 +67,7 @@ public class Luban implements Handler.Callback {
     this.targetFormat = builder.targetFormat;
     this.keepExif = builder.keepExif;
     this.tintBgColorIfHasTransInAlpha = builder.tintBgColorIfHasTransInAlpha;
+    this.maxShortDimension = builder.maxShortDimension;
   }
 
   private static IBitmapToFile engine;
@@ -249,6 +250,10 @@ public class Luban implements Handler.Callback {
       outFile = getImageCustomFile(context, filename);
     }
 
+    //加上日志:
+    LubanUtil.logFile("compressByLuban begin",path.getPath());
+    long start = System.currentTimeMillis();
+
     if (mCompressionPredicate != null) {
       if (mCompressionPredicate.apply(path.getPath())
           && Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath())) {
@@ -261,6 +266,20 @@ public class Luban implements Handler.Callback {
           new Engine(path, outFile, focusAlpha,bitmapToFile,quality,this).compress() :
           new File(path.getPath());
     }
+
+    //加上日志:
+
+    long duration = System.currentTimeMillis() - start;
+    LubanUtil.logFile("compressByLuban end",result.getAbsolutePath());
+    LubanUtil.i("compressByLuban cost " + duration + " ms");
+
+    int percent = 0;
+    File file0 = new File(path.getPath());
+    if(file0.exists() && result.exists() && file0.length() > 0){
+      percent = (int) ((file0.length() - result.length()) * 100 / file0.length());
+    }
+    int[] wh = LubanUtil.getImageWidthHeight(result.getAbsolutePath());
+    LubanUtil.config.trace(duration,percent,result.length()/1024,wh[0],wh[1]);
 
     return result;
   }
@@ -297,6 +316,7 @@ public class Luban implements Handler.Callback {
     private Bitmap.CompressFormat targetFormat = Bitmap.CompressFormat.JPEG;
     boolean keepExif = true;
     int tintBgColorIfHasTransInAlpha = 0x00ffffff;
+    private int maxShortDimension;
     Builder(Context context) {
       this.context = context;
       this.mStreamProviders = new ArrayList<>();
@@ -313,6 +333,17 @@ public class Luban implements Handler.Callback {
 
     public Builder saver(IBitmapToFile bitmapToFile) {
       this.bitmapToFile = bitmapToFile;
+      return this;
+    }
+
+    /**
+     * 最短边的边长上限
+     * 比如可以限制上线为720或者1080
+     * @param maxShortDimension
+     * @return
+     */
+    public Builder maxShortDimension(int maxShortDimension) {
+      this.maxShortDimension = maxShortDimension;
       return this;
     }
 

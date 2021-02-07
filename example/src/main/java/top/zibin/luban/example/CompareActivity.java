@@ -52,23 +52,7 @@ public class CompareActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LubanUtil.init(getApplication(), true, new ILubanConfig() {
-            @Override
-            public void reportException(Throwable throwable) {
-                throwable.printStackTrace();
-
-            }
-
-            @Override
-            public File getSaveDir() {
-                return CompareActivity.this.getFilesDir();
-            }
-
-            @Override
-            public void trace(long timeCost, int percent, long sizeAfterCompressInK, long width, long height) {
-
-            }
-        });
+        LubanUtil.init(getApplication(), true, null);
         //stickMode();
         setContentView(R.layout.activity_comprare);
         initView();
@@ -162,7 +146,7 @@ public class CompareActivity extends AppCompatActivity {
           String compress = files.get(0).getAbsolutePath();
             ivLuban.setImage(ImageSource.uri(Uri.fromFile(new File(compress))));
             tvLuban.setText("luban-jpg85:"+getImgInfo(compress));
-            ExifUtil.readExif(new FileInputStream(files.get(0)));
+            //ExifUtil.readExif(new FileInputStream(files.get(0)));
             //Log.w("meta",MetaDataUtil.getAllInfo(compress).toString());
 
             //{ImageWidth=1560, ImageLength=2080, Orientation=0, LightSource=0}

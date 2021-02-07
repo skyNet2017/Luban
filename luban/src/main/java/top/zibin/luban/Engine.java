@@ -44,12 +44,11 @@ class Engine {
     BitmapFactory.Options options = new BitmapFactory.Options();
     options.inJustDecodeBounds = true;
     options.inSampleSize = 1;
-    Log.d("luban","original path:"+srcImg.getPath());
     BitmapFactory.decodeFile(srcImg.getPath(), options);
     this.srcWidth = options.outWidth;
     this.srcHeight = options.outHeight;
     this.originalMimeType = options.outMimeType;
-    Log.d("luban","类型:"+originalMimeType);
+    LubanUtil.d("类型:"+originalMimeType);
 
   }
 
@@ -68,7 +67,7 @@ class Engine {
       Bitmap tagBitmap = compressBitmap();
       //it.sephiroth.android.library.exif2.ExifInterface exifInterface = null;
       Map<String,String> exifs = null;
-
+      int  rotation = 0;
       try {
         //是否能读webp的exif?
         //还是用原生的api吧,兼容性好点?
@@ -79,31 +78,49 @@ class Engine {
       }catch (Throwable throwable){
         throwable.printStackTrace();
       }
+      boolean rotateSuccess = false;
+
       //webp也有exif
       if (exifs != null ) {
         String ori = exifs.get("Orientation");
         if(TextUtils.isEmpty(ori)){
           try {
            int o =  Integer.parseInt(ori);
-            tagBitmap = rotatingImage(tagBitmap, o);
+           if(o !=0){
+             rotation = o;
+             //可能oom. 万一oom了,图片还是留着,但是exif丽保留原旋转角度.
+             tagBitmap = rotatingImage(tagBitmap, o);
+             rotateSuccess = true;
+           }
           }catch (Throwable throwable){
             throwable.printStackTrace();
           }
         }
       }
       bitmapToFile.compressToFile(tagBitmap,tagImg,focusAlpha,quality,luban,this);
-      /*if(exifInterface!= null){
-        exifInterface.writeExif(tagImg.getAbsolutePath());
-      }*/
-      if(exifs != null && luban.keepExif){
-        ExifUtil.resetImageWHToMap(exifs,tagImg.getAbsolutePath(),true);
-        ExifUtil.writeExif(exifs,tagImg.getAbsolutePath());
+
+      if(exifs != null ){
+        if(luban.keepExif){
+          //最后一个参数代表是否要复写Orientation参数为0. 旋转成功就复写,没有成功就维持原先的
+          ExifUtil.resetImageWHToMap(exifs,tagImg.getAbsolutePath(),rotateSuccess);
+          ExifUtil.writeExif(exifs,tagImg.getAbsolutePath());
+        }else {
+          if(!rotateSuccess && rotation != 0){
+            //rotation回写:
+            try {
+              ExifInterface exif = new ExifInterface(tagImg);
+              exif.setAttribute("Orientation",rotation+"");
+              exif.saveAttributes();
+            }catch (Throwable throwable){
+              throwable.printStackTrace();
+            }
+          }
+        }
       }
     }catch (Throwable throwable){
       if(LubanUtil.config != null){
         LubanUtil.config.reportException(throwable);
       }
-
       //还TMD不行,老子不压了,返回原图
       tagImg = new File(srcImg.getPath());
     }
@@ -114,8 +131,19 @@ class Engine {
 
   //先使用双线性采样,oom了再使用单线性采样,还oom就强制压缩到720p
   private Bitmap compressBitmap() {
-    //Luban.computeInSampleSize下限1080p
-    int scale = Luban.computeInSampleSize(srcWidth,srcHeight);
+
+    float scale = 1f;
+    if(luban.maxShortDimension != 0){
+      //指定压缩上限:
+      int shorter = Math.min(srcHeight,srcWidth);
+      if(shorter > luban.maxShortDimension){
+        scale = shorter * 1f / luban.maxShortDimension;
+      }
+    }else {
+      //Luban.computeInSampleSize下限1080p
+      scale = Luban.computeInSampleSize(srcWidth,srcHeight);
+    }
+
     //获取原图的类型
     //String mimeType = options.outMimeType;
     //如果是png,看是否有透明的alpha通道,如果没有,给你压成jpg. 如果有,用白色填充.
@@ -127,13 +155,13 @@ class Engine {
     try {
       //使用双线性插值
       Bitmap tagBitmap = BitmapFactory.decodeFile(srcImg.getPath());
-      tagBitmap2 = Bitmap.createScaledBitmap(tagBitmap,srcWidth/scale,srcHeight/scale,true);
+      tagBitmap2 = Bitmap.createScaledBitmap(tagBitmap,(int)(srcWidth/scale),(int)(srcHeight/scale),true);
     }catch (OutOfMemoryError throwable){
       throwable.printStackTrace();
       try {
         //使用单线性插值
         BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = scale;
+        options.inSampleSize = (int) scale;
         //优先使用888. 因为RGB565在低版本手机上会变绿
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         tagBitmap2 = BitmapFactory.decodeFile(srcImg.getPath(), options);
@@ -144,7 +172,7 @@ class Engine {
         try {
           //使用RGB565将就一下:
           BitmapFactory.Options options = new BitmapFactory.Options();
-          options.inSampleSize = scale;
+          options.inSampleSize = (int) scale;
           options.inPreferredConfig = Bitmap.Config.RGB_565;
           tagBitmap2 = BitmapFactory.decodeFile(srcImg.getPath(), options);
           isPngWithTransAlpha = false;
@@ -153,9 +181,9 @@ class Engine {
           //try {
             //还TMD不行,只能压一把狠的:强制压缩到720p:
             int w = Math.min(srcHeight,srcWidth);
-            scale =  w/720;
+            scale =  w/720f;
             BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = scale;
+            options.inSampleSize = (int) scale;
             options.inPreferredConfig = Bitmap.Config.RGB_565;
             tagBitmap2 = BitmapFactory.decodeFile(srcImg.getPath(), options);
             isPngWithTransAlpha = false;

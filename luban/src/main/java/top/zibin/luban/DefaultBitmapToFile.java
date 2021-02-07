@@ -38,7 +38,7 @@ public class DefaultBitmapToFile implements IBitmapToFile {
         if("image/png".equals(engine.originalMimeType) && !engine.isPngWithTransAlpha){
             long start2 = System.currentTimeMillis();
             engine.isPngWithTransAlpha =   LubanUtil.hasTransInAlpha(tagBitmap);
-            Log.d("ss","hastrans: cost(ms):"+(System.currentTimeMillis() - start2));
+            LubanUtil.d("hastrans: cost(ms):"+(System.currentTimeMillis() - start2));
         }
 
         //engine.isPngWithTransAlpha = false;
@@ -99,7 +99,7 @@ public class DefaultBitmapToFile implements IBitmapToFile {
                         }
                     }
                 }
-                Log.d("luban","半透明通道颜色混合 cost(ms):"+(System.currentTimeMillis() - start));
+                LubanUtil.d("半透明通道颜色混合 cost(ms):"+(System.currentTimeMillis() - start));
                 tagBitmap = bitmap;
             }
 
