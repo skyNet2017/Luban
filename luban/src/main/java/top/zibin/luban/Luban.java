@@ -32,6 +32,7 @@ public class Luban implements Handler.Callback {
    boolean focusAlpha;
   boolean keepExif;
    int mLeastCompressSize;
+  int tintBgColorIfHasTransInAlpha;
    OnRenameListener mRenameListener;
    OnCompressListener mCompressListener;
    CompressionPredicate mCompressionPredicate;
@@ -65,6 +66,7 @@ public class Luban implements Handler.Callback {
     mHandler = new Handler(Looper.getMainLooper(), this);
     this.targetFormat = builder.targetFormat;
     this.keepExif = builder.keepExif;
+    this.tintBgColorIfHasTransInAlpha = builder.tintBgColorIfHasTransInAlpha;
   }
 
   private static IBitmapToFile engine;
@@ -294,6 +296,7 @@ public class Luban implements Handler.Callback {
     private int quality  = TARGET_QUALITY;
     private Bitmap.CompressFormat targetFormat = Bitmap.CompressFormat.JPEG;
     boolean keepExif = true;
+    int tintBgColorIfHasTransInAlpha = 0x00ffffff;
     Builder(Context context) {
       this.context = context;
       this.mStreamProviders = new ArrayList<>();
@@ -313,6 +316,16 @@ public class Luban implements Handler.Callback {
       return this;
     }
 
+    /**
+     * 当为png,有半透明像素时,转为jpg时使用什么颜色来计算最终颜色
+     * 格式: 0xff00ff. 不要传带透明通道的值
+     * @param tintBgColorIfHasTransInAlpha
+     * @return
+     */
+    public Builder tintBgColorIfHasTransInAlpha(int tintBgColorIfHasTransInAlpha) {
+      this.tintBgColorIfHasTransInAlpha = tintBgColorIfHasTransInAlpha   ;
+      return this;
+    }
     public Builder targetQuality(int quality) {
       this.quality = quality;
       return this;

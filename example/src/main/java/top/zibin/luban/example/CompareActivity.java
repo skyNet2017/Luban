@@ -154,6 +154,7 @@ public class CompareActivity extends AppCompatActivity {
                     .load(path)
                   .targetQuality(85)
                   .ignoreBy(1)
+                  .tintBgColorIfHasTransInAlpha(0xff00ff)
                   //.keepExif(true)
                   .targetFormat(Bitmap.CompressFormat.JPEG)
                  // .ignoreBy(40)

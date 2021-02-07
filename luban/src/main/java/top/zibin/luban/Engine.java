@@ -50,57 +50,10 @@ class Engine {
     this.srcHeight = options.outHeight;
     this.originalMimeType = options.outMimeType;
     Log.d("luban","类型:"+originalMimeType);
-    calAlpha();
+
   }
 
-  /**
-   * 计算图像内是否有透明的像素点
-   */
-  private void calAlpha() {
-    if(!"image/png".equals(originalMimeType)){
-      return ;
-    }
-    try {
-      long start = System.currentTimeMillis();
-      //最长边压缩到360p,看像素点内是否有不透明的像素点
-      int max = Math.max(srcHeight,srcWidth);
-      int scale = 1;
-      if(max > 50){
-        //限定长边100时,最大耗时400ms
-        //限定50时,最大耗时82ms
-        //最快: 四个角判断是否为0, 1ms即可.
-        scale = (int) Math.ceil(max/50f);
-      }
-      BitmapFactory.Options options = new BitmapFactory.Options();
-      options.inSampleSize = scale;
-      //优先使用888. 因为RGB565在低版本手机上会变绿
-      options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-      Bitmap bitmap = BitmapFactory.decodeFile(srcImg.getPath(), options);
 
-      int w = srcWidth/scale;
-      int h = srcHeight/scale;
-      //可以先判断4个角
-     out: for (int i = 0; i < w; i++) {
-        for (int j = 0; j < h; j++) {
-          // The argb {@link Color} at the specified coordinate
-          int pix = bitmap.getPixel(i,j);
-          int a = ((pix >> 24) & 0xff) ;/// 255.0f
-          //Log.d("luban","位置:"+i+"-"+j+", 不透明度:"+a);
-          //255就是没有透明度, = 0 就是完全透明. 值代表不透明度.值越大,越不透明
-          if(a != 255 ){
-            isPngWithTransAlpha = true;
-            break out;
-          }
-          //FF: 255   00 : 0
-          //Color color = Color.valueOf(pix);
-          //color.alpha()
-        }
-      }
-      Log.d("luban","cal alpah cost(ms):"+(System.currentTimeMillis() - start));
-    }catch (Throwable throwable){
-      throwable.printStackTrace();
-    }
-  }
 
   private Bitmap rotatingImage(Bitmap bitmap, int angle) {
     Matrix matrix = new Matrix();

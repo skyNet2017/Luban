@@ -159,17 +159,195 @@ api 'com.github.hss01248:metadata:1.0.1'
 
 ![image-20210205191609366](https://gitee.com/hss012489/picbed/raw/master/picgo/1612523769414-image-20210205191609366.jpg)
 
+### 最终压缩前,再判断一次准备压缩的bitmap:
+
+> 直接采四个角,中心点,次中心点,然后折半查找
+>
+> 大前提: 
+>
+>  "image/png".equals(engine.originalMimeType)   && bitmap.getConfig().equals(Bitmap.Config.ARGB_8888)
 
 
 
+```java
+if("image/png".equals(engine.originalMimeType)){
+            long start2 = System.currentTimeMillis();
+            engine.isPngWithTransAlpha =   LubanUtil.hasTransInAlpha(tagBitmap);
+            Log.d("ss","hastrans: cost(ms):"+(System.currentTimeMillis() - start2));
+ }
+```
 
-### 转换算法:
 
-![image-20210205191701186](https://gitee.com/hss012489/picbed/raw/master/picgo/1612523821231-image-20210205191701186.jpg)
 
-### 压缩效果:
+```java
+public static boolean hasTransInAlpha(Bitmap bitmap){
+    if(!bitmap.getConfig().equals(Bitmap.Config.ARGB_8888)){
+        return false;
+    }
+    int w = bitmap.getWidth()-1;
+    int h = bitmap.getHeight()-1;
+    if(isTrans(bitmap,0,0)
+            || isTrans(bitmap,w,h)
+            || isTrans(bitmap,0,h)
+            || isTrans(bitmap,w,0)
+            || isTrans(bitmap,bitmap.getWidth()/2,bitmap.getHeight()/2) ){
+        //先判断4个顶点和中心.
+        return true;
+    }
+    //然后折半查找
+    return hasTransInAngel(bitmap,w,h);
+}
 
-![image-20210205191329511](https://gitee.com/hss012489/picbed/raw/master/picgo/1612523609570-image-20210205191329511.jpg)
+private static boolean hasTransInAngel(Bitmap bitmap,int w, int h) {
+    Log.d("ss","hastrans: porint:"+w+"-"+h);
+    // int[][] arr = new int[8][2];
+    if(w ==0 || h == 0){
+        return false;
+    }
+    int halfw = w / 2;
+    int halfh = h / 2;
+
+    boolean hasTrans = isTrans(bitmap,w,h)
+            || isTrans(bitmap,w,0)
+            || isTrans(bitmap,0,h)
+            || isTrans(bitmap,w,halfh)
+            || isTrans(bitmap,halfw,h)
+            || isTrans(bitmap,0,halfh)
+            || isTrans(bitmap,halfw,0);
+    if(hasTrans){
+        return hasTrans;
+    }
+    return hasTransInAngel(bitmap,halfw,halfh) ;
+}
+
+private static boolean isTrans(Bitmap bitmap,int x,int y){
+    int pix = bitmap.getPixel(x,y);
+    int a = ((pix >> 24) & 0xff) ;
+    return a != 255;
+}
+```
+
+
+
+性能: 1200x1600的图片,跑完最长算法路径.耗时1ms
+
+![image-20210207145859841](https://gitee.com/hss012489/picbed/raw/master/picgo/1612681139922-image-20210207145859841.jpg)
+
+## 拿像素点,修改像素点
+
+```java
+ if(luban.targetFormat.equals(Bitmap.CompressFormat.JPEG)){
+            if(engine.isPngWithTransAlpha){
+                //原bitmap是imutable,不能直接更改像素点,要新建bitmap,像素编辑后设置
+                Bitmap  bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
+
+                long start = System.currentTimeMillis();
+                out: for (int i = 0; i < w; i++) {
+                    for (int j = 0; j < h; j++) {
+                        // The argb {@link Color} at the specified coordinate
+                        int pix = tagBitmap.getPixel(i,j);
+                        int alpha = ((pix >> 24) & 0xff) ;/// 255.0f
+                      if(alpha != 255 ){
+                        
+                        pix = trans(xxxxx)....//转换算法处
+                          
+                        bitmap.setPixel(i,j,pix);
+                      }else{
+                        bitmap.setPixel(i,j,pix);
+                      }
+                    }
+               Log.d("luban","半透明通道颜色混合 cost(ms):"+(System.currentTimeMillis() - start));
+                tagBitmap = bitmap;
+                }
+            }
+ }
+ }
+                      
+```
+
+## 转换
+
+Android原生默认的转换策略是直接将alpha != 255的像素点变成黑色: alpha=0. 转jpg时黑色化.. 效果不好. 
+
+此处尝试两种转换策略:
+
+### 策略1:  稍显野蛮粗暴
+
+alpha=0 完全透明的点,使用背景色
+
+alpha !=0的点,使用前景色.
+
+```java
+//策略1: 不混合颜色,只区分0和255.只要有半透明,就使用前景色  性能还可以
+                            if(alpha == 0){
+                                luban.tintBgColorIfHasTransInAlpha = luban.tintBgColorIfHasTransInAlpha | 0xff000000;
+                                pix = luban.tintBgColorIfHasTransInAlpha ;
+                                //也可以改成外部传入背景色
+                            }else {
+                               pix = pix | 0xff000000;
+                            }
+```
+
+效果:
+
+> 以下示例图中,activity背景色为洋红色, png图片压缩为jpg图时指定填充背景色也为洋红色,以与系统渲染对比效果.
+
+半透明通道颜色混合 cost(ms):10
+
+![image-20210207113034415](https://gitee.com/hss012489/picbed/raw/master/picgo/1612668634485-image-20210207113034415.jpg)
+
+![image-20210207113119542](https://gitee.com/hss012489/picbed/raw/master/picgo/1612668679605-image-20210207113119542.jpg)
+
+但在真正有半透明像素的图片上效果不好:
+
+半透明通道颜色混合 cost(ms):574 
+
+![image-20210207113239283](https://gitee.com/hss012489/picbed/raw/master/picgo/1612668759343-image-20210207113239283.jpg)
+
+### 策略2: 严谨地使用alpha通道颜色混合计算方法来计算最终颜色:
+
+>  显示颜色= 前景色* alpha/255 + 背景色 * (255 - alpha)/255
+>
+> 要使用rgb三个通道分别计算,而不能作为一个int值整体计算:
+
+ ```java
+                            if(alpha == 0){
+                                //将alpha改成255.完全不透明
+                                pix = luban.tintBgColorIfHasTransInAlpha | 0xff000000;
+                            }else {
+                               /* 要使用rgb三个通道分别计算,而不能作为一个int值整体计算:
+                               long pix2 = (long) (pix * alpha/255f +  luban.tintBgColorIfHasTransInAlpha * (255f-alpha) / 255f);
+                                pix2 = pix2 | 0xff000000; */
+
+                                int r = ((pix >> 16) & 0xff);
+                                int g = ((pix >>  8) & 0xff);
+                                int b = ((pix      ) & 0xff);
+
+                                int br = ((luban.tintBgColorIfHasTransInAlpha >> 16) & 0xff);
+                                int bg = ((luban.tintBgColorIfHasTransInAlpha >>  8) & 0xff);
+                                int bb = ((luban.tintBgColorIfHasTransInAlpha      ) & 0xff);
+
+                                int fr = Math.round((r * alpha +  br * (255-alpha)) / 255f);
+                                int fg = Math.round((g * alpha +  bg * (255-alpha)) / 255f);
+                                int fb = Math.round((b * alpha +  bb * (255-alpha)) / 255f);
+
+                                // 注意是用或,不是用加: pix = 0xff << 24 + fr << 16 + fg << 8 + fb;
+                                pix =  (0xff << 24) | (fr << 16) | (fg << 8) | fb;
+                                //等效: Color.argb(0xff,fr,fg,fb);
+                            }
+ ```
+
+效果:
+
+半透明通道颜色混合 cost(ms):951
+
+![image-20210207141026341](https://gitee.com/hss012489/picbed/raw/master/picgo/1612678226416-image-20210207141026341.jpg)
+
+半透明通道颜色混合 cost(ms):30
+
+![image-20210207150222634](https://gitee.com/hss012489/picbed/raw/master/picgo/1612681342711-image-20210207150222634.jpg)
+
+
 
 ## 增加了一些trace,外部实现:
 

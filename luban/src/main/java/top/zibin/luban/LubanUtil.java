@@ -604,4 +604,114 @@ public class LubanUtil {
         }
         return tags;
     }
+
+
+
+
+
+    public static boolean hasTransInAlpha(Bitmap bitmap){
+        if(!bitmap.getConfig().equals(Bitmap.Config.ARGB_8888)){
+            return false;
+        }
+        int w = bitmap.getWidth()-1;
+        int h = bitmap.getHeight()-1;
+        if(isTrans(bitmap,0,0)
+                || isTrans(bitmap,w,h)
+                || isTrans(bitmap,0,h)
+                || isTrans(bitmap,w,0)
+                || isTrans(bitmap,bitmap.getWidth()/2,bitmap.getHeight()/2) ){
+            //先判断4个顶点和中心.
+            return true;
+        }
+        //然后折半查找
+        return hasTransInAngel(bitmap,w,h);
+    }
+
+    private static boolean hasTransInAngel(Bitmap bitmap,int w, int h) {
+        Log.d("ss","hastrans: porint:"+w+"-"+h);
+        // int[][] arr = new int[8][2];
+        if(w ==0 || h == 0){
+            return false;
+        }
+        int halfw = w / 2;
+        int halfh = h / 2;
+
+        boolean hasTrans = isTrans(bitmap,w,h)
+                || isTrans(bitmap,w,0)
+                || isTrans(bitmap,0,h)
+                || isTrans(bitmap,w,halfh)
+                || isTrans(bitmap,halfw,h)
+                || isTrans(bitmap,0,halfh)
+                || isTrans(bitmap,halfw,0);
+        if(hasTrans){
+            return hasTrans;
+        }
+        return hasTransInAngel(bitmap,halfw,halfh) ;
+    }
+
+    private static boolean isTrans(Bitmap bitmap,int x,int y){
+        int pix = bitmap.getPixel(x,y);
+        int a = ((pix >> 24) & 0xff) ;
+        return a != 255;
+    }
+
+
+    /**
+     * 计算图像内是否有透明的像素点
+     */
+    private boolean hasTransAlpha(String filePath) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        options.inSampleSize = 1;
+        BitmapFactory.decodeFile(filePath, options);
+        int srcWidth = options.outWidth;
+        int srcHeight = options.outHeight;
+        String originalMimeType = options.outMimeType;
+        if(!"image/png".equals(originalMimeType)){
+            return false;
+        }
+        try {
+            long start = System.currentTimeMillis();
+            //最长边压缩到360p,看像素点内是否有不透明的像素点
+            int max = Math.max(srcHeight,srcWidth);
+            int scale = 1;
+            if(max > 50){
+                //限定长边100时,最大耗时400ms
+                //限定50时,最大耗时82ms
+                //最快: 四个角判断是否为0, 1ms即可.
+                scale = (int) Math.ceil(max/50f);
+            }
+            BitmapFactory.Options options2 = new BitmapFactory.Options();
+            options2.inSampleSize = scale;
+            //优先使用888. 因为RGB565在低版本手机上会变绿
+            options2.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap bitmap = BitmapFactory.decodeFile(filePath, options2);
+
+            int w = srcWidth/scale;
+            int h = srcHeight/scale;
+            //可以先判断4个角
+            out: for (int i = 0; i < w; i++) {
+                for (int j = 0; j < h; j++) {
+                    // The argb {@link Color} at the specified coordinate
+                    int pix = bitmap.getPixel(i,j);
+                    int a = ((pix >> 24) & 0xff) ;/// 255.0f
+                    //Log.d("luban","位置:"+i+"-"+j+", 不透明度:"+a);
+                    //255就是没有透明度, = 0 就是完全透明. 值代表不透明度.值越大,越不透明
+                    if(a != 255 ){
+                        Log.d("luban","cal alpah cost(ms):"+(System.currentTimeMillis() - start));
+                        return true;
+                    }
+                    //FF: 255   00 : 0
+                    //Color color = Color.valueOf(pix);
+                    //color.alpha()
+                }
+            }
+            Log.d("luban","cal alpah cost(ms):"+(System.currentTimeMillis() - start));
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+        }
+        return false;
+    }
+
+
 }
