@@ -50,23 +50,24 @@ public class LubanUtil {
 
 
     public static File compressByLuban(String imgPath, boolean isPng) {
-        File file0 = new File(imgPath);
-        logFile("compressByLuban begin",imgPath);
-        long start = System.currentTimeMillis();
-
         File file = compressByLubanInternal(imgPath, isPng);
-
-        long duration = System.currentTimeMillis() - start;
-        logFile("compressByLuban end",file.getAbsolutePath());
-        i("compressByLuban cost " + duration + " ms");
-
-        int percent = 0;
-        if(file0.exists() && file.exists() && file0.length() > 0){
-            percent = (int) (file.length() * 100 / file0.length());
-        }
-        int[] wh = getImageWidthHeight(file.getAbsolutePath());
-        config.trace(duration,percent,file.length()/1024,wh[0],wh[1]);
         return file;
+    }
+
+    /**
+     * 聊天,商品评论等使用.
+     * @param imgPath
+     * @param maxShortDimension 最短边长度. 可以为0
+     * @return
+     */
+    public static File compressForNormalUsage(String imgPath, int maxShortDimension) {
+
+        return Luban.with(app)
+                .ignoreBy(150)
+                .targetQuality(65)
+                .maxShortDimension(maxShortDimension)
+                .setTargetDir(config.getSaveDir().getAbsolutePath())
+                .get(imgPath);
     }
 
      static File compressByLubanInternal(String imgPath, boolean isPng) {
@@ -97,31 +98,17 @@ public class LubanUtil {
 
     public static void compressByLubanAsync(final String imgPath, boolean isPng,
                                             final CompressCallback callback) {
-        logFile("compressByLuban begin",imgPath);
-        long start = System.currentTimeMillis();
-        File file0 = new File(imgPath);
+
         compressByLubanAsyncInternal(imgPath, isPng, new CompressCallback() {
             @Override
             public void onSuccess(File file) {
-                long duration = System.currentTimeMillis() - start;
-                logFile("compressByLuban end",file.getAbsolutePath());
-                i("compressByLuban cost " + duration + " ms");
                 callback.onSuccess(file);
                 int percent = 0;
-                if(file0.exists() && file.exists() && file0.length() > 0){
-                    percent = (int) (file.length() * 100 / file0.length());
-                }
-                int[] wh = getImageWidthHeight(file.getAbsolutePath());
-                config.trace(duration,percent,file.length()/1024,wh[0],wh[1]);
             }
 
             @Override
             public void onError(Throwable e) {
-                long duration = System.currentTimeMillis() - start;
-                logFile("compressByLuban end with fail",imgPath);
-                i("compressByLuban cost " + duration + " ms");
                 callback.onError(e);
-                config.trace(duration,0,0,0,0);
             }
         });
     }
@@ -673,7 +660,7 @@ public class LubanUtil {
         int srcWidth = options.outWidth;
         int srcHeight = options.outHeight;
         String originalMimeType = options.outMimeType;
-        if(!"image/png".equals(originalMimeType)){
+        if(!"image/png".equals(originalMimeType) || "image/webp".equals(originalMimeType)){
             return false;
         }
         try {

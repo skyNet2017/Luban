@@ -35,7 +35,7 @@ public class DefaultBitmapToFile implements IBitmapToFile {
         int w = tagBitmap.getWidth();
         int h = tagBitmap.getHeight();
         //采样,看是否存在不透明度!=255的情况:
-        if("image/png".equals(engine.originalMimeType) && !engine.isPngWithTransAlpha){
+        if("image/png".equals(engine.originalMimeType)  || "image/webp".equals(engine.originalMimeType)){
             long start2 = System.currentTimeMillis();
             engine.isPngWithTransAlpha =   LubanUtil.hasTransInAlpha(tagBitmap);
             LubanUtil.d("hastrans: cost(ms):"+(System.currentTimeMillis() - start2));

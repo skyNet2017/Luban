@@ -210,7 +210,7 @@ public class Luban implements Handler.Callback {
             File result = compress(context, path);
 
             mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_SUCCESS, result));
-          } catch (IOException e) {
+          } catch (Exception e) {
             mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_ERROR, e));
           }
         }
@@ -223,7 +223,7 @@ public class Luban implements Handler.Callback {
   /**
    * start compress and return the file
    */
-  private File get(InputStreamProvider input, Context context) throws IOException {
+  private File get(InputStreamProvider input, Context context)  {
     //return new Engine(input, getImageCacheFile(context, Checker.SINGLE.extSuffix(input)), focusAlpha,bitmapToFile).compress();
     return compress(context,input);
   }
@@ -240,7 +240,12 @@ public class Luban implements Handler.Callback {
     return results;
   }
 
-  private File compress(Context context, InputStreamProvider path) throws IOException {
+  private File compress(Context context, InputStreamProvider path) {
+    File file0 = new File(path.getPath());
+    if(!file0.exists()){
+      LubanUtil.i("compressByLuban file not exist: " + file0.getAbsolutePath());
+      return file0;
+    }
     File result;
 
     File outFile = getImageCustomFile(context, new File(path.getPath()).getName());
@@ -254,32 +259,42 @@ public class Luban implements Handler.Callback {
     LubanUtil.logFile("compressByLuban begin",path.getPath());
     long start = System.currentTimeMillis();
 
-    if (mCompressionPredicate != null) {
-      if (mCompressionPredicate.apply(path.getPath())
-          && Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath())) {
-        result = new Engine(path, outFile, focusAlpha,bitmapToFile,quality,this).compress();
+    try {
+      if (mCompressionPredicate != null) {
+        if (mCompressionPredicate.apply(path.getPath())
+                && Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath())) {
+          result = new Engine(path, outFile, focusAlpha,bitmapToFile,quality,this).compress();
+        } else {
+          result = new File(path.getPath());
+        }
       } else {
-        result = new File(path.getPath());
+        result = Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath()) ?
+                new Engine(path, outFile, focusAlpha,bitmapToFile,quality,this).compress() :
+                new File(path.getPath());
       }
-    } else {
-      result = Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath()) ?
-          new Engine(path, outFile, focusAlpha,bitmapToFile,quality,this).compress() :
-          new File(path.getPath());
+
+      //加上日志:
+
+      long duration = System.currentTimeMillis() - start;
+      LubanUtil.logFile("compressByLuban end",result.getAbsolutePath());
+      LubanUtil.i("compressByLuban cost " + duration + " ms");
+
+      int percent = 0;
+
+      if(file0.exists() && result.exists() && file0.length() > 0){
+        percent = (int) ((file0.length() - result.length()) * 100 / file0.length());
+      }
+      int[] wh = LubanUtil.getImageWidthHeight(result.getAbsolutePath());
+      LubanUtil.config.trace(duration,percent,result.length()/1024,wh[0],wh[1]);
+
+    }catch (Throwable throwable){
+      LubanUtil.config.reportException(throwable);
+      result = file0;
+      long duration = System.currentTimeMillis() - start;
+      LubanUtil.i("compressByLuban cost " + duration + " ms, throws exception:"+throwable.getClass()+" "+throwable.getMessage());
+
     }
 
-    //加上日志:
-
-    long duration = System.currentTimeMillis() - start;
-    LubanUtil.logFile("compressByLuban end",result.getAbsolutePath());
-    LubanUtil.i("compressByLuban cost " + duration + " ms");
-
-    int percent = 0;
-    File file0 = new File(path.getPath());
-    if(file0.exists() && result.exists() && file0.length() > 0){
-      percent = (int) ((file0.length() - result.length()) * 100 / file0.length());
-    }
-    int[] wh = LubanUtil.getImageWidthHeight(result.getAbsolutePath());
-    LubanUtil.config.trace(duration,percent,result.length()/1024,wh[0],wh[1]);
 
     return result;
   }
@@ -455,6 +470,7 @@ public class Luban implements Handler.Callback {
      * @param focusAlpha <p> true - to keep alpha channel, the compress speed will be slow. </p>
      *                   <p> false - don't keep alpha channel, it might have a black background.</p>
      */
+    @Deprecated
     public Builder setFocusAlpha(boolean focusAlpha) {
       this.focusAlpha = focusAlpha;
       return this;
@@ -488,7 +504,7 @@ public class Luban implements Handler.Callback {
       build().launch(context);
     }
 
-    public File get(final String path) throws IOException {
+    public File get(final String path)  {
       return build().get(new InputStreamProvider() {
         @Override
         public InputStream open() throws IOException {

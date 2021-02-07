@@ -33,7 +33,7 @@ class Engine {
    boolean isPngWithTransAlpha;
   Luban luban;
 
-  Engine(InputStreamProvider srcImg, File tagImg, boolean focusAlpha,IBitmapToFile bitmapToFile,int quality,Luban luban) throws IOException {
+  Engine(InputStreamProvider srcImg, File tagImg, boolean focusAlpha,IBitmapToFile bitmapToFile,int quality,Luban luban)  {
     this.tagImg = tagImg;
     this.srcImg = srcImg;
     this.focusAlpha = focusAlpha;
@@ -60,7 +60,7 @@ class Engine {
     return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
   }
 
-  File compress() throws IOException {
+  File compress()  {
 
     try {
       //先使用双线性采样,oom了再使用单线性采样,还oom就强制压缩到720p, 但最后还是可能抛出oom
@@ -76,7 +76,7 @@ class Engine {
         //exifInterface = new it.sephiroth.android.library.exif2.ExifInterface();
         // exifInterface.readExif(srcImg.getPath(), it.sephiroth.android.library.exif2.ExifInterface.Options.OPTION_ALL);
       }catch (Throwable throwable){
-        throwable.printStackTrace();
+        LubanUtil.config.reportException(throwable);
       }
       boolean rotateSuccess = false;
 
@@ -93,7 +93,7 @@ class Engine {
              rotateSuccess = true;
            }
           }catch (Throwable throwable){
-            throwable.printStackTrace();
+            LubanUtil.config.reportException(throwable);
           }
         }
       }
@@ -157,7 +157,7 @@ class Engine {
       Bitmap tagBitmap = BitmapFactory.decodeFile(srcImg.getPath());
       tagBitmap2 = Bitmap.createScaledBitmap(tagBitmap,(int)(srcWidth/scale),(int)(srcHeight/scale),true);
     }catch (OutOfMemoryError throwable){
-      throwable.printStackTrace();
+      LubanUtil.config.reportException(throwable);
       try {
         //使用单线性插值
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -166,7 +166,7 @@ class Engine {
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         tagBitmap2 = BitmapFactory.decodeFile(srcImg.getPath(), options);
       }catch (OutOfMemoryError throwable1){
-        throwable1.printStackTrace();
+        LubanUtil.config.reportException(throwable1);
 
         //用RGB_565, 如果原图是png,且有透明的alpha通道,那么会变黑. 如何处理?
         try {
@@ -177,7 +177,7 @@ class Engine {
           tagBitmap2 = BitmapFactory.decodeFile(srcImg.getPath(), options);
           isPngWithTransAlpha = false;
         }catch (OutOfMemoryError error){
-          error.printStackTrace();
+          LubanUtil.config.reportException(error);
           //try {
             //还TMD不行,只能压一把狠的:强制压缩到720p:
             int w = Math.min(srcHeight,srcWidth);

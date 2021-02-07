@@ -320,12 +320,12 @@ boolean rotateSuccess = false;
 >
 > 大前提: 
 >
->  "image/png".equals(engine.originalMimeType)   && bitmap.getConfig().equals(Bitmap.Config.ARGB_8888)
+>  "image/png/webp".equals(engine.originalMimeType)   && bitmap.getConfig().equals(Bitmap.Config.ARGB_8888)
 
 
 
 ```java
-if("image/png".equals(engine.originalMimeType)){
+if("image/png".equals(engine.originalMimeType) || "image/webp".equals(engine.originalMimeType)){
             long start2 = System.currentTimeMillis();
             engine.isPngWithTransAlpha =   LubanUtil.hasTransInAlpha(tagBitmap);
             Log.d("ss","hastrans: cost(ms):"+(System.currentTimeMillis() - start2));
