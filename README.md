@@ -4,6 +4,30 @@
 
 
 
+|                                                              |                                                              |                                                              |                                                              |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 存在的问题                                                   | 解决措施                                                     | api                                                          | 说明                                                         |
+| 压缩目标格式只支持jpg,不支持png,webp等无损压缩格式           | 支持压缩为指定格式, 以及只压缩,不转换图片格式(传入null) //todo | targetFormat(Bitmap.CompressFormat targetFormat)             |                                                              |
+| 图片质量写死了65.信息损耗太大.                               | 支持指定目标质量.                                            | targetQuality(int quality)                                   | webp 质量99和100,文件大小相差极大.尽量不用100.jpg 质量100的文件大小约为质量80的文件大小的2-3倍 |
+| 大图缩放使用的是向下采样(downsampling),信息损耗太大,         | 优先使用双线性插值,                                          | -                                                            | 内存不足以支持双线性时才使用向下采样                         |
+| 压缩后,exif信息丢失                                          | 支持指定是否需要保留exif信息.                                | keepExif(boolean keepExif)                                   | 读取原exif信息,压缩后,将新宽高,旋转角度更新exif map,然后写入到新文件中. |
+| 只支持文件路径,不支持content://格式的uri,target api升到Android11后无法压缩外部图片 | 支持content://格式的uri //todo                               | api不变,内部自动判断处理                                     |                                                              |
+| 图片压缩后最大尺寸不可控, 有的情景下不需要太大的图.          | 支持指定压缩后图片的短边的最大尺寸                           | maxShortDimension(int maxShortDimension)                     | 仿720p,1080p的制式                                           |
+| 有透明通道的png压缩成jpg后,透明部分变黑                      | 使用透明通道混合算法计算前景色,背景色混合出的最终颜色,. 背景色默认是白色,可设置背景色 | tintBgColorIfHasTransInAlpha(int tintBgColorIfHasTransInAlpha) | 图片上是否有半透明像素点的算法较耗时,采用了几种近似判断策略. |
+| 细小文本的图片压缩后,文字看不清                              | 可指定此图只压缩质量,不进行尺寸压缩                          | //todo                                                       | 集成ocr或图片分类识别?成本太高?                              |
+| OOM风险                                                      | 多次降级                                                     |                                                              | 先把全部load进内存,使用双线性插值 OOM后使用向下采样+ARGB8888 还OOM,使用向下采样+RGB565 还OOM,使用向下采样+限定短边为原来的1/2+RGB565 还OOM,不压了,返回原图 |
+| 压缩后图片泛绿                                               | 优先使用ARGB888                                              |                                                              | android源码在RGB565转YUV精度损失导致.说Android7.0修复了,实际上7.0以上还是有的ROM出现. |
+| 删除压缩中间图片会被有的Android系统提示图片被删(参考拼多多远程删图事件) | 中间图片后缀名加上.luban //todo                              |                                                              |                                                              |
+| 已压缩图片被重复压缩                                         | 压缩前使用量化表判断图片质量,只图片质量大于目标质量的图片.   |                                                              |                                                              |
+| 压缩后的文件比原图还大                                       | 如果压缩后文件变大,如果格式一样,就返回原图.                  |                                                              |                                                              |
+| 缺乏算法的线上运行效果监测,反馈                              | 加上OOM的上报. 加上压缩效果的上报                            | void reportException(Throwable throwable)``void trace(long timeCost,int percent,long sizeAfterCompressInK,long width,long height) |                                                              |
+
+
+
+
+
+
+
 # 功能特点
 
 * 内部妥善处理OOM,直接拿去用,不用再加try-catch
@@ -527,6 +551,8 @@ public void trace(long timeCost, int percent, long sizeAfterCompressInK, long wi
 # 参考
 
 [Android关于Color你所知道的和不知道的一切](https://cloud.tencent.com/developer/article/1370953)
+
+[读取JPEG文件的压缩质量/质量因子参数](http://hx173149.github.io/2016/04/19/jepge_quality/)
 
 
 
