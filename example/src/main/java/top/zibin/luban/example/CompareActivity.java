@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -27,8 +28,10 @@ import top.zibin.luban.LubanUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by huangshuisheng on 2019/1/23.
@@ -84,9 +87,15 @@ public class CompareActivity extends AppCompatActivity {
     private void chooseAndShow() {
         TakePhotoUtil.startPickOneWitchDialog(this, new TakeOnePhotoListener() {
             @Override
-            public void onSuccess(String path) {
+            public void onSuccess(final String path) {
                 ivOriginal.setImage(ImageSource.uri(Uri.fromFile(new File(path))));
-                tvOriginal.setText("原图:"+getImgInfo(path));
+                tvOriginal.setText("原图(点击显示exif:):"+getImgInfo(path));
+                tvOriginal.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showExif(path);
+                    }
+                });
                 compress(path);
             }
 
@@ -115,7 +124,7 @@ public class CompareActivity extends AppCompatActivity {
 
         int quality = guessQuality(path);
 
-        return srcWidth + "x"+srcHeight+","+sizeStr+","+path+",Q:"+quality;
+        return srcWidth + "x"+srcHeight+","+sizeStr+",Q:"+quality+"\npath: "+path;
     }
 
     private int guessQuality(String path) {
@@ -134,7 +143,7 @@ public class CompareActivity extends AppCompatActivity {
     private void compress(String path) {
         try {
             //ExifUtil.readExif(new FileInputStream(path));
-          List<File> files =  Luban.with(this)
+         /* List<File> files =  Luban.with(this)
                     .load(path)
                   .targetQuality(85)
                   .ignoreBy(1)
@@ -143,9 +152,34 @@ public class CompareActivity extends AppCompatActivity {
                   .targetFormat(Bitmap.CompressFormat.JPEG)
                  // .ignoreBy(40)
                     .get();
-          String compress = files.get(0).getAbsolutePath();
+          String compress = files.get(0).getAbsolutePath();*/
+            final String compress = LubanUtil.compressForMaterialUpload(path).getAbsolutePath();
             ivLuban.setImage(ImageSource.uri(Uri.fromFile(new File(compress))));
-            tvLuban.setText("luban-jpg85:"+getImgInfo(compress));
+            tvLuban.setText("compressForMaterialUpload(点击显示exif):\n"+getImgInfo(compress));
+            tvLuban.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showExif(compress);
+
+                }
+            });
+
+
+            final String compress2 = LubanUtil.compressForNormalUsage(path).getAbsolutePath();
+            ivLubanTurbo.setImage(ImageSource.uri(Uri.fromFile(new File(compress2))));
+            tvLubanTurbo.setText("compressForNormalUsage(点击显示exif):\n"+getImgInfo(compress2));
+            tvLubanTurbo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showExif(compress2);
+
+                }
+            });
+
+
+
+
+
             //ExifUtil.readExif(new FileInputStream(files.get(0)));
             //Log.w("meta",MetaDataUtil.getAllInfo(compress).toString());
 
@@ -170,10 +204,26 @@ public class CompareActivity extends AppCompatActivity {
             Log.w("exif",ExifUtil.readExif(new FileInputStream(files2.get(0))).toString());*/
            // Log.w("meta",MetaDataUtil.getAllInfo(compress2).toString());
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
 
+    }
+
+    private void showExif(String compress) {
+        try {
+            Map<String, String> map = ExifUtil.readExif(new FileInputStream(new File(compress)));
+            String str = map.toString().replace(",","\n");
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle(compress)
+                    .setMessage(str)
+                    .setPositiveButton("ok",null)
+                    .create();
+            dialog.show();
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     private void initView() {

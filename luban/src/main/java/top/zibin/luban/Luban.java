@@ -262,13 +262,13 @@ public class Luban implements Handler.Callback {
     try {
       if (mCompressionPredicate != null) {
         if (mCompressionPredicate.apply(path.getPath())
-                && Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath())) {
+                && Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath(),maxShortDimension)) {
           result = new Engine(path, outFile, focusAlpha,bitmapToFile,quality,this).compress();
         } else {
           result = new File(path.getPath());
         }
       } else {
-        result = Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath()) ?
+        result = Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath(),maxShortDimension) ?
                 new Engine(path, outFile, focusAlpha,bitmapToFile,quality,this).compress() :
                 new File(path.getPath());
       }

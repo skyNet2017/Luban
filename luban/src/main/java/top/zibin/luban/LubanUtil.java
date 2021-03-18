@@ -57,16 +57,33 @@ public class LubanUtil {
     /**
      * 聊天,商品评论等使用.
      * @param imgPath
-     * @param maxShortDimension 最短边长度. 可以为0
      * @return
      */
-    public static File compressForNormalUsage(String imgPath, int maxShortDimension) {
+    public static File compressForNormalUsage(String imgPath) {
 
         return Luban.with(app)
                 .ignoreBy(150)
-                .targetQuality(65)
-                .maxShortDimension(maxShortDimension)
+                .targetQuality(70)
+                .keepExif(false)
+                .maxShortDimension(1080)
                 .setTargetDir(config.getSaveDir().getAbsolutePath())
+                .get(imgPath);
+    }
+
+    public static File compressForMaterialUpload(String imgPath) {
+        return Luban.with(app)
+                .ignoreBy(150)
+                .targetQuality(85)
+                .keepExif(true)
+                .maxShortDimension(1080)
+                .setTargetDir(config.getSaveDir().getAbsolutePath())
+                .setRenameListener(new OnRenameListener() {
+                    @Override
+                    public String rename(String filePath) {
+                        return filePath.substring(filePath.lastIndexOf("/")+1,filePath.lastIndexOf("."))
+                                +"-"+System.currentTimeMillis()+filePath.substring(filePath.lastIndexOf("."));
+                    }
+                })
                 .get(imgPath);
     }
 

@@ -200,7 +200,18 @@ enum Checker {
     }
   }
 
-  boolean needCompress(int leastCompressSize,int quality, String path) {
+  int getShortDemension(String path){
+    try {
+      BitmapFactory.Options options = new BitmapFactory.Options();
+      options.inJustDecodeBounds = true;
+      BitmapFactory.decodeFile(path,  options);
+      return Math.min(options.outHeight,options.outWidth);
+    } catch (Exception e) {
+      return 0;
+    }
+  }
+
+  boolean needCompress(int leastCompressSize, int quality, String path, int maxShortDimension) {
     File source = new File(path);
     if(!source.exists()){
       return false;
@@ -215,8 +226,22 @@ enum Checker {
     try {
       exif.readExif( path, ExifInterface.Options.OPTION_ALL );
       int quality0 = exif.getQualityGuess();
-      if(quality0 > 0 && quality0 <= quality + 5 && source.length()<= 500 * 1024){//通过质量的判断来避免二次压缩,同时判断文件大小.500k以上,即使质量小,也压.
-        return false;
+      if(quality0 == 0){
+        return true;
+      }
+      //先看尺寸:
+      if(maxShortDimension != 0){
+        if(maxShortDimension < getShortDemension(path)){
+          return true;
+        }else {
+          if(quality0 <= quality){
+            return false;
+          }
+        }
+      }else {
+        if(quality0 <= quality){
+          return false;
+        }
       }
       return true;
     } catch (Throwable e) {

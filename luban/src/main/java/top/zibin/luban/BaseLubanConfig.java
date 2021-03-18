@@ -19,7 +19,12 @@ public class BaseLubanConfig implements ILubanConfig {
 
     @Override
     public File getSaveDir() {
-        return LubanUtil.app.getExternalFilesDir(Environment.DIRECTORY_DCIM);
+        File dir =  LubanUtil.app.getFilesDir();
+        File subDir = new File(dir,"luban");
+        if(!subDir.exists()){
+            subDir.mkdirs();
+        }
+        return subDir;
     }
 
     @Override

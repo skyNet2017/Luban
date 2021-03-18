@@ -11,6 +11,10 @@ public interface ILubanConfig {
 
     void reportException(Throwable throwable);
 
+    /**
+     * 使用应用内部的路径,避免被app提示
+     * @return
+     */
     File getSaveDir();
 
     /**

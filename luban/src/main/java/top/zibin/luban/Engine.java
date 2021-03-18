@@ -112,7 +112,7 @@ class Engine {
               exif.setAttribute("Orientation",rotation+"");
               exif.saveAttributes();
             }catch (Throwable throwable){
-              throwable.printStackTrace();
+              LubanUtil.config.reportException(throwable);
             }
           }
         }
