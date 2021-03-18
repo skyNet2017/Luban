@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -22,11 +23,20 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.FileIOUtils;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
@@ -98,6 +108,7 @@ public class CompareActivity extends AppCompatActivity {
             }
         }).start();
 
+
     }
 
     private void copyfile() {
@@ -137,6 +148,39 @@ public class CompareActivity extends AppCompatActivity {
         dialog.setContentView(recyclerView);
         initRecycler(recyclerView,dialog);
         dialog.show();
+    }
+
+    public void api(View view) {
+        RelativeLayout linearLayout = new RelativeLayout(this);
+        ImageView imageView = new ImageView(this);
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        imageView.setLayoutParams(params);
+        linearLayout.addView(imageView);
+        Dialog dialog = new Dialog(this);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        String path =  "file:///android_asset/luban.jpg";
+        //Uri imageUri = Uri.fromFile(new File("//android_asset/luban.jpg"));
+
+        dialog.setContentView(linearLayout);
+
+        dialog.show();
+        Glide.with(this)
+                .load(path)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        e.printStackTrace();
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        Log.i("ss","onResourceReady:"+model);
+                        return false;
+                    }
+                })
+                .into(imageView);
+
     }
 
     private void initRecycler(RecyclerView recyclerView, final Dialog dialog) {
@@ -441,6 +485,9 @@ public class CompareActivity extends AppCompatActivity {
         scannerClient.setScanner(scanner);
         scanner.connect();
     }
+
+
+
     private   static class MyMediaScannerConnectionClient implements MediaScannerConnection.MediaScannerConnectionClient {
 
         private MediaScannerConnection mScanner;

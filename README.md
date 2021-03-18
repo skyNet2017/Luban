@@ -1,5 +1,7 @@
 # Luban2
 
+[![](https://jitpack.io/v/skyNet2017/Luban.svg)](https://jitpack.io/#skyNet2017/Luban)
+
 基于原Luban库,解决了原库存在的一些问题.增加了一些工程化实践的功能
 
 
@@ -50,17 +52,17 @@
 com.github.skyNet2017:Luban:1.2.5
 ```
 
-Androidx版本:
+**Androidx版本:**
 
 ```
-com.github.skyNet2017:Luban:3.0.0
+com.github.skyNet2017:Luban:3.0.1
 ```
 
 ### LubanUtil
 
 > 提供三种最常见的模式:
 
-```
+```java
 init(Application app,boolean enableLog,@Nullable  ILubanConfig config)
 
   /**
@@ -92,6 +94,8 @@ init(Application app,boolean enableLog,@Nullable  ILubanConfig config)
      * @return
      */
     public static File compressForMaterialUpload(String imgPath)
+    
+    public static File  compressForMaterialUploadWebp(String imgPath)
 ```
 
 

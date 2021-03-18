@@ -35,8 +35,8 @@ dependencies {
 
     implementation 'com.nineoldandroids:library:2.4.0'
 
-    implementation 'com.github.bumptech.glide:glide:3.7.0'
-
+    implementation 'com.github.bumptech.glide:glide:4.6.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.6.0' //注解处理器
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.1.6'
     implementation 'com.github.skyNet2017:TakePhoto:4.2.1'

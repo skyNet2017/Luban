@@ -20,6 +20,12 @@
         android:text="选图-内置典型图片"
         android:id="@+id/btn_chooseself"
         android:layout_height="wrap_content"/>
+    <Button
+        android:layout_width="match_parent"
+        android:text="api说明"
+        android:onClick="api"
+        android:id="@+id/btn_api"
+        android:layout_height="wrap_content"/>
     <TextView
         android:layout_width="match_parent"
         android:text="原图"
