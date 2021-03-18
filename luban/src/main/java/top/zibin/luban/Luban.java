@@ -41,6 +41,7 @@ public class Luban implements Handler.Callback {
 
    Bitmap.CompressFormat targetFormat;
    int maxShortDimension;
+  boolean noResize = false;
   /**
    * 压缩的目标质量,65
    */
@@ -68,6 +69,7 @@ public class Luban implements Handler.Callback {
     this.keepExif = builder.keepExif;
     this.tintBgColorIfHasTransInAlpha = builder.tintBgColorIfHasTransInAlpha;
     this.maxShortDimension = builder.maxShortDimension;
+    this.noResize = builder.noResize;
   }
 
   private static IBitmapToFile engine;
@@ -322,7 +324,7 @@ public class Luban implements Handler.Callback {
     private String mTargetDir;
     private boolean focusAlpha;
     private int mLeastCompressSize = 100;
-    private OnRenameListener mRenameListener;
+    private OnRenameListener mRenameListener = new DefaultRenameListener();
     private OnCompressListener mCompressListener;
     private CompressionPredicate mCompressionPredicate;
     private List<InputStreamProvider> mStreamProviders;
@@ -330,6 +332,7 @@ public class Luban implements Handler.Callback {
     private int quality  = TARGET_QUALITY;
     private Bitmap.CompressFormat targetFormat = Bitmap.CompressFormat.JPEG;
     boolean keepExif = true;
+    boolean noResize = false;
     int tintBgColorIfHasTransInAlpha = 0x00ffffff;
     private int maxShortDimension;
     Builder(Context context) {
@@ -348,6 +351,10 @@ public class Luban implements Handler.Callback {
 
     public Builder saver(IBitmapToFile bitmapToFile) {
       this.bitmapToFile = bitmapToFile;
+      return this;
+    }
+    public Builder noResize(boolean noResize) {
+      this.noResize = noResize;
       return this;
     }
 

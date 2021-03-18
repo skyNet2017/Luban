@@ -35,12 +35,30 @@
         android:layout_height="250dp"/>
     <TextView
         android:layout_width="match_parent"
+        android:text="luban"
+        android:id="@+id/tv_webp"
+        android:layout_height="wrap_content"/>
+    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+        android:layout_width="match_parent"
+        android:id="@+id/iv_webp"
+        android:layout_height="250dp"/>
+    <TextView
+        android:layout_width="match_parent"
         android:text="luban-turbo"
         android:id="@+id/tv_luban_turbo"
         android:layout_height="wrap_content"/>
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         android:layout_width="match_parent"
         android:id="@+id/iv_luban_turbo"
+        android:layout_height="250dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:text="noresize"
+        android:id="@+id/tv_noresize"
+        android:layout_height="wrap_content"/>
+    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+        android:layout_width="match_parent"
+        android:id="@+id/iv_noresize"
         android:layout_height="250dp"/>
 
 

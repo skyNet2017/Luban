@@ -52,6 +52,14 @@ public class CompareActivity extends AppCompatActivity {
 
     private SubsamplingScaleImageView ivLubanTurbo;
 
+    private TextView tvNoResize;
+
+    private SubsamplingScaleImageView ivNoResize;
+
+    private TextView tvwebp;
+
+    private SubsamplingScaleImageView ivwebp;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -164,6 +172,17 @@ public class CompareActivity extends AppCompatActivity {
                 }
             });
 
+            final String compress0 = LubanUtil.compressForMaterialUploadWebp(path).getAbsolutePath();
+            ivwebp.setImage(ImageSource.uri(Uri.fromFile(new File(compress0))));
+            tvwebp.setText("webp(点击显示exif):\n"+getImgInfo(compress0));
+            tvwebp.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showExif(compress0);
+
+                }
+            });
+
 
             final String compress2 = LubanUtil.compressForNormalUsage(path).getAbsolutePath();
             ivLubanTurbo.setImage(ImageSource.uri(Uri.fromFile(new File(compress2))));
@@ -172,6 +191,17 @@ public class CompareActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     showExif(compress2);
+
+                }
+            });
+
+            final String compress3 = LubanUtil.compressWithNoResize(path).getAbsolutePath();
+            ivNoResize.setImage(ImageSource.uri(Uri.fromFile(new File(compress3))));
+            tvNoResize.setText("compressWithNoResize(点击显示exif):\n"+getImgInfo(compress3));
+            tvNoResize.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showExif(compress3);
 
                 }
             });
@@ -234,6 +264,10 @@ public class CompareActivity extends AppCompatActivity {
         ivLuban = (SubsamplingScaleImageView) findViewById(R.id.iv_luban);
         tvLubanTurbo = (TextView) findViewById(R.id.tv_luban_turbo);
         ivLubanTurbo = (SubsamplingScaleImageView) findViewById(R.id.iv_luban_turbo);
+        tvNoResize = (TextView) findViewById(R.id.tv_noresize);
+        ivNoResize = (SubsamplingScaleImageView) findViewById(R.id.iv_noresize);
+        tvwebp = (TextView) findViewById(R.id.tv_webp);
+        ivwebp = (SubsamplingScaleImageView) findViewById(R.id.iv_webp);
     }
     public static String formatFileSize(long size) {
         try {

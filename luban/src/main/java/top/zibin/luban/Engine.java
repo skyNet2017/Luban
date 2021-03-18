@@ -65,6 +65,7 @@ class Engine {
     try {
       //先使用双线性采样,oom了再使用单线性采样,还oom就强制压缩到720p, 但最后还是可能抛出oom
       Bitmap tagBitmap = compressBitmap();
+
       //it.sephiroth.android.library.exif2.ExifInterface exifInterface = null;
       Map<String,String> exifs = null;
       int  rotation = 0;
@@ -133,16 +134,19 @@ class Engine {
   private Bitmap compressBitmap() {
 
     float scale = 1f;
-    if(luban.maxShortDimension != 0){
-      //指定压缩上限:
-      int shorter = Math.min(srcHeight,srcWidth);
-      if(shorter > luban.maxShortDimension){
-        scale = shorter * 1f / luban.maxShortDimension;
+    if(!luban.noResize){
+      if(luban.maxShortDimension != 0){
+        //指定压缩上限:
+        int shorter = Math.min(srcHeight,srcWidth);
+        if(shorter > luban.maxShortDimension){
+          scale = shorter * 1f / luban.maxShortDimension;
+        }
+      }else {
+        //Luban.computeInSampleSize下限1080p
+        scale = Luban.computeInSampleSize(srcWidth,srcHeight);
       }
-    }else {
-      //Luban.computeInSampleSize下限1080p
-      scale = Luban.computeInSampleSize(srcWidth,srcHeight);
     }
+
 
     //获取原图的类型
     //String mimeType = options.outMimeType;
@@ -155,7 +159,12 @@ class Engine {
     try {
       //使用双线性插值
       Bitmap tagBitmap = BitmapFactory.decodeFile(srcImg.getPath());
-      tagBitmap2 = Bitmap.createScaledBitmap(tagBitmap,(int)(srcWidth/scale),(int)(srcHeight/scale),true);
+      if(scale != 1f){
+        tagBitmap2 = Bitmap.createScaledBitmap(tagBitmap,(int)(srcWidth/scale),(int)(srcHeight/scale),true);
+      }else {
+        tagBitmap2 = tagBitmap;
+      }
+
     }catch (OutOfMemoryError throwable){
       LubanUtil.config.reportException(throwable);
       try {

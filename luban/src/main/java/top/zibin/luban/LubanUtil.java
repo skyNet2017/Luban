@@ -56,6 +56,9 @@ public class LubanUtil {
 
     /**
      * 聊天,商品评论等使用.
+     * 质量压到70
+     * 大小压到最大1080p
+     * 去除exif信息
      * @param imgPath
      * @return
      */
@@ -70,6 +73,32 @@ public class LubanUtil {
                 .get(imgPath);
     }
 
+    /**
+     * 适用于大图小字的场景,比如拍书,拍A4纸,拍一些小票,资料之类的.
+     * 不压缩图片尺寸,只把图片质量降到70
+     * 保留exif
+     * @param imgPath
+     * @return
+     */
+    public static File compressWithNoResize(String imgPath) {
+        return Luban.with(app)
+                .ignoreBy(150)
+                .targetQuality(70)
+                .keepExif(true)
+                .noResize(true)
+                .setTargetDir(config.getSaveDir().getAbsolutePath())
+                .get(imgPath);
+    }
+
+    /**
+     * 资料提交使用,用来跑图像识别,比对算法等
+     * 保留exif
+     * 质量设置为85
+     * 压到1080p以下
+     * 默认jpg,可指定图片格式为webp
+     * @param imgPath
+     * @return
+     */
     public static File compressForMaterialUpload(String imgPath) {
         return Luban.with(app)
                 .ignoreBy(150)
@@ -77,13 +106,17 @@ public class LubanUtil {
                 .keepExif(true)
                 .maxShortDimension(1080)
                 .setTargetDir(config.getSaveDir().getAbsolutePath())
-                .setRenameListener(new OnRenameListener() {
-                    @Override
-                    public String rename(String filePath) {
-                        return filePath.substring(filePath.lastIndexOf("/")+1,filePath.lastIndexOf("."))
-                                +"-"+System.currentTimeMillis()+filePath.substring(filePath.lastIndexOf("."));
-                    }
-                })
+                .get(imgPath);
+    }
+
+    public static File compressForMaterialUploadWebp(String imgPath) {
+        return Luban.with(app)
+                .ignoreBy(150)
+                .targetQuality(85)
+                .keepExif(true)
+                .targetFormat(Bitmap.CompressFormat.WEBP)
+                .maxShortDimension(1080)
+                .setTargetDir(config.getSaveDir().getAbsolutePath())
                 .get(imgPath);
     }
 

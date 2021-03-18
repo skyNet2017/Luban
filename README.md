@@ -14,7 +14,7 @@
 | 只支持文件路径,不支持content://格式的uri,target api升到Android11后无法压缩外部图片 | 支持content://格式的uri //todo                               | api不变,内部自动判断处理                                     |                                                              |
 | 图片压缩后最大尺寸不可控, 有的情景下不需要太大的图.          | 支持指定压缩后图片的短边的最大尺寸                           | maxShortDimension(int maxShortDimension)                     | 仿720p,1080p的制式                                           |
 | 有透明通道的png压缩成jpg后,透明部分变黑                      | 使用透明通道混合算法计算前景色,背景色混合出的最终颜色,. 背景色默认是白色,可设置背景色 | tintBgColorIfHasTransInAlpha(int tintBgColorIfHasTransInAlpha) | 图片上是否有半透明像素点的算法较耗时,采用了几种近似判断策略. |
-| 细小文本的图片压缩后,文字看不清                              | 可指定此图只压缩质量,不进行尺寸压缩                          | //todo                                                       | 集成ocr或图片分类识别?成本太高?                              |
+| 细小文本的图片压缩后,文字看不清                              | 可指定此图只压缩质量,不进行尺寸压缩                          | .noResize(true)                                              | 集成ocr或图片分类识别?成本太高?                              |
 | OOM风险                                                      | 多次降级                                                     |                                                              | 先把全部load进内存,使用双线性插值 OOM后使用向下采样+ARGB8888 还OOM,使用向下采样+RGB565 还OOM,使用向下采样+限定短边为原来的1/2+RGB565 还OOM,不压了,返回原图 |
 | 压缩后图片泛绿                                               | 优先使用ARGB888                                              |                                                              | android源码在RGB565转YUV精度损失导致.说Android7.0修复了,实际上7.0以上还是有的ROM出现. |
 | 删除压缩中间图片会被有的Android系统提示图片被删(参考拼多多远程删图事件) | 中间图片后缀名加上.luban //todo                              |                                                              |                                                              |
@@ -58,11 +58,43 @@ com.github.skyNet2017:Luban:3.0.0
 
 ### LubanUtil
 
-> 默认质量85. 不片面追求文件大小.
->
-> 如果是聊天场景,可以自己设成65,最大可能节省大小.
+> 提供三种最常见的模式:
 
-![snapshot](snapshot.jpg)
+```
+init(Application app,boolean enableLog,@Nullable  ILubanConfig config)
+
+  /**
+     * 聊天,商品评论等使用.
+     * 质量压到70
+     * 大小压到1080p
+     * 去除exif信息
+     * @param imgPath
+     * @return
+     */
+    public static File compressForNormalUsage(String imgPath)
+    
+     /**
+     * 适用于大图小字的场景,比如拍书,拍A4纸,拍一些小票,资料之类的. 
+     * 不压缩图片尺寸,只把图片质量降到70
+     * 保留exif
+     * @param imgPath
+     * @return
+     */
+    public static File compressWithNoResize(String imgPath)
+    
+    /**
+     * 资料提交使用,用来跑图像识别,比对算法等
+     * 保留exif
+     * 质量设置为85
+     * 压到1080p以下
+     * 默认jpg,可指定图片格式为webp
+     * @param imgPath
+     * @return
+     */
+    public static File compressForMaterialUpload(String imgPath)
+```
+
+
 
 ### 方法列表
 
