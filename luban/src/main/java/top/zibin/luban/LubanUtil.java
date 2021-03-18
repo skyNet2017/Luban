@@ -49,9 +49,9 @@ public class LubanUtil {
     }
 
 
+    @Deprecated
     public static File compressByLuban(String imgPath, boolean isPng) {
-        File file = compressByLubanInternal(imgPath, isPng);
-        return file;
+        return compressForMaterialUpload(imgPath);
     }
 
     /**
@@ -120,32 +120,7 @@ public class LubanUtil {
                 .get(imgPath);
     }
 
-     static File compressByLubanInternal(String imgPath, boolean isPng) {
-        File file0 = null;
-        try {
-            file0 = new File(imgPath);
-            if (file0.length() <= MIN_IMAGE_COMPRESS_SIZE) {
-                return file0;
-            }
-            File file = Luban.with(app)
-                    .ignoreBy(150)
-                    .targetQuality(TARGET_QUALITY)
-                    .setTargetDir(config.getSaveDir().getAbsolutePath())
-                    .setFocusAlpha(isPng)
-                    .get(imgPath);
-            if (file.exists()) {
-                return file;
-            }
-            return new File(imgPath);
-        } catch (OutOfMemoryError e) {
-            config.reportException(e);
-            return compressBySubsamling2(imgPath);
-        } catch (Throwable e) {
-            config.reportException(e);
-            return new File(imgPath);
-        }
-    }
-
+    @Deprecated
     public static void compressByLubanAsync(final String imgPath, boolean isPng,
                                             final CompressCallback callback) {
 
@@ -153,7 +128,6 @@ public class LubanUtil {
             @Override
             public void onSuccess(File file) {
                 callback.onSuccess(file);
-                int percent = 0;
             }
 
             @Override
