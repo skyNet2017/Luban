@@ -22,7 +22,8 @@ public interface ILubanConfig {
      * @param timeCost
      * @param percent
      */
-   default void trace(long timeCost,int percent,long sizeAfterCompressInK,long width,long height){
-       LubanUtil.i("time cost : "+timeCost+"ms, filesize after compress:"+sizeAfterCompressInK +"kB , 压缩比:"+percent +"%,  wh:"+width+"x"+height);
+   default void trace(String inputPath,String outputPath,long timeCost,int percent,long sizeAfterCompressInK,long width,long height){
+       LubanUtil.i(inputPath+"\ncompress to --> "+outputPath+"\ntime cost : "+timeCost+"ms, filesize after compress:"
+               +sizeAfterCompressInK +"kB , 减少掉:"+percent +"%,  wh:"+width+"x"+height);
    }
 }

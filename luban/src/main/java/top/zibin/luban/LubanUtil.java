@@ -217,6 +217,12 @@ public class LubanUtil {
         return String.valueOf(size);
     }
 
+    public static void w(String s) {
+        if(enableLog){
+            Log.w("lubanutil",s);
+        }
+    }
+
     public interface CompressCallback{
         void onSuccess(File file);
 

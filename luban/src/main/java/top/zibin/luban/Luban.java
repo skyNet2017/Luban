@@ -287,13 +287,13 @@ public class Luban implements Handler.Callback {
         percent = (int) ((file0.length() - result.length()) * 100 / file0.length());
       }
       int[] wh = LubanUtil.getImageWidthHeight(result.getAbsolutePath());
-      LubanUtil.config.trace(duration,percent,result.length()/1024,wh[0],wh[1]);
+      LubanUtil.config.trace(file0.getAbsolutePath(),result.getAbsolutePath(),duration,percent,result.length()/1024,wh[0],wh[1]);
 
     }catch (Throwable throwable){
       LubanUtil.config.reportException(throwable);
       result = file0;
       long duration = System.currentTimeMillis() - start;
-      LubanUtil.i("compressByLuban cost " + duration + " ms, throws exception:"+throwable.getClass()+" "+throwable.getMessage());
+      LubanUtil.w("compressByLuban cost " + duration + " ms, throws exception:"+throwable.getClass()+" "+throwable.getMessage());
 
     }
 

@@ -1,1 +1,2 @@
+include ':showResult'
 include ':example', ':luban'//, ':lubanturbo'
