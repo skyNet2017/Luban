@@ -62,9 +62,12 @@ public class ShowResultUtil {
             }
         });
 
-        Dialog dialog = new Dialog(activity);
+        Dialog dialog = new AlertDialog.Builder(activity)
+                .setTitle("压缩结果")
+                .setView(root)
+                .setPositiveButton("ok",null)
+                .create();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        dialog.setContentView(root);
         dialog.show();
 
 

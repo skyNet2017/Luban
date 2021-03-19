@@ -156,13 +156,13 @@ public class CompareActivity extends AppCompatActivity {
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         imageView.setLayoutParams(params);
         linearLayout.addView(imageView);
-        Dialog dialog = new Dialog(this);
+        Dialog dialog = new AlertDialog.Builder(this)
+                .setTitle("apis")
+                .setView(linearLayout)
+                .setPositiveButton("ok",null).create();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         String path =  "file:///android_asset/luban.jpg";
         //Uri imageUri = Uri.fromFile(new File("//android_asset/luban.jpg"));
-
-        dialog.setContentView(linearLayout);
-
         dialog.show();
         Glide.with(this)
                 .load(path)
