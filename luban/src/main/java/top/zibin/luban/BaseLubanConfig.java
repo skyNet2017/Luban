@@ -1,6 +1,5 @@
 package top.zibin.luban;
 
-import android.os.Environment;
 
 import java.io.File;
 
@@ -27,9 +26,5 @@ public class BaseLubanConfig implements ILubanConfig {
         return subDir;
     }
 
-    @Override
-    public void trace(long timeCost, int percent, long sizeAfterCompressInK, long width, long height) {
-        LubanUtil.i("time cost : "+timeCost+"ms, filesize after compress:"+sizeAfterCompressInK +"kB , 压缩比:"+percent +"%,  wh:"+width+"x"+height);
-    }
 
 }
