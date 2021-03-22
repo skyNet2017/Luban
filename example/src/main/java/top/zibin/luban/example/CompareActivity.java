@@ -89,6 +89,8 @@ public class CompareActivity extends AppCompatActivity {
     private TextView tvwebp;
 
     private SubsamplingScaleImageView ivwebp;
+    private TextView tvturbo;
+    private SubsamplingScaleImageView ivTurbo;
     List<File> files = new ArrayList<>();
     private Button btnSelf;
 
@@ -351,19 +353,22 @@ public class CompareActivity extends AppCompatActivity {
                    // .ignoreBy(40)
                     //.saver(TurboCompressor.getTurboCompressor())//rgb565会导致crash
                     .get();*/
-            /*List<File> files2 =  Luban.with(this)
-                    .load(path)
-                    .ignoreBy(5)
-                    .targetQuality(65)
-                    .targetFormat(Bitmap.CompressFormat.WEBP)
-                    // .ignoreBy(40)
-                    .get();
-            String compress2 = files2.get(0).getAbsolutePath();
-            ivLubanTurbo.setImage(ImageSource.uri(Uri.fromFile(new File(compress2))));
-            tvLubanTurbo.setText("luban-webp-65:"+getImgInfo(compress2));
+            File files66 =  Luban.with(this)
+                    .ignoreBy(150)
+                    .setCompressor(new LubanTurbo())
+                    .targetQuality(70)
+                    .noResize(true)
+                    .get(path);
+            String compress66 = files66.getAbsolutePath();
+            ivTurbo.setImage(ImageSource.uri(Uri.fromFile(new File(compress66))));
+            tvturbo.setText("libjpegturbo(点击显示exif):\n"+getImgInfo(compress66));
+            tvturbo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showExif(compress66);
 
-            Log.w("exif",ExifUtil.readExif(new FileInputStream(files2.get(0))).toString());*/
-           // Log.w("meta",MetaDataUtil.getAllInfo(compress2).toString());
+                }
+            });
 
         } catch (Throwable e) {
             e.printStackTrace();
@@ -399,6 +404,8 @@ public class CompareActivity extends AppCompatActivity {
         ivNoResize = (SubsamplingScaleImageView) findViewById(R.id.iv_noresize);
         tvwebp = (TextView) findViewById(R.id.tv_webp);
         ivwebp = (SubsamplingScaleImageView) findViewById(R.id.iv_webp);
+        tvturbo = findViewById(R.id.tv_jpgturbo);
+        ivTurbo = findViewById(R.id.iv_jpgturbo);
     }
     public static String formatFileSize(long size) {
         try {

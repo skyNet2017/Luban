@@ -37,7 +37,7 @@ public class Luban implements Handler.Callback {
    OnCompressListener mCompressListener;
    CompressionPredicate mCompressionPredicate;
    List<InputStreamProvider> mStreamProviders;
-   IBitmapToFile bitmapToFile;
+  protected IBitmapToFile bitmapToFile;
 
    Bitmap.CompressFormat targetFormat;
    int maxShortDimension;
@@ -349,7 +349,7 @@ public class Luban implements Handler.Callback {
       return this;
     }
 
-    public Builder saver(IBitmapToFile bitmapToFile) {
+    public Builder setCompressor(IBitmapToFile bitmapToFile) {
       this.bitmapToFile = bitmapToFile;
       return this;
     }

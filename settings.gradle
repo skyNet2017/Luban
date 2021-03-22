@@ -1,2 +1,2 @@
 include ':showResult'
-include ':example', ':luban'//, ':lubanturbo'
+include ':example', ':luban', ':lubanturbo'

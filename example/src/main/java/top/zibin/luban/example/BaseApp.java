@@ -20,7 +20,7 @@ public class BaseApp extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        ShowResultUtil.showCompressResult = true;
+        ShowResultUtil.showCompressResult = false;
         LubanUtil.init(this,true,new BaseLubanConfig(){
             @Override
             public void trace(String inputPath, String outputPath, long timeCost, int percent, long sizeAfterCompressInK, long width, long height) {

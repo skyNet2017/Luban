@@ -2,10 +2,10 @@ package com.hss01248.lubanturbo;
 
 import android.graphics.Bitmap;
 import android.util.Log;
-import top.zibin.luban.IBitmapToFile;
+
 
 import java.io.File;
-import java.io.IOException;
+
 
 /**
  * Created by hss on 2018/12/14.
@@ -14,24 +14,28 @@ import java.io.IOException;
 public class TurboCompressor {
 
     static {
-        System.loadLibrary("luban");
+        try {
+            System.loadLibrary("luban");
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+        }
+
     }
 
     public native static boolean nativeCompress(Bitmap bitmap,int quality,boolean isRGB565,String outPath);
 
 
-    public static IBitmapToFile getTurboCompressor(){
-        return new IBitmapToFile() {
-            @Override
-            public void compressToFile(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality) throws IOException {
-                Log.d("dd","TurboCompressor started  tagBitmap.getConfig():"+tagBitmap.getConfig());
-                long start = System.currentTimeMillis();
-                boolean isSuccess = nativeCompress(tagBitmap,quality,tagBitmap.getConfig() == Bitmap.Config.RGB_565,tagImg.getAbsolutePath());
-                Log.d("dd","TurboCompressor ended,cost time:"+(System.currentTimeMillis() - start));
-                if(!isSuccess){
-                    throw new IOException("nativeCompress failed");
-                }
-            }
-        };
+    public static boolean compressToFile(Bitmap tagBitmap, File tagImg, int quality){
+        boolean isSuccess = false;
+        long start = System.currentTimeMillis();
+        try {
+            isSuccess = nativeCompress(tagBitmap,quality,tagBitmap.getConfig() == Bitmap.Config.RGB_565,tagImg.getAbsolutePath());
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+        }
+        Log.d("dd","TurboCompressor ended,cost time:"+(System.currentTimeMillis() - start));
+
+        return isSuccess;
     }
+
 }

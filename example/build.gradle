@@ -46,7 +46,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.6'
     implementation 'com.github.skyNet2017:TakePhoto:4.2.1'
     implementation project(':luban')
-    //implementation project(':lubanturbo')
+    implementation project(':lubanturbo')
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
 //    implementation 'top.zibin:Luban:1.1.5'
     implementation 'id.zelory:compressor:2.1.0'

@@ -584,6 +584,22 @@ public void trace(long timeCost, int percent, long sizeAfterCompressInK, long wi
 
 
 
+
+
+## Android bitmap 压缩api  vs libjpegTurbo:
+
+> 可以看到,Android10上,bitmap api压缩效果还略优于libjpegTurbo
+
+![image-20210322112521000](https://gitee.com/hss012489/picbed/raw/master/picgo/1616383521094-image-20210322112521000.jpg)
+
+![image-20210322112408117](https://gitee.com/hss012489/picbed/raw/master/picgo/1616383454835-image-20210322112408117.jpg)
+
+
+
+
+
+
+
 # 参考
 
 [Android关于Color你所知道的和不知道的一切](https://cloud.tencent.com/developer/article/1370953)

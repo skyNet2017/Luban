@@ -3,6 +3,7 @@
 #include <android/log.h>
 #include <android/bitmap.h>
 #include <malloc.h>
+#include <stdio.h>
 #include "include/jpeglib.h"
 
 #define LOG_TAG "Luban"

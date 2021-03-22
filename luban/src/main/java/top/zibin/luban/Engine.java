@@ -21,7 +21,7 @@ import javax.xml.transform.sax.TemplatesHandler;
 /**
  * Responsible for starting compress and managing active and cached resources.
  */
-class Engine {
+public class Engine {
   private InputStreamProvider srcImg;
   private File tagImg;
   private int srcWidth;
