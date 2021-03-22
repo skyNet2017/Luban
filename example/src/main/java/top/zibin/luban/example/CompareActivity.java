@@ -354,7 +354,7 @@ public class CompareActivity extends AppCompatActivity {
                     //.saver(TurboCompressor.getTurboCompressor())//rgb565会导致crash
                     .get();*/
             File files66 =  Luban.with(this)
-                    .ignoreBy(150)
+                    .ignoreBy(50)
                     .setCompressor(new LubanTurbo())
                     .targetQuality(70)
                     .noResize(true)
