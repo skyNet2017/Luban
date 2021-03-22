@@ -211,7 +211,7 @@ enum Checker {
     }
   }
 
-  boolean needCompress(int leastCompressSize, int quality, String path, int maxShortDimension) {
+  boolean needCompress(int leastCompressSize, int quality, String path, int maxShortDimension,boolean noResize) {
     File source = new File(path);
     if(!source.exists()){
       return false;
@@ -221,6 +221,11 @@ enum Checker {
     }
     if(source.length() < (leastCompressSize << 10)){
       return false;
+    }
+    if(noResize){
+      if(source.getName().contains(Luban.FILE_PREFIX_NO_RESIZE)){
+        return false;
+      }
     }
     ExifInterface exif = new ExifInterface();
     try {

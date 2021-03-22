@@ -21,6 +21,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class Luban implements Handler.Callback {
   private static final String TAG = "Luban";
+    public static final String FILE_PREFIX_NO_RESIZE = "_luban_noresize";
   private static final String DEFAULT_DISK_CACHE_DIR = "luban_disk_cache";
 
   private static final int MSG_COMPRESS_SUCCESS = 0;
@@ -264,13 +265,13 @@ public class Luban implements Handler.Callback {
     try {
       if (mCompressionPredicate != null) {
         if (mCompressionPredicate.apply(path.getPath())
-                && Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath(),maxShortDimension)) {
+                && Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath(),maxShortDimension,noResize)) {
           result = new Engine(path, outFile, focusAlpha,bitmapToFile,quality,this).compress();
         } else {
           result = new File(path.getPath());
         }
       } else {
-        result = Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath(),maxShortDimension) ?
+        result = Checker.SINGLE.needCompress(mLeastCompressSize,quality, path.getPath(),maxShortDimension,noResize) ?
                 new Engine(path, outFile, focusAlpha,bitmapToFile,quality,this).compress() :
                 new File(path.getPath());
       }
@@ -355,6 +356,9 @@ public class Luban implements Handler.Callback {
     }
     public Builder noResize(boolean noResize) {
       this.noResize = noResize;
+      if(noResize){
+        setRenameListener(new NoResizeRenameListener());
+      }
       return this;
     }
 
