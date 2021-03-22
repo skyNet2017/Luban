@@ -103,7 +103,7 @@ class Engine {
       if(exifs != null ){
         if(luban.keepExif){
           //最后一个参数代表是否要复写Orientation参数为0. 旋转成功就复写,没有成功就维持原先的
-          ExifUtil.resetImageWHToMap(exifs,tagImg.getAbsolutePath(),rotateSuccess);
+          ExifUtil.resetImageWHToMap(exifs,new FileInputStream(new File(tagImg.getAbsolutePath())),rotateSuccess);
           ExifUtil.writeExif(exifs,tagImg.getAbsolutePath());
         }else {
           if(!rotateSuccess && rotation != 0){
