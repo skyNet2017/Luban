@@ -49,10 +49,11 @@ import org.devio.takephoto.wrap.TakeOnePhotoListener;
 import org.devio.takephoto.wrap.TakePhotoUtil;
 
 
-
+import top.zibin.luban.DefaultRenameListener;
 import top.zibin.luban.ILubanConfig;
 import top.zibin.luban.Luban;
 import top.zibin.luban.LubanUtil;
+import top.zibin.luban.example.quality.Magick;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -372,6 +373,48 @@ public class CompareActivity extends AppCompatActivity {
 
         } catch (Throwable e) {
             e.printStackTrace();
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //compressDifferentQualitys(path);
+            }
+        }).start();
+
+
+    }
+
+    private void compressDifferentQualitys(String path) {
+        for (int i = 0; i <=100; i+=5) {
+            int finalI = i;
+            File in =   Luban.with(this)
+                    .ignoreBy(10)
+                    .targetQuality(i)
+                    .setRenameListener(new DefaultRenameListener(){
+                        @Override
+                        public String rename(String filePath) {
+                            try {
+                                return filePath.substring(filePath.lastIndexOf("/")+1,filePath.lastIndexOf("."))
+                                        +"_q_"+ finalI +filePath.substring(filePath.lastIndexOf("."));
+                            }catch (Throwable throwable){
+                                throwable.printStackTrace();
+                                return new File(filePath).getName();
+                            }
+                        }
+                    })
+                    .maxShortDimension(1080)
+                    .get(path);
+            ExifInterface exif = new ExifInterface();
+            int quality1 = 0;
+            try {
+                exif.readExif(in.getAbsolutePath(), ExifInterface.Options.OPTION_ALL);
+                quality1 = exif.getQualityGuess();
+                int quality2 =   new Magick().getJPEGImageQuality(in);
+                Log.w("quality",in.getName()+" compress q:"+i+", real q1:"+quality1+", real q2:"+quality2);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
 
     }
