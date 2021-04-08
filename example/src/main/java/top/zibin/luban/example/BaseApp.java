@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.exifinterface.media.ExifInterface;
 import androidx.multidex.MultiDexApplication;
 
 import com.blankj.utilcode.util.Utils;
@@ -25,6 +26,15 @@ public class BaseApp extends MultiDexApplication {
             @Override
             public void trace(String inputPath, String outputPath, long timeCost, int percent, long sizeAfterCompressInK, long width, long height) {
                 ShowResultUtil.showResult(top,inputPath,outputPath,timeCost,percent,sizeAfterCompressInK,width,height);
+            }
+
+            @Override
+            public boolean editExif(@Nullable ExifInterface exif) {
+                if(exif == null){
+                    return true;
+                }
+                exif.setAttribute(ExifInterface.TAG_ARTIST,"sb");
+                return true;
             }
         });
         Utils.init(this);

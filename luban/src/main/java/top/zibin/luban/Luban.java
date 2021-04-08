@@ -10,6 +10,8 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.exifinterface.media.ExifInterface;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -275,7 +277,8 @@ public class Luban implements Handler.Callback {
                 new Engine(path, outFile, focusAlpha,bitmapToFile,quality,this).compress() :
                 new File(path.getPath());
       }
-
+      //修改exif
+      editExif(result);
       //加上日志:
 
       long duration = System.currentTimeMillis() - start;
@@ -293,6 +296,8 @@ public class Luban implements Handler.Callback {
     }catch (Throwable throwable){
       LubanUtil.config.reportException(throwable);
       result = file0;
+      //修改exif
+      editExif(result);
       long duration = System.currentTimeMillis() - start;
       LubanUtil.w("compressByLuban cost " + duration + " ms, throws exception:"+throwable.getClass()+" "+throwable.getMessage());
 
@@ -300,6 +305,18 @@ public class Luban implements Handler.Callback {
 
 
     return result;
+  }
+
+  private void editExif(File result) {
+    try {
+      if(LubanUtil.config.editExif(null)){
+        ExifInterface exif = new ExifInterface(result);
+        LubanUtil.config.editExif(exif);
+        exif.saveAttributes();
+      }
+    }catch (Throwable throwable){
+      LubanUtil.config.reportException(throwable);
+    }
   }
 
   @Override

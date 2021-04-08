@@ -1,5 +1,8 @@
 package top.zibin.luban;
 
+import androidx.annotation.Nullable;
+import androidx.exifinterface.media.ExifInterface;
+
 import java.io.File;
 
 /**
@@ -25,5 +28,9 @@ public interface ILubanConfig {
    default void trace(String inputPath,String outputPath,long timeCost,int percent,long sizeAfterCompressInK,long width,long height){
        LubanUtil.i(inputPath+"\ncompress to --> "+outputPath+"\ntime cost : "+timeCost+"ms, filesize after compress:"
                +sizeAfterCompressInK +"kB , 减少掉:"+percent +"%,  wh:"+width+"x"+height);
+   }
+
+   default boolean editExif(@Nullable ExifInterface exif){
+       return false;
    }
 }
