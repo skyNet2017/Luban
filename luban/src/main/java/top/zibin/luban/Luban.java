@@ -29,7 +29,7 @@ public class Luban implements Handler.Callback {
   private static final int MSG_COMPRESS_SUCCESS = 0;
   private static final int MSG_COMPRESS_START = 1;
   private static final int MSG_COMPRESS_ERROR = 2;
-  public static final int TARGET_QUALITY = 65;
+  public static final int TARGET_QUALITY = 70;
 
    String mTargetDir;
    boolean focusAlpha;
@@ -46,7 +46,7 @@ public class Luban implements Handler.Callback {
    int maxShortDimension;
   boolean noResize = false;
   /**
-   * 压缩的目标质量,65
+   * 压缩的目标质量
    */
   private int quality = TARGET_QUALITY;
 

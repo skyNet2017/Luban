@@ -37,7 +37,8 @@ public class LubanUtil {
     static Application app;
      static ILubanConfig config;
      static boolean enableLog;
-     static final int TARGET_QUALITY = 85;//默认质量85.
+    public static  int quality_material = 85;//默认质量85.
+    public static  int quality_normal = 70;
 
     public static void init(Application app,boolean enableLog,@Nullable  ILubanConfig config){
         LubanUtil.app = app;
@@ -66,7 +67,7 @@ public class LubanUtil {
 
         return Luban.with(app)
                 .ignoreBy(150)
-                .targetQuality(70)
+                .targetQuality(quality_normal)
                 .keepExif(false)
                 .maxShortDimension(1080)
                 .setTargetDir(config.getSaveDir().getAbsolutePath())
@@ -83,7 +84,7 @@ public class LubanUtil {
     public static File compressWithNoResize(String imgPath) {
         return Luban.with(app)
                 .ignoreBy(150)
-                .targetQuality(70)
+                .targetQuality(quality_normal)
                 .keepExif(true)
                 .noResize(true)
                 .setTargetDir(config.getSaveDir().getAbsolutePath())
@@ -102,7 +103,7 @@ public class LubanUtil {
     public static File compressForMaterialUpload(String imgPath) {
         return Luban.with(app)
                 .ignoreBy(150)
-                .targetQuality(85)
+                .targetQuality(quality_material)
                 .keepExif(true)
                 .maxShortDimension(1080)
                 .setTargetDir(config.getSaveDir().getAbsolutePath())
@@ -112,7 +113,7 @@ public class LubanUtil {
     public static File compressForMaterialUploadWebp(String imgPath) {
         return Luban.with(app)
                 .ignoreBy(150)
-                .targetQuality(85)
+                .targetQuality(quality_material)
                 .keepExif(true)
                 .targetFormat(Bitmap.CompressFormat.WEBP)
                 .maxShortDimension(1080)
@@ -151,7 +152,7 @@ public class LubanUtil {
         Luban.with(app)
                 .setTargetDir(config.getSaveDir().getAbsolutePath())
                 .setFocusAlpha(isPng)
-                .targetQuality(TARGET_QUALITY)
+                .targetQuality(quality_material)
                 .ignoreBy(150)
                 .load(file)
                 .setCompressListener(new OnCompressListener() {
@@ -262,7 +263,7 @@ public class LubanUtil {
 
 
     private static boolean saveBitmapToFile(String filename, Bitmap bitmap, Bitmap.CompressFormat compressFormat) {
-        return saveBitmapToFile(filename, bitmap, 80, compressFormat);
+        return saveBitmapToFile(filename, bitmap, quality_material, compressFormat);
     }
 
     /**
