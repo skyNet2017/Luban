@@ -32,7 +32,7 @@ public class LubanUtil {
 
     private static final int MAX_IMAGE_HEIGHT = 720;
 
-    private static final long MIN_IMAGE_COMPRESS_SIZE = 150 * 1024;//150k以下,不压缩
+    private static final int MIN_IMAGE_COMPRESS_SIZE = 80 ;//80k以下,不压缩
     
     static Application app;
      static ILubanConfig config;
@@ -66,7 +66,7 @@ public class LubanUtil {
     public static File compressForNormalUsage(String imgPath) {
 
         return Luban.with(app)
-                .ignoreBy(150)
+                .ignoreBy(MIN_IMAGE_COMPRESS_SIZE)
                 .targetQuality(quality_normal)
                 .keepExif(false)
                 .maxShortDimension(1080)
@@ -83,7 +83,7 @@ public class LubanUtil {
      */
     public static File compressWithNoResize(String imgPath) {
         return Luban.with(app)
-                .ignoreBy(150)
+                .ignoreBy(MIN_IMAGE_COMPRESS_SIZE)
                 .targetQuality(quality_normal)
                 .keepExif(true)
                 .noResize(true)
@@ -102,7 +102,7 @@ public class LubanUtil {
      */
     public static File compressForMaterialUpload(String imgPath) {
         return Luban.with(app)
-                .ignoreBy(150)
+                .ignoreBy(MIN_IMAGE_COMPRESS_SIZE)
                 .targetQuality(quality_material)
                 .keepExif(true)
                 .maxShortDimension(1080)
@@ -112,7 +112,7 @@ public class LubanUtil {
 
     public static File compressForMaterialUploadWebp(String imgPath) {
         return Luban.with(app)
-                .ignoreBy(150)
+                .ignoreBy(MIN_IMAGE_COMPRESS_SIZE)
                 .targetQuality(quality_material)
                 .keepExif(true)
                 .targetFormat(Bitmap.CompressFormat.WEBP)
@@ -145,7 +145,7 @@ public class LubanUtil {
             callback.onError(new Throwable("file not exist"));
             return;
         }
-        if (file.length() <= MIN_IMAGE_COMPRESS_SIZE) {
+        if (file.length() <= MIN_IMAGE_COMPRESS_SIZE *1024) {
             callback.onSuccess(file);
             return;
         }
@@ -153,7 +153,7 @@ public class LubanUtil {
                 .setTargetDir(config.getSaveDir().getAbsolutePath())
                 .setFocusAlpha(isPng)
                 .targetQuality(quality_material)
-                .ignoreBy(150)
+                .ignoreBy(MIN_IMAGE_COMPRESS_SIZE)
                 .load(file)
                 .setCompressListener(new OnCompressListener() {
                     @Override
