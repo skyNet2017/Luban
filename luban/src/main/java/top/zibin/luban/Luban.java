@@ -248,7 +248,11 @@ public class Luban implements Handler.Callback {
   private File compress(Context context, InputStreamProvider path) {
     File file0 = new File(path.getPath());
     if(!file0.exists()){
-      LubanUtil.i("compressByLuban file not exist: " + file0.getAbsolutePath());
+      LubanUtil.w("compressByLuban file not exist: " + file0.getAbsolutePath());
+      return file0;
+    }
+    if(file0.length() ==0){
+      LubanUtil.w("compressByLuban file is empty: " + file0.getAbsolutePath());
       return file0;
     }
     File result;
@@ -279,6 +283,19 @@ public class Luban implements Handler.Callback {
       }
       //修改exif
       editExif(result);
+
+
+      //压缩完成后,判断压缩文件是否存在,是否为空文件,如果是,就返回原文件
+      if(!result.exists()){
+        LubanUtil.w("compressed file not exist: " + result.getAbsolutePath());
+        LubanUtil.config.reportException(new CompressFailException("compressed file not exist"));
+        result =  file0;
+      }else if(result.length() ==0){
+        LubanUtil.w("compressed file is empty: " + result.getAbsolutePath());
+        LubanUtil.config.reportException(new CompressFailException("compressed file is empty:size =0"));
+        result =  file0;
+      }
+
       //加上日志:
 
       long duration = System.currentTimeMillis() - start;
@@ -294,16 +311,13 @@ public class Luban implements Handler.Callback {
       LubanUtil.config.trace(file0.getAbsolutePath(),result.getAbsolutePath(),duration,percent,result.length()/1024,wh[0],wh[1]);
 
     }catch (Throwable throwable){
-      LubanUtil.config.reportException(throwable);
+      LubanUtil.config.reportException(new CompressFailException(throwable));
       result = file0;
       //修改exif
       editExif(result);
       long duration = System.currentTimeMillis() - start;
       LubanUtil.w("compressByLuban cost " + duration + " ms, throws exception:"+throwable.getClass()+" "+throwable.getMessage());
-
     }
-
-
     return result;
   }
 
