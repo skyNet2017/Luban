@@ -11,6 +11,8 @@ import androidx.exifinterface.media.ExifInterface;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.hss01248.media.metadata.ExifUtil;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -248,7 +250,7 @@ public class LubanUtil {
 
    static void  logFile(String desc,String file){
         if(enableLog){
-            i(desc+" :  size:"+ formatFileSize(new File(file).length()) +", "+readExif(file));
+            i(desc + readExif(file));
         }
 
     }
@@ -471,58 +473,9 @@ public class LubanUtil {
     }
 
    public   static String readExif(String path) {
-        int degree = 0;
-        try {
-            ExifInterface exifInterface = new ExifInterface(path);
-            int orientation = exifInterface.getAttributeInt(
-                    ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_NORMAL);
-            switch (orientation) {
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    degree = 90;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    degree = 180;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    degree = 270;
-                    break;
-            }
 
-            List<String> tags = getTags();
-            it.sephiroth.android.library.exif2.ExifInterface exifInterface1 = new it.sephiroth.android.library.exif2.ExifInterface();
-            exifInterface1.readExif(path, it.sephiroth.android.library.exif2.ExifInterface.Options.OPTION_ALL);
-            int quality = exifInterface1.getQualityGuess();
-            int[] wh = getImageWidthHeight(path);
 
-            StringBuilder sb = new StringBuilder();
-            sb.append("file info:");
-            sb.append("\n")
-                    .append(path)
-                    .append("\nwh")
-                    .append(wh[0])
-                    .append("x")
-                    .append(wh[1])
-                    .append("\nsize:")
-                    .append(formatFileSize(new File(path).length()))
-                    .append("\ntype:")
-                    .append(getRealType(new File(path)));
-            sb.append("\njpeg quality guess:").append(quality);
-            sb.append("\norientation degree:").append(degree);
-            for (String tag: tags) {
-                String attr = exifInterface.getAttribute(tag);
-                if(!TextUtils.isEmpty(attr)){
-                    sb.append("\n").append(tag)
-                            .append(":")
-                            .append(attr);
-                }
-            }
-            return sb.toString();
-
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return e.getMessage();
-        }
+        return ExifUtil.getExifStr(path);
 
     }
 
