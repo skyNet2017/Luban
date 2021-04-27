@@ -16,13 +16,12 @@ import androidx.appcompat.app.AlertDialog;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.media.metadata.ExifUtil;
+import com.hss01248.media.metadata.quality.Magick;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.DecimalFormat;
 import java.util.Map;
-
-import it.sephiroth.android.library.exif2.ExifInterface;
 
 public class ShowResultUtil {
     public static boolean showCompressResult = false;
@@ -109,15 +108,11 @@ public class ShowResultUtil {
     }
 
     public static int guessQuality(String path) {
-        ExifInterface exif = new ExifInterface();
         try {
-            exif.readExif( path, ExifInterface.Options.OPTION_ALL );
-            return   exif.getQualityGuess();
-
-        } catch (Throwable e) {
-            e.printStackTrace();
+            return new Magick().getJPEGImageQuality(new FileInputStream(path));
+        }catch (Throwable throwable) {
+            throwable.printStackTrace();
             return 0;
-
         }
     }
 

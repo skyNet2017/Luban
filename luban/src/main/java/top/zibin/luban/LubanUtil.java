@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.hss01248.media.metadata.ExifUtil;
+import com.hss01248.media.metadata.quality.Magick;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -368,6 +369,15 @@ public class LubanUtil {
 
     private static Bitmap rotateBitmapByDegree(Bitmap bm, int degree) {
         return rotateBitmapByDegree(bm, degree, true);
+    }
+
+    public static int getJpegQuality(String path){
+        try {
+           return new Magick().getJPEGImageQuality(new FileInputStream(path));
+        }catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return 0;
+        }
     }
 
     private static Bitmap rotateBitmapByDegree(Bitmap bm, int degree, boolean recycle) {

@@ -42,9 +42,6 @@ import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.media.metadata.ExifUtil;
 
-import it.sephiroth.android.library.exif2.ExifInterface;
-
-import org.apache.commons.io.FileUtils;
 import org.devio.takephoto.wrap.TakeOnePhotoListener;
 import org.devio.takephoto.wrap.TakePhotoUtil;
 
@@ -56,9 +53,7 @@ import top.zibin.luban.LubanUtil;
 import top.zibin.luban.example.quality.Magick;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -262,16 +257,7 @@ public class CompareActivity extends AppCompatActivity {
     }
 
     private int guessQuality(String path) {
-        ExifInterface exif = new ExifInterface();
-        try {
-            exif.readExif( path, ExifInterface.Options.OPTION_ALL );
-            return   exif.getQualityGuess();
-
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return 0;
-
-        }
+       return LubanUtil.getJpegQuality(path);
     }
 
     private void compress(final String path) {
@@ -405,11 +391,11 @@ public class CompareActivity extends AppCompatActivity {
                     })
                     .maxShortDimension(1080)
                     .get(path);
-            ExifInterface exif = new ExifInterface();
+          //  ExifInterface exif = new ExifInterface();
             int quality1 = 0;
             try {
-                exif.readExif(in.getAbsolutePath(), ExifInterface.Options.OPTION_ALL);
-                quality1 = exif.getQualityGuess();
+               // exif.readExif(in.getAbsolutePath(), ExifInterface.Options.OPTION_ALL);
+              //  quality1 = exif.getQualityGuess();
                 int quality2 =   new Magick().getJPEGImageQuality(in);
                 Log.w("quality",in.getName()+" compress q:"+i+", real q1:"+quality1+", real q2:"+quality2);
             } catch (Exception e) {

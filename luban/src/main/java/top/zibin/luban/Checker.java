@@ -3,7 +3,7 @@ package top.zibin.luban;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.Log;
-import it.sephiroth.android.library.exif2.ExifInterface;
+
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -227,10 +227,10 @@ enum Checker {
         return false;
       }
     }
-    ExifInterface exif = new ExifInterface();
+
     try {
-      exif.readExif( path, ExifInterface.Options.OPTION_ALL );
-      int quality0 = exif.getQualityGuess();
+
+      int quality0 = LubanUtil.getJpegQuality(path);
       if(quality0 == 0){
         return true;
       }

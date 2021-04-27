@@ -1,10 +1,6 @@
 package top.zibin.luban;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.util.Log;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
