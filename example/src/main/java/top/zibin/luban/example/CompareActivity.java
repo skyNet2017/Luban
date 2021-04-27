@@ -258,6 +258,7 @@ public class CompareActivity extends AppCompatActivity {
         int quality = guessQuality(path);
 
         return srcWidth + "x"+srcHeight+","+sizeStr+",Q:"+quality+"\npath: "+path;
+        //return ExifUtil.getExifStr(path);
     }
 
     private int guessQuality(String path) {
@@ -421,11 +422,9 @@ public class CompareActivity extends AppCompatActivity {
 
     private void showExif(String compress) {
         try {
-            Map<String, String> map = ExifUtil.readExif(new FileInputStream(new File(compress)));
-            String str = map.toString().replace(",","\n");
             AlertDialog dialog = new AlertDialog.Builder(this)
                     .setTitle(compress)
-                    .setMessage(str)
+                    .setMessage(ExifUtil.getExifStr(compress))
                     .setPositiveButton("ok",null)
                     .create();
             dialog.show();

@@ -77,8 +77,8 @@ public class ShowResultUtil {
 
     public static void showExif(Activity activity,String compress) {
         try {
-            Map<String, String> map = ExifUtil.readExif(new FileInputStream(new File(compress)));
-            String str = map.toString().replace(",","\n");
+
+            String str = ExifUtil.getExifStr(compress);
             AlertDialog dialog = new AlertDialog.Builder(activity)
                     .setTitle(compress)
                     .setMessage(str)
