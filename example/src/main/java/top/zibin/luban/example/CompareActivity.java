@@ -223,6 +223,7 @@ public class CompareActivity extends AppCompatActivity {
         TakePhotoUtil.startPickOneWitchDialog(this, new TakeOnePhotoListener() {
             @Override
             public void onSuccess(final String path) {
+                LubanUtil.compressOriginal(path,88);
 
                 compress(path);
             }

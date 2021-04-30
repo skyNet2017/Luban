@@ -14,11 +14,13 @@ import android.util.Log;
 import com.hss01248.media.metadata.ExifUtil;
 import com.hss01248.media.metadata.quality.Magick;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -77,10 +79,76 @@ public class LubanUtil {
                 .get(imgPath);
     }
 
+    public static File compressOriginal(String path,int quality){
+        File file = new File(path);
+        try {
+            int q = new Magick().getJPEGImageQuality(new FileInputStream(file));
+            if(q > 0 && q < quality){
+                return file;
+            }
+            Bitmap bitmap = BitmapFactory.decodeFile(path);
+            File tmp = new File(file.getParentFile(),file.getName()+".tmp");
+            boolean success =  bitmap.compress(Bitmap.CompressFormat.JPEG,quality,new FileOutputStream(tmp));
+            if(!success){
+                return file;
+            }
+            if(!tmp.exists() || tmp.length()< 10){
+                return file;
+            }
+
+            ExifUtil.copyExif(path,tmp.getAbsolutePath());
+            if(tmp.length() > file.length()){
+                return file;
+            }
+            //拷贝文件
+            copyFile(new FileInputStream(tmp),new FileOutputStream(file));
+
+            if(!file.exists() || file.length()< 10){
+                return tmp;
+            }
+            tmp.delete();
+            return file;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return file;
+        }
+    }
+
+     static void copyFile(InputStream in, OutputStream out) {
+        try {
+            byte[] b = new byte[128 * 1024]; //128k memory
+            int len = -1;
+            while ((len = in.read(b)) > 0) {
+                out.write(b, 0, len);
+                out.flush();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            closeIO(in, out);
+        }
+    }
+
+     static void closeIO(Closeable... closeables) {
+        if (null == closeables || closeables.length <= 0) {
+            return;
+        }
+        for (Closeable cb : closeables) {
+            try {
+                if (null == cb) {
+                    continue;
+                }
+                cb.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     /**
      * 适用于大图小字的场景,比如拍书,拍A4纸,拍一些小票,资料之类的.
      * 不压缩图片尺寸,只把图片质量降到70
-     * 保留exif
+     * 保留exif 文件路径里有_luban_noresize,以此来告诉后续的luabn不要重复压缩
      * @param imgPath
      * @return
      */
