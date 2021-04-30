@@ -222,11 +222,11 @@ enum Checker {
     if(source.length() < (leastCompressSize << 10)){
       return false;
     }
-    if(noResize){
+    //if(noResize){
       if(source.getName().contains(Luban.FILE_PREFIX_NO_RESIZE)){
         return false;
       }
-    }
+    //}
 
     try {
 
