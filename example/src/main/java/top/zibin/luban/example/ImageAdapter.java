@@ -22,7 +22,7 @@ class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageHolder> {
 
   @Override public ImageHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     mContext = parent.getContext();
-    return new ImageHolder(LayoutInflater.from(mContext).inflate(R.layout.item_image, parent, false));
+    return new ImageHolder(LayoutInflater.from(mContext).inflate(R.layout.imgdata_item_image, parent, false));
   }
 
   @Override public void onBindViewHolder(ImageHolder holder, int position) {

@@ -3,7 +3,6 @@ package top.zibin.luban.example;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -17,7 +16,6 @@ import android.os.StrictMode;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -27,7 +25,6 @@ import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -40,6 +37,8 @@ import com.bumptech.glide.request.target.Target;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.hss01248.image.dataforphotoselet.ImgAdapter2;
+import com.hss01248.image.dataforphotoselet.ImgDataSeletor;
 import com.hss01248.media.metadata.ExifUtil;
 
 import org.devio.takephoto.wrap.TakeOnePhotoListener;
@@ -47,7 +46,6 @@ import org.devio.takephoto.wrap.TakePhotoUtil;
 
 
 import top.zibin.luban.DefaultRenameListener;
-import top.zibin.luban.ILubanConfig;
 import top.zibin.luban.Luban;
 import top.zibin.luban.LubanUtil;
 import top.zibin.luban.example.quality.Magick;
@@ -57,7 +55,6 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by huangshuisheng on 2019/1/23.
@@ -99,54 +96,14 @@ public class CompareActivity extends AppCompatActivity {
         btnSelf = findViewById(R.id.btn_chooseself);
         btnSelf.setVisibility(View.GONE);
         initEvent();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                copyfile();
-            }
-        }).start();
+
 
 
     }
 
-    private void copyfile() {
-        try {
-            String[] imgs = getAssets().list("imgs");
-            File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"0lubanTestImgs");
-            dir.mkdirs();
-            for (String img : imgs) {
-                File target = new File(dir,img);
-                files.add(target);
-                FileIOUtils.writeFileFromIS(target,getAssets().open("imgs/"+img));
-                refreshMediaCenter(getApplicationContext(),target.getAbsolutePath());
-            }
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    btnSelf.setVisibility(View.VISIBLE);
-                    btnSelf.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            showFiles();
-                        }
-                    });
-                }
-            });
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    private void showFiles() {
-        Dialog dialog = new Dialog(this);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
 
-        RecyclerView recyclerView = new RecyclerView(this);
-        dialog.setContentView(recyclerView);
-        initRecycler(recyclerView,dialog);
-        dialog.show();
-    }
 
     public void api(View view) {
         RelativeLayout linearLayout = new RelativeLayout(this);
@@ -181,21 +138,7 @@ public class CompareActivity extends AppCompatActivity {
 
     }
 
-    private void initRecycler(RecyclerView recyclerView, final Dialog dialog) {
-        BaseQuickAdapter adapter = new ImgAdapter2(R.layout.item_img);
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
-        recyclerView.setAdapter(adapter);
-        adapter.setNewData(files);
-        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                dialog.dismiss();
-                compress(files.get(position).getAbsolutePath());
-            }
-        });
 
-
-    }
 
     private void stickMode() {
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -220,7 +163,12 @@ public class CompareActivity extends AppCompatActivity {
     }
 
     private void chooseAndShow() {
-        TakePhotoUtil.startPickOneWitchDialog(this, new TakeOnePhotoListener() {
+
+       // ImgDataSeletor.startPickOneWitchDialog(thism);
+
+
+
+        ImgDataSeletor.startPickOneWitchDialog(this, new TakeOnePhotoListener() {
             @Override
             public void onSuccess(final String path) {
                 LubanUtil.compressOriginal(path,88);
@@ -456,99 +404,6 @@ public class CompareActivity extends AppCompatActivity {
         return String.valueOf(size);
     }
 
-    public static  void refreshMediaCenter(Context activity, String filePath){
-       /* File file  = new File(filePath);
-        try {
-            MediaStore.Images.Media.insertImage(activity.getContentResolver(),file.getAbsolutePath(), file.getName(), null);
-        } catch (FileNotFoundException e) {
-            ExceptionReporterHelper.reportException(e);
-        }*/
 
-
-        if (Build.VERSION.SDK_INT>19){
-            String mineType =getMineType(filePath);
-
-            saveImageSendScanner(activity,new MyMediaScannerConnectionClient(filePath,mineType));
-        }else {
-
-            saveImageSendBroadcast(activity,filePath);
-        }
-    }
-
-    public static String getMineType(String filePath) {
-
-        String type = "text/plain";
-        String extension = MimeTypeMap.getFileExtensionFromUrl(filePath);
-        if (extension != null) {
-            MimeTypeMap mime = MimeTypeMap.getSingleton();
-            type = mime.getMimeTypeFromExtension(extension);
-        }
-        return type;
-
-
-       /* MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        String mime = "text/plain";
-        if (filePath != null) {
-            try {
-                mmr.setDataSource(filePath);
-                mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
-            } catch (IllegalStateException e) {
-                return mime;
-            } catch (IllegalArgumentException e) {
-                return mime;
-            } catch (RuntimeException e) {
-                return mime;
-            }
-        }
-        return mime;*/
-    }
-
-    /**
-     * 保存后用广播扫描，Android4.4以下使用这个方法
-     * @author YOLANDA
-     */
-    private static void saveImageSendBroadcast(Context activity, String filePath){
-        activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + filePath)));
-    }
-
-    /**
-     * 保存后用MediaScanner扫描，通用的方法
-     *
-     */
-    private static void saveImageSendScanner (Context context, MyMediaScannerConnectionClient scannerClient) {
-
-        final MediaScannerConnection scanner = new MediaScannerConnection(context, scannerClient);
-        scannerClient.setScanner(scanner);
-        scanner.connect();
-    }
-
-
-
-    private   static class MyMediaScannerConnectionClient implements MediaScannerConnection.MediaScannerConnectionClient {
-
-        private MediaScannerConnection mScanner;
-
-        private String mScanPath;
-        private String mimeType;
-
-        public MyMediaScannerConnectionClient(String scanPath, String mimeType) {
-            mScanPath = scanPath;
-            this.mimeType = mimeType;
-        }
-
-        public void setScanner(MediaScannerConnection con) {
-            mScanner = con;
-        }
-
-        @Override
-        public void onMediaScannerConnected() {
-            mScanner.scanFile(mScanPath, mimeType);
-        }
-
-        @Override
-        public void onScanCompleted(String path, Uri uri) {
-            mScanner.disconnect();
-        }
-    }
 
 }
