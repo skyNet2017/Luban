@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="data_from_assets">from assets</string>
+    <string name="data_from_assets">img from assets</string>
+    <string name="data_pick_file">pick file</string>
+    <string name="data_pick_folder">pick folder</string>
 </resources>

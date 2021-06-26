@@ -47,5 +47,9 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0' //注解处理器
 
+    api('com.github.gzu-liyujiang.AndroidPicker:FilePicker:1.5.6.20181018') {
+        exclude group: 'com.android.support'
+    }
+
     //implementation 'jp.co.link_u.library.glideavif:glideavif:0.8.1'
 }

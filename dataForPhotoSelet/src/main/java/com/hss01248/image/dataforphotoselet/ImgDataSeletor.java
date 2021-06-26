@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -33,6 +34,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import cn.qqtheme.framework.picker.FilePicker;
 
 public class ImgDataSeletor {
 
@@ -73,6 +76,24 @@ public class ImgDataSeletor {
                     selectAssertFile(activity, listener);
                 }
             });
+            dialog.getWindow().findViewById(R.id.btn_pick_file).setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+
+                    if (dialog != null) {
+                        dialog.dismiss();
+                    }
+                    selectFile(activity,true, listener);
+                }
+            });
+            dialog.getWindow().findViewById(R.id.btn_pick_folder).setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+
+                    if (dialog != null) {
+                        dialog.dismiss();
+                    }
+                    selectFile(activity,false, listener);
+                }
+            });
             dialog.getWindow().findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     if (dialog != null) {
@@ -85,6 +106,24 @@ public class ImgDataSeletor {
             var4.printStackTrace();
         }
 
+    }
+
+    private static void selectFile(FragmentActivity activity,boolean isFile, TakeOnePhotoListener listener) {
+        FilePicker filePicker =    new FilePicker(activity,isFile ? FilePicker.FILE : FilePicker.DIRECTORY);
+        String path = activity.getSharedPreferences("select",Context.MODE_PRIVATE).getString("lastpath","");
+        if(!TextUtils.isEmpty(path)){
+            filePicker.setRootPath(path);
+        }
+
+        filePicker.setOnFilePickListener(new FilePicker.OnFilePickListener() {
+            @Override
+            public void onFilePicked(String currentPath) {
+                activity.getSharedPreferences("select",Context.MODE_PRIVATE).edit().putString("lastpath",
+                        isFile ? new File(currentPath).getParentFile().getAbsolutePath() : currentPath).apply();
+                listener.onSuccess(currentPath);
+            }
+        });
+        filePicker.show();
     }
 
 
