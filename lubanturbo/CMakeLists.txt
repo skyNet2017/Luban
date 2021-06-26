@@ -1,23 +1,23 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 
-add_library( luban
-             SHARED
-             src/main/cpp/turbo.c )
+add_library(luban
+        SHARED
+        src/main/cpp/turbo.c)
 
 include_directories(src/main/cpp/include)
 
-add_library( jpeg SHARED IMPORTED )
+add_library(jpeg SHARED IMPORTED)
 
-set_target_properties(  jpeg
-                        PROPERTIES IMPORTED_LOCATION
-                        ${CMAKE_SOURCE_DIR}/libs/${ANDROID_ABI}/libjpeg-turbo.a )
+set_target_properties(jpeg
+        PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/libs/${ANDROID_ABI}/libjpeg-turbo.a)
 
-find_library( log-lib log )
+find_library(log-lib log)
 
-target_link_libraries( luban
+target_link_libraries(luban
 
-                       jpeg
-                       jnigraphics
+        jpeg
+        jnigraphics
 
-                       ${log-lib})
+        ${log-lib})

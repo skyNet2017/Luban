@@ -19,7 +19,7 @@
  * with updates from Robert Hutchinson.
  */
 
-#include "cdjpeg.h"		/* Common decls for cjpeg/djpeg applications */
+#include "cdjpeg.h"        /* Common decls for cjpeg/djpeg applications */
 
 #ifdef RLE_SUPPORTED
 
@@ -131,11 +131,11 @@ start_input_rle (j_compress_ptr cinfo, cjpeg_source_ptr sinfo)
   } else if (source->header.ncolors == 1 && source->header.ncmap == 3) {
     source->visual     = PSEUDOCOLOR;
     TRACEMS3(cinfo, 1, JTRC_RLE_MAPPED, width, height,
-	     1 << source->header.cmaplen);
+         1 << source->header.cmaplen);
   } else if (source->header.ncolors == 3 && source->header.ncmap == 3) {
     source->visual     = TRUECOLOR;
     TRACEMS3(cinfo, 1, JTRC_RLE_FULLMAP, width, height,
-	     1 << source->header.cmaplen);
+         1 << source->header.cmaplen);
   } else if (source->header.ncolors == 3 && source->header.ncmap == 0) {
     source->visual     = DIRECTCOLOR;
     TRACEMS2(cinfo, 1, JTRC_RLE, width, height);

@@ -8,18 +8,18 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
-
 
 
 import io.reactivex.Flowable;
@@ -47,257 +47,259 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-  private static final String TAG = "Luban";
-  private static final int range = 3;
+    private static final String TAG = "Luban";
+    private static final int range = 3;
 
-  private List<ImageBean> mImageList = new ArrayList<>();
-  private ImageAdapter mAdapter = new ImageAdapter(mImageList);
-  private CompositeDisposable mDisposable;
+    private List<ImageBean> mImageList = new ArrayList<>();
+    private ImageAdapter mAdapter = new ImageAdapter(mImageList);
+    private CompositeDisposable mDisposable;
 
-  private List<File> originPhotos = new ArrayList<>();
+    private List<File> originPhotos = new ArrayList<>();
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    LubanUtil.init(getApplication(),true,null);
-   // TakePhotoUtil3.init(this,true,true);
-    setContentView(R.layout.activity_main);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        LubanUtil.init(getApplication(), true, null);
+        // TakePhotoUtil3.init(this,true,true);
+        setContentView(R.layout.activity_main);
 
 
-    mDisposable = new CompositeDisposable();
+        mDisposable = new CompositeDisposable();
 
-    RecyclerView mRecyclerView = findViewById(R.id.recycler_view);
-    mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-    mRecyclerView.setAdapter(mAdapter);
+        RecyclerView mRecyclerView = findViewById(R.id.recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setAdapter(mAdapter);
 
-    initPermission();
-  }
-
-  @Override
-  protected void onDestroy() {
-    super.onDestroy();
-    mDisposable.clear();
-  }
-
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    getMenuInflater().inflate(R.menu.menu_main, menu);
-    return true;
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    originPhotos.clear();
-    mImageList.clear();
-    assetsToFiles();
-    switch (item.getItemId()) {
-      case R.id.sync_files:
-       // withRx(assetsToFiles());
-        File file = LubanUtil.compressByLuban(originPhotos.get(0).getAbsolutePath(),false);
-
-        break;
-      case R.id.sync_uris:
-        withRx(assetsToUri());
-        break;
-      case R.id.async_files:
-       // withLs(assetsToFiles());
-        LubanUtil.compressByLubanAsync(originPhotos.get(0).getAbsolutePath(), false, new LubanUtil.CompressCallback() {
-          @Override
-          public void onSuccess(File file) {
-
-          }
-
-          @Override
-          public void onError(Throwable e) {
-
-          }
-        });
-        break;
-      case R.id.async_uris:
-        withLs(assetsToUri());
-        break;
+        initPermission();
     }
-    return super.onOptionsItemSelected(item);
-  }
 
-  private List<File> assetsToFiles() {
-    final List<File> files = new ArrayList<>();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mDisposable.clear();
+    }
 
-    for (int i = 0; i < range; i++) {
-      try {
-        InputStream is = getResources().getAssets().open("img_" + i);
-        File file = new File(getExternalFilesDir(null), "test_" + i);
-        FileOutputStream fos = new FileOutputStream(file);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
 
-        byte[] buffer = new byte[4096];
-        int len = is.read(buffer);
-        while (len > 0) {
-          fos.write(buffer, 0, len);
-          len = is.read(buffer);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        originPhotos.clear();
+        mImageList.clear();
+        assetsToFiles();
+        switch (item.getItemId()) {
+            case R.id.sync_files:
+                // withRx(assetsToFiles());
+                File file = LubanUtil.compressByLuban(originPhotos.get(0).getAbsolutePath(), false);
+
+                break;
+            case R.id.sync_uris:
+                withRx(assetsToUri());
+                break;
+            case R.id.async_files:
+                // withLs(assetsToFiles());
+                LubanUtil.compressByLubanAsync(originPhotos.get(0).getAbsolutePath(), false, new LubanUtil.CompressCallback() {
+                    @Override
+                    public void onSuccess(File file) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                });
+                break;
+            case R.id.async_uris:
+                withLs(assetsToUri());
+                break;
         }
-        fos.close();
-        is.close();
-
-        files.add(file);
-        originPhotos.add(file);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+        return super.onOptionsItemSelected(item);
     }
 
-    return files;
-  }
+    private List<File> assetsToFiles() {
+        final List<File> files = new ArrayList<>();
 
-  private List<Uri> assetsToUri() {
-    final List<Uri> uris = new ArrayList<>();
-    final List<File> files = assetsToFiles();
-
-    for (int i = 0; i < range; i++) {
-      Uri uri = Uri.fromFile(files.get(i));
-      uris.add(uri);
-    }
-
-    return uris;
-  }
-
-  private <T> void withRx(final List<T> photos) {
-    mDisposable.add(Flowable.just(photos)
-        .observeOn(Schedulers.io())
-        .map(new Function<List<T>, List<File>>() {
-          @Override
-          public List<File> apply(@NonNull List<T> list) throws Exception {
-            return Luban.with(MainActivity.this)
-                .setTargetDir(getPath())
-                   // .saver(TurboCompressor.getTurboCompressor())
-                .load(list)
-                .get();
-          }
-        })
-        .observeOn(AndroidSchedulers.mainThread())
-        .doOnError(new Consumer<Throwable>() {
-          @Override
-          public void accept(Throwable throwable) {
-            Log.e(TAG, throwable.getMessage());
-          }
-        })
-        .onErrorResumeNext(Flowable.<List<File>>empty())
-        .subscribe(new Consumer<List<File>>() {
-          @Override
-          public void accept(@NonNull List<File> list) {
-            for (File file : list) {
-              Log.i(TAG, file.getAbsolutePath());
-              showResult(originPhotos, file);
-            }
-          }
-        }));
-  }
-
-  private <T> void withLs(final List<T> photos) {
-    Luban.with(this)
-        .load(photos)
-            //.saver(TurboCompressor.getTurboCompressor())
-        .ignoreBy(100)
-        .setTargetDir(getPath())
-        .setFocusAlpha(false)
-        .filter(new CompressionPredicate() {
-          @Override
-          public boolean apply(String path) {
-            return !(TextUtils.isEmpty(path) || path.toLowerCase().endsWith(".gif"));
-          }
-        })
-        .setRenameListener(new OnRenameListener() {
-          @Override
-          public String rename(String filePath) {
+        for (int i = 0; i < range; i++) {
             try {
-              MessageDigest md = MessageDigest.getInstance("MD5");
-              md.update(filePath.getBytes());
-              return new BigInteger(1, md.digest()).toString(32);
-            } catch (NoSuchAlgorithmException e) {
-              e.printStackTrace();
+                InputStream is = getResources().getAssets().open("img_" + i);
+                File file = new File(getExternalFilesDir(null), "test_" + i);
+                FileOutputStream fos = new FileOutputStream(file);
+
+                byte[] buffer = new byte[4096];
+                int len = is.read(buffer);
+                while (len > 0) {
+                    fos.write(buffer, 0, len);
+                    len = is.read(buffer);
+                }
+                fos.close();
+                is.close();
+
+                files.add(file);
+                originPhotos.add(file);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            return "";
-          }
-        })
-        .setCompressListener(new OnCompressListener() {
-          @Override
-          public void onStart() { }
+        }
 
-          @Override
-          public void onSuccess(File file) {
-            Log.i(TAG, file.getAbsolutePath());
-            showResult(originPhotos, file);
-          }
-
-          @Override
-          public void onError(Throwable e) { }
-        }).launch();
-  }
-
-  private String getPath() {
-    String path = Environment.getExternalStorageDirectory() + "/Luban/image/";
-    File file = new File(path);
-    if (file.mkdirs()) {
-      return path;
+        return files;
     }
-    return path;
-  }
 
-  private void showResult(List<File> photos, File file) {
-    int[] originSize = computeSize(photos.get(mAdapter.getItemCount()));
-    int[] thumbSize = computeSize(file);
-    String originArg = String.format(Locale.CHINA, "原图参数：%d*%d, %dk", originSize[0], originSize[1], photos.get(mAdapter.getItemCount()).length() >> 10);
-    String thumbArg = String.format(Locale.CHINA, "压缩后参数：%d*%d, %dk", thumbSize[0], thumbSize[1], file.length() >> 10);
+    private List<Uri> assetsToUri() {
+        final List<Uri> uris = new ArrayList<>();
+        final List<File> files = assetsToFiles();
 
-    ImageBean imageBean = new ImageBean(originArg, thumbArg, file.getAbsolutePath());
-    mImageList.add(imageBean);
-    mAdapter.notifyDataSetChanged();
-  }
+        for (int i = 0; i < range; i++) {
+            Uri uri = Uri.fromFile(files.get(i));
+            uris.add(uri);
+        }
 
-  private int[] computeSize(File srcImg) {
-    int[] size = new int[2];
-
-    BitmapFactory.Options options = new BitmapFactory.Options();
-    options.inJustDecodeBounds = true;
-    options.inSampleSize = 1;
-
-    BitmapFactory.decodeFile(srcImg.getAbsolutePath(), options);
-    size[0] = options.outWidth;
-    size[1] = options.outHeight;
-
-    return size;
-  }
-
-  @TargetApi(Build.VERSION_CODES.M)
-  private void initPermission() {
-    if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-      ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0x0001);
+        return uris;
     }
-  }
 
-  private void compress(String path) {
-    Luban.with(getApplicationContext())
-            .load(path)
-            .keepExif(true)
-            .setCompressListener(new OnCompressListener() {
-              @Override
-              public void onStart() {
+    private <T> void withRx(final List<T> photos) {
+        mDisposable.add(Flowable.just(photos)
+                .observeOn(Schedulers.io())
+                .map(new Function<List<T>, List<File>>() {
+                    @Override
+                    public List<File> apply(@NonNull List<T> list) throws Exception {
+                        return Luban.with(MainActivity.this)
+                                .setTargetDir(getPath())
+                                // .saver(TurboCompressor.getTurboCompressor())
+                                .load(list)
+                                .get();
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) {
+                        Log.e(TAG, throwable.getMessage());
+                    }
+                })
+                .onErrorResumeNext(Flowable.<List<File>>empty())
+                .subscribe(new Consumer<List<File>>() {
+                    @Override
+                    public void accept(@NonNull List<File> list) {
+                        for (File file : list) {
+                            Log.i(TAG, file.getAbsolutePath());
+                            showResult(originPhotos, file);
+                        }
+                    }
+                }));
+    }
 
-              }
+    private <T> void withLs(final List<T> photos) {
+        Luban.with(this)
+                .load(photos)
+                //.saver(TurboCompressor.getTurboCompressor())
+                .ignoreBy(100)
+                .setTargetDir(getPath())
+                .setFocusAlpha(false)
+                .filter(new CompressionPredicate() {
+                    @Override
+                    public boolean apply(String path) {
+                        return !(TextUtils.isEmpty(path) || path.toLowerCase().endsWith(".gif"));
+                    }
+                })
+                .setRenameListener(new OnRenameListener() {
+                    @Override
+                    public String rename(String filePath) {
+                        try {
+                            MessageDigest md = MessageDigest.getInstance("MD5");
+                            md.update(filePath.getBytes());
+                            return new BigInteger(1, md.digest()).toString(32);
+                        } catch (NoSuchAlgorithmException e) {
+                            e.printStackTrace();
+                        }
+                        return "";
+                    }
+                })
+                .setCompressListener(new OnCompressListener() {
+                    @Override
+                    public void onStart() {
+                    }
 
-              @Override
-              public void onSuccess(File file) {
+                    @Override
+                    public void onSuccess(File file) {
+                        Log.i(TAG, file.getAbsolutePath());
+                        showResult(originPhotos, file);
+                    }
 
-              }
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+                }).launch();
+    }
 
-              @Override
-              public void onError(Throwable e) {
+    private String getPath() {
+        String path = Environment.getExternalStorageDirectory() + "/Luban/image/";
+        File file = new File(path);
+        if (file.mkdirs()) {
+            return path;
+        }
+        return path;
+    }
 
-              }
-            }).launch();
+    private void showResult(List<File> photos, File file) {
+        int[] originSize = computeSize(photos.get(mAdapter.getItemCount()));
+        int[] thumbSize = computeSize(file);
+        String originArg = String.format(Locale.CHINA, "原图参数：%d*%d, %dk", originSize[0], originSize[1], photos.get(mAdapter.getItemCount()).length() >> 10);
+        String thumbArg = String.format(Locale.CHINA, "压缩后参数：%d*%d, %dk", thumbSize[0], thumbSize[1], file.length() >> 10);
 
-  }
+        ImageBean imageBean = new ImageBean(originArg, thumbArg, file.getAbsolutePath());
+        mImageList.add(imageBean);
+        mAdapter.notifyDataSetChanged();
+    }
 
-  public void select(View view) {
+    private int[] computeSize(File srcImg) {
+        int[] size = new int[2];
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        options.inSampleSize = 1;
+
+        BitmapFactory.decodeFile(srcImg.getAbsolutePath(), options);
+        size[0] = options.outWidth;
+        size[1] = options.outHeight;
+
+        return size;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void initPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0x0001);
+        }
+    }
+
+    private void compress(String path) {
+        Luban.with(getApplicationContext())
+                .load(path)
+                .keepExif(true)
+                .setCompressListener(new OnCompressListener() {
+                    @Override
+                    public void onStart() {
+
+                    }
+
+                    @Override
+                    public void onSuccess(File file) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                }).launch();
+
+    }
+
+    public void select(View view) {
    /* TakePhotoUtil3.pickImage(this, new TakePhotoListener() {
       @Override
       public void onSuccess(String path) {
@@ -307,5 +309,5 @@ public class MainActivity extends AppCompatActivity {
 
 
     });*/
-  }
+    }
 }

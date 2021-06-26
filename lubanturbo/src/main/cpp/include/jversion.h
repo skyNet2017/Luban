@@ -24,13 +24,13 @@
 
 #else
 
-#define JVERSION	"6b  27-Mar-1998"
+#define JVERSION    "6b  27-Mar-1998"
 
-#define JCOPYRIGHT	"Copyright (C) 1998, Thomas G. Lane"
+#define JCOPYRIGHT    "Copyright (C) 1998, Thomas G. Lane"
 
 #endif
 
-#define LJTCOPYRIGHT	"Copyright (C) 1999-2006 MIYASAKA Masaru\n" \
-			"Copyright (C) 2009 Pierre Ossman for Cendio AB\n" \
-			"Copyright (C) 2009-2011 D. R. Commander\n" \
-			"Copyright (C) 2009-2011 Nokia Corporation and/or its subsidiary(-ies)"
+#define LJTCOPYRIGHT    "Copyright (C) 1999-2006 MIYASAKA Masaru\n" \
+            "Copyright (C) 2009 Pierre Ossman for Cendio AB\n" \
+            "Copyright (C) 2009-2011 D. R. Commander\n" \
+            "Copyright (C) 2009-2011 Nokia Corporation and/or its subsidiary(-ies)"

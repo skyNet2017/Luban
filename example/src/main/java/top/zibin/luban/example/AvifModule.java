@@ -22,8 +22,8 @@ public class AvifModule extends AppGlideModule {
     @Override
     public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
         super.registerComponents(context, glide, registry);
-        registry.prepend(ByteBuffer.class, Bitmap.class,new AvifDecoderFromByteBuffer());
-        Log.w("dd","glide init.......");
+        registry.prepend(ByteBuffer.class, Bitmap.class, new AvifDecoderFromByteBuffer());
+        Log.w("dd", "glide init.......");
     }
 
     // Disable manifest parsing to avoid adding similar modules twice.

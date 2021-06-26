@@ -11,16 +11,16 @@ import java.io.File;
 public class BaseLubanConfig implements ILubanConfig {
     @Override
     public void reportException(Throwable throwable) {
-        if(LubanUtil.enableLog){
+        if (LubanUtil.enableLog) {
             throwable.printStackTrace();
         }
     }
 
     @Override
     public File getSaveDir() {
-        File dir =  LubanUtil.app.getFilesDir();
-        File subDir = new File(dir,"luban");
-        if(!subDir.exists()){
+        File dir = LubanUtil.app.getFilesDir();
+        File subDir = new File(dir, "luban");
+        if (!subDir.exists()) {
             subDir.mkdirs();
         }
         return subDir;

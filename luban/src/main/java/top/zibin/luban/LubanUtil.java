@@ -6,8 +6,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
+
 import androidx.annotation.Nullable;
 import androidx.exifinterface.media.ExifInterface;
+
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -37,19 +39,19 @@ public class LubanUtil {
 
     private static final int MAX_IMAGE_HEIGHT = 720;
 
-    private static final int MIN_IMAGE_COMPRESS_SIZE = 80 ;//80k以下,不压缩
-    
-    static Application app;
-     static ILubanConfig config;
-     static boolean enableLog;
-    public static  int quality_material = 85;//默认质量85.
-    public static  int quality_normal = 70;
+    private static final int MIN_IMAGE_COMPRESS_SIZE = 80;//80k以下,不压缩
 
-    public static void init(Application app,boolean enableLog,@Nullable  ILubanConfig config){
+    static Application app;
+    static ILubanConfig config;
+    static boolean enableLog;
+    public static int quality_material = 85;//默认质量85.
+    public static int quality_normal = 70;
+
+    public static void init(Application app, boolean enableLog, @Nullable ILubanConfig config) {
         LubanUtil.app = app;
         LubanUtil.enableLog = enableLog;
         LubanUtil.config = config;
-        if(config == null){
+        if (config == null) {
             LubanUtil.config = new BaseLubanConfig();
         }
     }
@@ -65,6 +67,7 @@ public class LubanUtil {
      * 质量压到70
      * 大小压到最大1080p
      * 去除exif信息
+     *
      * @param imgPath
      * @return
      */
@@ -79,31 +82,31 @@ public class LubanUtil {
                 .get(imgPath);
     }
 
-    public static File compressOriginal(String path,int quality){
+    public static File compressOriginal(String path, int quality) {
         File file = new File(path);
         try {
             int q = new Magick().getJPEGImageQuality(new FileInputStream(file));
-            if(q > 0 && q < quality){
+            if (q > 0 && q < quality) {
                 return file;
             }
             Bitmap bitmap = BitmapFactory.decodeFile(path);
-            File tmp = new File(file.getParentFile(),file.getName()+".tmp");
-            boolean success =  bitmap.compress(Bitmap.CompressFormat.JPEG,quality,new FileOutputStream(tmp));
-            if(!success){
+            File tmp = new File(file.getParentFile(), file.getName() + ".tmp");
+            boolean success = bitmap.compress(Bitmap.CompressFormat.JPEG, quality, new FileOutputStream(tmp));
+            if (!success) {
                 return file;
             }
-            if(!tmp.exists() || tmp.length()< 10){
+            if (!tmp.exists() || tmp.length() < 10) {
                 return file;
             }
 
-            ExifUtil.copyExif(path,tmp.getAbsolutePath());
-            if(tmp.length() > file.length()){
+            ExifUtil.copyExif(path, tmp.getAbsolutePath());
+            if (tmp.length() > file.length()) {
                 return file;
             }
             //拷贝文件
-            copyFile(new FileInputStream(tmp),new FileOutputStream(file));
+            copyFile(new FileInputStream(tmp), new FileOutputStream(file));
 
-            if(!file.exists() || file.length()< 10){
+            if (!file.exists() || file.length() < 10) {
                 return tmp;
             }
             tmp.delete();
@@ -114,7 +117,7 @@ public class LubanUtil {
         }
     }
 
-     static void copyFile(InputStream in, OutputStream out) {
+    static void copyFile(InputStream in, OutputStream out) {
         try {
             byte[] b = new byte[128 * 1024]; //128k memory
             int len = -1;
@@ -129,7 +132,7 @@ public class LubanUtil {
         }
     }
 
-     static void closeIO(Closeable... closeables) {
+    static void closeIO(Closeable... closeables) {
         if (null == closeables || closeables.length <= 0) {
             return;
         }
@@ -149,6 +152,7 @@ public class LubanUtil {
      * 适用于大图小字的场景,比如拍书,拍A4纸,拍一些小票,资料之类的.
      * 不压缩图片尺寸,只把图片质量降到70
      * 保留exif 文件路径里有_luban_noresize,以此来告诉后续的luabn不要重复压缩
+     *
      * @param imgPath
      * @return
      */
@@ -168,6 +172,7 @@ public class LubanUtil {
      * 质量设置为85
      * 压到1080p以下
      * 默认jpg,可指定图片格式为webp
+     *
      * @param imgPath
      * @return
      */
@@ -209,14 +214,14 @@ public class LubanUtil {
         });
     }
 
-     static void compressByLubanAsyncInternal(final String imgPath, boolean isPng,
-                                            final CompressCallback callback) {
+    static void compressByLubanAsyncInternal(final String imgPath, boolean isPng,
+                                             final CompressCallback callback) {
         final File file = new File(imgPath);
         if (!file.exists()) {
             callback.onError(new Throwable("file not exist"));
             return;
         }
-        if (file.length() <= MIN_IMAGE_COMPRESS_SIZE *1024) {
+        if (file.length() <= MIN_IMAGE_COMPRESS_SIZE * 1024) {
             callback.onSuccess(file);
             return;
         }
@@ -243,7 +248,7 @@ public class LubanUtil {
                         if (file.exists()) {
                             if (e instanceof OutOfMemoryError) {
                                 config.reportException(e);
-                                File file1 =  compressBySubsamling2(imgPath);
+                                File file1 = compressBySubsamling2(imgPath);
                                 callback.onSuccess(file1);
                                 return;
                             }
@@ -257,15 +262,15 @@ public class LubanUtil {
 
     }
 
-     static void i(String s) {
-        if(enableLog && !TextUtils.isEmpty(s)){
-            Log.i("lubanutil",s);
+    static void i(String s) {
+        if (enableLog && !TextUtils.isEmpty(s)) {
+            Log.i("lubanutil", s);
         }
     }
 
     static void d(String s) {
-        if(enableLog && !TextUtils.isEmpty(s)){
-            Log.d("lubanutil",s);
+        if (enableLog && !TextUtils.isEmpty(s)) {
+            Log.d("lubanutil", s);
         }
     }
 
@@ -290,35 +295,33 @@ public class LubanUtil {
     }
 
     public static void w(String s) {
-        if(enableLog){
-            Log.w("lubanutil",s);
+        if (enableLog) {
+            Log.w("lubanutil", s);
         }
     }
 
-    public interface CompressCallback{
+    public interface CompressCallback {
         void onSuccess(File file);
 
         void onError(Throwable e);
     }
 
 
-
-
     private static File compressBySubsamling2(String imgPath) {
-        logFile("compressBySubsamling2 begin",imgPath);
+        logFile("compressBySubsamling2 begin", imgPath);
         Bitmap bitmap = decodeRGB565BitmapFromUri(Uri.fromFile(new File(imgPath)), MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
-        String fileName = new File(config.getSaveDir(),System.currentTimeMillis() + "-compressed2.jpg").getAbsolutePath();
+        String fileName = new File(config.getSaveDir(), System.currentTimeMillis() + "-compressed2.jpg").getAbsolutePath();
 
         boolean success = saveBitmapToFile(fileName, bitmap);
-        logFile("compressBySubsamling2 result",fileName);
+        logFile("compressBySubsamling2 result", fileName);
         if (success) {
             return new File(fileName);
         }
         return new File(imgPath);
     }
 
-   static void  logFile(String desc,String file){
-        if(enableLog){
+    static void logFile(String desc, String file) {
+        if (enableLog) {
             i(desc + readExif(file));
         }
 
@@ -330,7 +333,6 @@ public class LubanUtil {
     private static boolean saveBitmapToFile(String filename, Bitmap bitmap) {
         return saveBitmapToFile(filename, bitmap, Bitmap.CompressFormat.JPEG);
     }
-
 
 
     private static boolean saveBitmapToFile(String filename, Bitmap bitmap, Bitmap.CompressFormat compressFormat) {
@@ -374,7 +376,6 @@ public class LubanUtil {
     }
 
 
-
     private static Bitmap decodeBitmapFromUri(Uri imageUri, int width, int height,
                                               Bitmap.Config config) {
         try {
@@ -395,7 +396,7 @@ public class LubanUtil {
                     options.inSampleSize = Math.max(options.outWidth / width, options.outHeight / height);
                 }
             }
-            i( "options.inSampleSize is:" + options.inSampleSize);
+            i("options.inSampleSize is:" + options.inSampleSize);
             if (options.inSampleSize < 1) {
                 options.inSampleSize = 1;
             }
@@ -439,10 +440,10 @@ public class LubanUtil {
         return rotateBitmapByDegree(bm, degree, true);
     }
 
-    public static int getJpegQuality(String path){
+    public static int getJpegQuality(String path) {
         try {
-           return new Magick().getJPEGImageQuality(new FileInputStream(path));
-        }catch (Throwable throwable) {
+            return new Magick().getJPEGImageQuality(new FileInputStream(path));
+        } catch (Throwable throwable) {
             throwable.printStackTrace();
             return 0;
         }
@@ -476,6 +477,7 @@ public class LubanUtil {
         }
         return returnBm;
     }
+
     /**
      * 读取图片的旋转的角度
      *
@@ -540,7 +542,7 @@ public class LubanUtil {
             }
         } catch (IOException e) {
             config.reportException(e);
-        }finally {
+        } finally {
             try {
                 inputStream.close();
             } catch (IOException e) {
@@ -550,7 +552,7 @@ public class LubanUtil {
         return degree;
     }
 
-   public   static String readExif(String path) {
+    public static String readExif(String path) {
 
 
         return ExifUtil.getExifStr(path);
@@ -558,10 +560,10 @@ public class LubanUtil {
     }
 
     private static String getRealType(File file) {
-        if(!file.exists()){
+        if (!file.exists()) {
             return "";
         }
-        if(file.getName().endsWith(".gif")){
+        if (file.getName().endsWith(".gif")) {
             return "gif";
         }
         FileInputStream is = null;
@@ -592,7 +594,7 @@ public class LubanUtil {
             return "";
         } finally {
             try {
-                if(is != null){
+                if (is != null) {
                     is.close();
                 }
             } catch (IOException e) {
@@ -619,7 +621,7 @@ public class LubanUtil {
         return stringBuilder.toString();
     }
 
-     static int[] getImageWidthHeight(String path) {
+    static int[] getImageWidthHeight(String path) {
         BitmapFactory.Options options = new BitmapFactory.Options();
 
         /**
@@ -640,19 +642,19 @@ public class LubanUtil {
 
     static List<String> tags;
 
-    private static List<String> getTags(){
-        if(tags != null && !tags.isEmpty()){
+    private static List<String> getTags() {
+        if (tags != null && !tags.isEmpty()) {
             return tags;
         }
         tags = new ArrayList<>();
         Class clazz = android.media.ExifInterface.class;
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
-            if (field.getName().startsWith("TAG_")){
+            if (field.getName().startsWith("TAG_")) {
                 try {
                     field.setAccessible(true);
                     tags.add(field.get(null).toString());
-                }catch (Throwable e){
+                } catch (Throwable e) {
                     e.printStackTrace();
                 }
             }
@@ -661,52 +663,49 @@ public class LubanUtil {
     }
 
 
-
-
-
-    public static boolean hasTransInAlpha(Bitmap bitmap){
-        if(!bitmap.getConfig().equals(Bitmap.Config.ARGB_8888)){
+    public static boolean hasTransInAlpha(Bitmap bitmap) {
+        if (!bitmap.getConfig().equals(Bitmap.Config.ARGB_8888)) {
             return false;
         }
-        int w = bitmap.getWidth()-1;
-        int h = bitmap.getHeight()-1;
-        if(isTrans(bitmap,0,0)
-                || isTrans(bitmap,w,h)
-                || isTrans(bitmap,0,h)
-                || isTrans(bitmap,w,0)
-                || isTrans(bitmap,bitmap.getWidth()/2,bitmap.getHeight()/2) ){
+        int w = bitmap.getWidth() - 1;
+        int h = bitmap.getHeight() - 1;
+        if (isTrans(bitmap, 0, 0)
+                || isTrans(bitmap, w, h)
+                || isTrans(bitmap, 0, h)
+                || isTrans(bitmap, w, 0)
+                || isTrans(bitmap, bitmap.getWidth() / 2, bitmap.getHeight() / 2)) {
             //先判断4个顶点和中心.
             return true;
         }
         //然后折半查找
-        return hasTransInAngel(bitmap,w,h);
+        return hasTransInAngel(bitmap, w, h);
     }
 
-    private static boolean hasTransInAngel(Bitmap bitmap,int w, int h) {
-        Log.d("ss","hastrans: porint:"+w+"-"+h);
+    private static boolean hasTransInAngel(Bitmap bitmap, int w, int h) {
+        Log.d("ss", "hastrans: porint:" + w + "-" + h);
         // int[][] arr = new int[8][2];
-        if(w ==0 || h == 0){
+        if (w == 0 || h == 0) {
             return false;
         }
         int halfw = w / 2;
         int halfh = h / 2;
 
-        boolean hasTrans = isTrans(bitmap,w,h)
-                || isTrans(bitmap,w,0)
-                || isTrans(bitmap,0,h)
-                || isTrans(bitmap,w,halfh)
-                || isTrans(bitmap,halfw,h)
-                || isTrans(bitmap,0,halfh)
-                || isTrans(bitmap,halfw,0);
-        if(hasTrans){
+        boolean hasTrans = isTrans(bitmap, w, h)
+                || isTrans(bitmap, w, 0)
+                || isTrans(bitmap, 0, h)
+                || isTrans(bitmap, w, halfh)
+                || isTrans(bitmap, halfw, h)
+                || isTrans(bitmap, 0, halfh)
+                || isTrans(bitmap, halfw, 0);
+        if (hasTrans) {
             return hasTrans;
         }
-        return hasTransInAngel(bitmap,halfw,halfh) ;
+        return hasTransInAngel(bitmap, halfw, halfh);
     }
 
-    private static boolean isTrans(Bitmap bitmap,int x,int y){
-        int pix = bitmap.getPixel(x,y);
-        int a = ((pix >> 24) & 0xff) ;
+    private static boolean isTrans(Bitmap bitmap, int x, int y) {
+        int pix = bitmap.getPixel(x, y);
+        int a = ((pix >> 24) & 0xff);
         return a != 255;
     }
 
@@ -722,19 +721,19 @@ public class LubanUtil {
         int srcWidth = options.outWidth;
         int srcHeight = options.outHeight;
         String originalMimeType = options.outMimeType;
-        if(!"image/png".equals(originalMimeType) || "image/webp".equals(originalMimeType)){
+        if (!"image/png".equals(originalMimeType) || "image/webp".equals(originalMimeType)) {
             return false;
         }
         try {
             long start = System.currentTimeMillis();
             //最长边压缩到360p,看像素点内是否有不透明的像素点
-            int max = Math.max(srcHeight,srcWidth);
+            int max = Math.max(srcHeight, srcWidth);
             int scale = 1;
-            if(max > 50){
+            if (max > 50) {
                 //限定长边100时,最大耗时400ms
                 //限定50时,最大耗时82ms
                 //最快: 四个角判断是否为0, 1ms即可.
-                scale = (int) Math.ceil(max/50f);
+                scale = (int) Math.ceil(max / 50f);
             }
             BitmapFactory.Options options2 = new BitmapFactory.Options();
             options2.inSampleSize = scale;
@@ -742,18 +741,19 @@ public class LubanUtil {
             options2.inPreferredConfig = Bitmap.Config.ARGB_8888;
             Bitmap bitmap = BitmapFactory.decodeFile(filePath, options2);
 
-            int w = srcWidth/scale;
-            int h = srcHeight/scale;
+            int w = srcWidth / scale;
+            int h = srcHeight / scale;
             //可以先判断4个角
-            out: for (int i = 0; i < w; i++) {
+            out:
+            for (int i = 0; i < w; i++) {
                 for (int j = 0; j < h; j++) {
                     // The argb {@link Color} at the specified coordinate
-                    int pix = bitmap.getPixel(i,j);
-                    int a = ((pix >> 24) & 0xff) ;/// 255.0f
+                    int pix = bitmap.getPixel(i, j);
+                    int a = ((pix >> 24) & 0xff);/// 255.0f
                     //Log.d("luban","位置:"+i+"-"+j+", 不透明度:"+a);
                     //255就是没有透明度, = 0 就是完全透明. 值代表不透明度.值越大,越不透明
-                    if(a != 255 ){
-                        Log.d("luban","cal alpah cost(ms):"+(System.currentTimeMillis() - start));
+                    if (a != 255) {
+                        Log.d("luban", "cal alpah cost(ms):" + (System.currentTimeMillis() - start));
                         return true;
                     }
                     //FF: 255   00 : 0
@@ -761,8 +761,8 @@ public class LubanUtil {
                     //color.alpha()
                 }
             }
-            Log.d("luban","cal alpah cost(ms):"+(System.currentTimeMillis() - start));
-        }catch (Throwable throwable){
+            Log.d("luban", "cal alpah cost(ms):" + (System.currentTimeMillis() - start));
+        } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
         return false;

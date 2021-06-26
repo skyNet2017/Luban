@@ -10,7 +10,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
     <TextView
         android:id="@+id/btn_take_photo"
@@ -21,13 +21,13 @@
         android:padding="10dp"
         android:text="@string/take_photo"
 
-        android:textSize="14dp"/>
+        android:textSize="14dp" />
 
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#f6f6f6"/>
+        android:background="#f6f6f6" />
 
     <TextView
         android:id="@+id/btn_pick_photo"
@@ -37,12 +37,13 @@
         android:gravity="center"
         android:padding="10dp"
         android:text="@string/choose_existing"
-        android:textSize="14dp"/>
+        android:textSize="14dp" />
+
     <View
         android:id="@+id/divider3"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#f6f6f6"/>
+        android:background="#f6f6f6" />
 
     <TextView
         android:id="@+id/btn_pick_photo_from_assets"
@@ -52,12 +53,12 @@
         android:gravity="center"
         android:padding="10dp"
         android:text="@string/data_from_assets"
-        android:textSize="14dp"/>
+        android:textSize="14dp" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="6dp"
-        android:background="#E7E7E7"/>
+        android:background="#E7E7E7" />
 
     <TextView
         android:id="@+id/btn_cancel"
@@ -68,6 +69,6 @@
         android:padding="10dp"
         android:text="@string/cancel"
         android:textColor="#666666"
-        android:textSize="14dp"/>
+        android:textSize="14dp" />
 
 </LinearLayout>

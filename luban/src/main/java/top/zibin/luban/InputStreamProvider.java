@@ -10,7 +10,7 @@ import java.io.InputStream;
  */
 public interface InputStreamProvider {
 
-  InputStream open() throws IOException;
+    InputStream open() throws IOException;
 
-  String getPath();
+    String getPath();
 }

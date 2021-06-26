@@ -19,7 +19,7 @@
  * the file is indeed PPM format).
  */
 
-#include "cdjpeg.h"		/* Common decls for cjpeg/djpeg applications */
+#include "cdjpeg.h"        /* Common decls for cjpeg/djpeg applications */
 
 #ifdef PPM_SUPPORTED
 
@@ -389,7 +389,7 @@ start_input_ppm (j_compress_ptr cinfo, cjpeg_source_ptr sinfo)
       ((maxval<=255) ? SIZEOF(U_CHAR) : (2*SIZEOF(U_CHAR)));
     source->iobuffer = (U_CHAR *)
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				  source->buffer_width);
+                  source->buffer_width);
   }
 
   /* Create compressor input buffer. */
@@ -415,7 +415,7 @@ start_input_ppm (j_compress_ptr cinfo, cjpeg_source_ptr sinfo)
     /* On 16-bit-int machines we have to be careful of maxval = 65535 */
     source->rescale = (JSAMPLE *)
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				  (size_t) (((long) maxval + 1L) * SIZEOF(JSAMPLE)));
+                  (size_t) (((long) maxval + 1L) * SIZEOF(JSAMPLE)));
     half_maxval = maxval / 2;
     for (val = 0; val <= (INT32) maxval; val++) {
       /* The multiplication here must be done in 32 bits to avoid overflow */
@@ -448,7 +448,7 @@ jinit_read_ppm (j_compress_ptr cinfo)
   /* Create module interface object */
   source = (ppm_source_ptr)
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				  SIZEOF(ppm_source_struct));
+                  SIZEOF(ppm_source_struct));
   /* Fill in method ptrs, except get_pixel_rows which start_input sets */
   source->pub.start_input = start_input_ppm;
   source->pub.finish_input = finish_input_ppm;

@@ -18,11 +18,11 @@ public class ImgAdapter2 extends BaseQuickAdapter<File, BaseViewHolder> {
 
     @Override
     protected void convert(@NonNull BaseViewHolder helper, File item) {
-        Log.w("path",item.getAbsolutePath());
+        Log.w("path", item.getAbsolutePath());
         Glide.with(helper.itemView)
                 .load(item)
                 .into((ImageView) helper.getView(R.id.iv));
         String text = item.getName();
-        helper.setText(R.id.tv,text);
+        helper.setText(R.id.tv, text);
     }
 }

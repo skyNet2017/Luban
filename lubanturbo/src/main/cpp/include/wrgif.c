@@ -37,7 +37,7 @@
  *    CompuServe Incorporated."
  */
 
-#include "cdjpeg.h"		/* Common decls for cjpeg/djpeg applications */
+#include "cdjpeg.h"        /* Common decls for cjpeg/djpeg applications */
 
 #ifdef GIF_SUPPORTED
 
@@ -84,7 +84,7 @@ flush_packet (gif_dest_ptr dinfo)
   if (dinfo->bytesinpkt > 0) {	/* never write zero-length packet */
     dinfo->packetbuf[0] = (char) dinfo->bytesinpkt++;
     if (JFWRITE(dinfo->pub.output_file, dinfo->packetbuf, dinfo->bytesinpkt)
-	!= (size_t) dinfo->bytesinpkt)
+    != (size_t) dinfo->bytesinpkt)
       ERREXIT(dinfo->cinfo, JERR_FILE_WRITE);
     dinfo->bytesinpkt = 0;
   }
@@ -93,10 +93,10 @@ flush_packet (gif_dest_ptr dinfo)
 
 /* Add a character to current packet; flush to disk if necessary */
 #define CHAR_OUT(dinfo,c)  \
-	{ (dinfo)->packetbuf[++(dinfo)->bytesinpkt] = (char) (c);  \
-	    if ((dinfo)->bytesinpkt >= 255)  \
-	      flush_packet(dinfo);  \
-	}
+    { (dinfo)->packetbuf[++(dinfo)->bytesinpkt] = (char) (c);  \
+        if ((dinfo)->bytesinpkt >= 255)  \
+          flush_packet(dinfo);  \
+    }
 
 
 /* Routine to convert variable-width codes into a byte stream */
@@ -260,18 +260,18 @@ emit_header (gif_dest_ptr dinfo, int num_colors, JSAMPARRAY colormap)
   for (i=0; i < ColorMapSize; i++) {
     if (i < num_colors) {
       if (colormap != NULL) {
-	if (dinfo->cinfo->out_color_space == JCS_RGB) {
-	  /* Normal case: RGB color map */
-	  putc(GETJSAMPLE(colormap[0][i]) >> cshift, dinfo->pub.output_file);
-	  putc(GETJSAMPLE(colormap[1][i]) >> cshift, dinfo->pub.output_file);
-	  putc(GETJSAMPLE(colormap[2][i]) >> cshift, dinfo->pub.output_file);
-	} else {
-	  /* Grayscale "color map": possible if quantizing grayscale image */
-	  put_3bytes(dinfo, GETJSAMPLE(colormap[0][i]) >> cshift);
-	}
+    if (dinfo->cinfo->out_color_space == JCS_RGB) {
+      /* Normal case: RGB color map */
+      putc(GETJSAMPLE(colormap[0][i]) >> cshift, dinfo->pub.output_file);
+      putc(GETJSAMPLE(colormap[1][i]) >> cshift, dinfo->pub.output_file);
+      putc(GETJSAMPLE(colormap[2][i]) >> cshift, dinfo->pub.output_file);
+    } else {
+      /* Grayscale "color map": possible if quantizing grayscale image */
+      put_3bytes(dinfo, GETJSAMPLE(colormap[0][i]) >> cshift);
+    }
       } else {
-	/* Create a gray-scale map of num_colors values, range 0..255 */
-	put_3bytes(dinfo, (i * 255 + (num_colors-1)/2) / (num_colors-1));
+    /* Create a gray-scale map of num_colors values, range 0..255 */
+    put_3bytes(dinfo, (i * 255 + (num_colors-1)/2) / (num_colors-1));
       }
     } else {
       /* fill out the map to a power of 2 */
@@ -317,7 +317,7 @@ start_output_gif (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
 
 METHODDEF(void)
 put_pixel_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
-		JDIMENSION rows_supplied)
+        JDIMENSION rows_supplied)
 {
   gif_dest_ptr dest = (gif_dest_ptr) dinfo;
   register JSAMPROW ptr;
@@ -364,7 +364,7 @@ jinit_write_gif (j_decompress_ptr cinfo)
   /* Create module interface object, fill in method pointers */
   dest = (gif_dest_ptr)
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				  SIZEOF(gif_dest_struct));
+                  SIZEOF(gif_dest_struct));
   dest->cinfo = cinfo;		/* make back link for subroutines */
   dest->pub.start_output = start_output_gif;
   dest->pub.put_pixel_rows = put_pixel_rows;

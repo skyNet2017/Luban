@@ -6,8 +6,8 @@ import java.io.IOException;
 
 /**
  * ————————————————
- *     版权声明：本文为CSDN博主「番茄大圣」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
- *     原文链接：https://blog.csdn.net/tomatomas/article/details/62235963
+ * 版权声明：本文为CSDN博主「番茄大圣」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+ * 原文链接：https://blog.csdn.net/tomatomas/article/details/62235963
  */
 public class QuantTables {
     static final int MAX_TABLE_COUNT = 2;
@@ -19,7 +19,7 @@ public class QuantTables {
     private static final byte JPEG_FLAG_START = (byte) 0xff;
     private static final byte JPEG_FLAG_DQT = (byte) 0xdb;// define quantization  table
 
-    private static final byte[] JPEG_HEADER_FLAG = new byte[] { (byte) 0xff, (byte) 0xd8 };
+    private static final byte[] JPEG_HEADER_FLAG = new byte[]{(byte) 0xff, (byte) 0xd8};
 
     void getDataFromFile(File file) {
         FileInputStream fis = null;

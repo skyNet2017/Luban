@@ -60,24 +60,30 @@ extern "C" {
  * Method:    bufSize
  * Signature: (III)I
  */
-JNIEXPORT jint JNICALL Java_org_libjpegturbo_turbojpeg_TJ_bufSize
-  (JNIEnv *, jclass, jint, jint, jint);
+JNIEXPORT jint
+
+JNICALL Java_org_libjpegturbo_turbojpeg_TJ_bufSize
+        (JNIEnv *, jclass, jint, jint, jint);
 
 /*
  * Class:     org_libjpegturbo_turbojpeg_TJ
  * Method:    bufSizeYUV
  * Signature: (III)I
  */
-JNIEXPORT jint JNICALL Java_org_libjpegturbo_turbojpeg_TJ_bufSizeYUV
-  (JNIEnv *, jclass, jint, jint, jint);
+JNIEXPORT jint
+
+JNICALL Java_org_libjpegturbo_turbojpeg_TJ_bufSizeYUV
+        (JNIEnv *, jclass, jint, jint, jint);
 
 /*
  * Class:     org_libjpegturbo_turbojpeg_TJ
  * Method:    getScalingFactors
  * Signature: ()[Lorg/libjpegturbo/turbojpeg/TJScalingFactor;
  */
-JNIEXPORT jobjectArray JNICALL Java_org_libjpegturbo_turbojpeg_TJ_getScalingFactors
-  (JNIEnv *, jclass);
+JNIEXPORT jobjectArray
+
+JNICALL Java_org_libjpegturbo_turbojpeg_TJ_getScalingFactors
+        (JNIEnv *, jclass);
 
 #ifdef __cplusplus
 }

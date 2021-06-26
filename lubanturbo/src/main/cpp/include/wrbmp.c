@@ -17,7 +17,7 @@
  * This code contributed by James Arthur Boucher.
  */
 
-#include "cdjpeg.h"		/* Common decls for cjpeg/djpeg applications */
+#include "cdjpeg.h"        /* Common decls for cjpeg/djpeg applications */
 
 #ifdef BMP_SUPPORTED
 
@@ -58,8 +58,8 @@ typedef bmp_dest_struct * bmp_dest_ptr;
 
 /* Forward declarations */
 LOCAL(void) write_colormap
-	JPP((j_decompress_ptr cinfo, bmp_dest_ptr dest,
-	     int map_colors, int map_entry_size));
+    JPP((j_decompress_ptr cinfo, bmp_dest_ptr dest,
+         int map_colors, int map_entry_size));
 
 
 /*
@@ -69,7 +69,7 @@ LOCAL(void) write_colormap
 
 METHODDEF(void)
 put_pixel_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
-		JDIMENSION rows_supplied)
+        JDIMENSION rows_supplied)
 /* This version is for writing 24-bit pixels */
 {
   bmp_dest_ptr dest = (bmp_dest_ptr) dinfo;
@@ -104,7 +104,7 @@ put_pixel_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
 
 METHODDEF(void)
 put_gray_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
-	       JDIMENSION rows_supplied)
+           JDIMENSION rows_supplied)
 /* This version is for grayscale OR quantized color output */
 {
   bmp_dest_ptr dest = (bmp_dest_ptr) dinfo;
@@ -160,13 +160,13 @@ write_bmp_header (j_decompress_ptr cinfo, bmp_dest_ptr dest)
   char bmpfileheader[14];
   char bmpinfoheader[40];
 #define PUT_2B(array,offset,value)  \
-	(array[offset] = (char) ((value) & 0xFF), \
-	 array[offset+1] = (char) (((value) >> 8) & 0xFF))
+    (array[offset] = (char) ((value) & 0xFF), \
+     array[offset+1] = (char) (((value) >> 8) & 0xFF))
 #define PUT_4B(array,offset,value)  \
-	(array[offset] = (char) ((value) & 0xFF), \
-	 array[offset+1] = (char) (((value) >> 8) & 0xFF), \
-	 array[offset+2] = (char) (((value) >> 16) & 0xFF), \
-	 array[offset+3] = (char) (((value) >> 24) & 0xFF))
+    (array[offset] = (char) ((value) & 0xFF), \
+     array[offset+1] = (char) (((value) >> 8) & 0xFF), \
+     array[offset+2] = (char) (((value) >> 16) & 0xFF), \
+     array[offset+3] = (char) (((value) >> 24) & 0xFF))
   INT32 headersize, bfSize;
   int bits_per_pixel, cmap_entries;
 
@@ -189,7 +189,7 @@ write_bmp_header (j_decompress_ptr cinfo, bmp_dest_ptr dest)
   /* File size */
   headersize = 14 + 40 + cmap_entries * 4; /* Header and colormap */
   bfSize = headersize + (INT32) dest->row_width * (INT32) cinfo->output_height;
-  
+
   /* Set unused fields of header to 0 */
   MEMZERO(bmpfileheader, SIZEOF(bmpfileheader));
   MEMZERO(bmpinfoheader, SIZEOF(bmpinfoheader));
@@ -254,7 +254,7 @@ write_os2_header (j_decompress_ptr cinfo, bmp_dest_ptr dest)
   /* File size */
   headersize = 14 + 12 + cmap_entries * 3; /* Header and colormap */
   bfSize = headersize + (INT32) dest->row_width * (INT32) cinfo->output_height;
-  
+
   /* Set unused fields of header to 0 */
   MEMZERO(bmpfileheader, SIZEOF(bmpfileheader));
   MEMZERO(bmpcoreheader, SIZEOF(bmpcoreheader));
@@ -290,7 +290,7 @@ write_os2_header (j_decompress_ptr cinfo, bmp_dest_ptr dest)
 
 LOCAL(void)
 write_colormap (j_decompress_ptr cinfo, bmp_dest_ptr dest,
-		int map_colors, int map_entry_size)
+        int map_colors, int map_entry_size)
 {
   JSAMPARRAY colormap = cinfo->colormap;
   int num_colors = cinfo->actual_number_of_colors;
@@ -301,20 +301,20 @@ write_colormap (j_decompress_ptr cinfo, bmp_dest_ptr dest,
     if (cinfo->out_color_components == 3) {
       /* Normal case with RGB colormap */
       for (i = 0; i < num_colors; i++) {
-	putc(GETJSAMPLE(colormap[2][i]), outfile);
-	putc(GETJSAMPLE(colormap[1][i]), outfile);
-	putc(GETJSAMPLE(colormap[0][i]), outfile);
-	if (map_entry_size == 4)
-	  putc(0, outfile);
+    putc(GETJSAMPLE(colormap[2][i]), outfile);
+    putc(GETJSAMPLE(colormap[1][i]), outfile);
+    putc(GETJSAMPLE(colormap[0][i]), outfile);
+    if (map_entry_size == 4)
+      putc(0, outfile);
       }
     } else {
       /* Grayscale colormap (only happens with grayscale quantization) */
       for (i = 0; i < num_colors; i++) {
-	putc(GETJSAMPLE(colormap[0][i]), outfile);
-	putc(GETJSAMPLE(colormap[0][i]), outfile);
-	putc(GETJSAMPLE(colormap[0][i]), outfile);
-	if (map_entry_size == 4)
-	  putc(0, outfile);
+    putc(GETJSAMPLE(colormap[0][i]), outfile);
+    putc(GETJSAMPLE(colormap[0][i]), outfile);
+    putc(GETJSAMPLE(colormap[0][i]), outfile);
+    if (map_entry_size == 4)
+      putc(0, outfile);
       }
     }
   } else {
@@ -324,10 +324,10 @@ write_colormap (j_decompress_ptr cinfo, bmp_dest_ptr dest,
       putc(i, outfile);
       putc(i, outfile);
       if (map_entry_size == 4)
-	putc(0, outfile);
+    putc(0, outfile);
     }
   }
-  /* Pad colormap with zeros to ensure specified number of colormap entries */ 
+  /* Pad colormap with zeros to ensure specified number of colormap entries */
   if (i > map_colors)
     ERREXIT1(cinfo, JERR_TOO_MANY_COLORS, i);
   for (; i < map_colors; i++) {
@@ -395,7 +395,7 @@ jinit_write_bmp (j_decompress_ptr cinfo, boolean is_os2)
   /* Create module interface object, fill in method pointers */
   dest = (bmp_dest_ptr)
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				  SIZEOF(bmp_dest_struct));
+                  SIZEOF(bmp_dest_struct));
   dest->pub.start_output = start_output_bmp;
   dest->pub.finish_output = finish_output_bmp;
   dest->is_os2 = is_os2;

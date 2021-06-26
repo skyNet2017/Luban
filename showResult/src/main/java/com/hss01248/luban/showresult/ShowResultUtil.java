@@ -27,14 +27,14 @@ public class ShowResultUtil {
     public static boolean showCompressResult = false;
 
 
-    public static void showResult(Activity activity,String inputPath, String outputPath, long timeCost, int percent, long sizeAfterCompressInK, long width, long height){
-        if(!showCompressResult){
+    public static void showResult(Activity activity, String inputPath, String outputPath, long timeCost, int percent, long sizeAfterCompressInK, long width, long height) {
+        if (!showCompressResult) {
             return;
         }
-        String desc = inputPath+"\ncompress to --> "+outputPath+"\ntime cost : "+timeCost+"ms, filesize after compress:"
-                +sizeAfterCompressInK +"kB , 减少掉:"+percent +"%,  wh:"+width+"x"+height;
+        String desc = inputPath + "\ncompress to --> " + outputPath + "\ntime cost : " + timeCost + "ms, filesize after compress:"
+                + sizeAfterCompressInK + "kB , 减少掉:" + percent + "%,  wh:" + width + "x" + height;
         ViewGroup root = (ViewGroup) activity.getLayoutInflater().inflate(R.layout.luban_result_dialog,
-                (ViewGroup) activity.getWindow().getDecorView(),false);
+                (ViewGroup) activity.getWindow().getDecorView(), false);
         TextView tvDesc = root.findViewById(R.id.tv_desc);
         TextView tvOriginal = root.findViewById(R.id.tv_original);
         TextView tvCompressed = root.findViewById(R.id.tv_compressed);
@@ -44,44 +44,43 @@ public class ShowResultUtil {
         tvDesc.setText(desc);
 
         ivOriginal.setImage(ImageSource.uri(Uri.fromFile(new File(inputPath))));
-        tvOriginal.setText("原图(点击显示exif:):"+getImgInfo(inputPath));
+        tvOriginal.setText("原图(点击显示exif:):" + getImgInfo(inputPath));
         tvOriginal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showExif(activity,inputPath);
+                showExif(activity, inputPath);
             }
         });
 
         ivComressed.setImage(ImageSource.uri(Uri.fromFile(new File(outputPath))));
-        tvCompressed.setText("压缩后(点击显示exif:):"+getImgInfo(outputPath));
+        tvCompressed.setText("压缩后(点击显示exif:):" + getImgInfo(outputPath));
         tvCompressed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showExif(activity,outputPath);
+                showExif(activity, outputPath);
             }
         });
 
         Dialog dialog = new AlertDialog.Builder(activity)
                 .setTitle("压缩结果")
                 .setView(root)
-                .setPositiveButton("ok",null)
+                .setPositiveButton("ok", null)
                 .create();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         dialog.show();
 
 
-
     }
 
 
-    public static void showExif(Activity activity,String compress) {
+    public static void showExif(Activity activity, String compress) {
         try {
 
             String str = ExifUtil.getExifStr(compress);
             AlertDialog dialog = new AlertDialog.Builder(activity)
                     .setTitle(compress)
                     .setMessage(str)
-                    .setPositiveButton("ok",null)
+                    .setPositiveButton("ok", null)
                     .create();
             dialog.show();
 
@@ -99,18 +98,18 @@ public class ShowResultUtil {
         BitmapFactory.decodeFile(path, options);
         int srcWidth = options.outWidth;
         int srcHeight = options.outHeight;
-        long  size = new File(path).length();
+        long size = new File(path).length();
         String sizeStr = formatFileSize(size);
 
         int quality = guessQuality(path);
 
-        return srcWidth + "x"+srcHeight+","+sizeStr+",Q:"+quality+"\npath: "+path;
+        return srcWidth + "x" + srcHeight + "," + sizeStr + ",Q:" + quality + "\npath: " + path;
     }
 
     public static int guessQuality(String path) {
         try {
             return new Magick().getJPEGImageQuality(new FileInputStream(path));
-        }catch (Throwable throwable) {
+        } catch (Throwable throwable) {
             throwable.printStackTrace();
             return 0;
         }

@@ -19,7 +19,7 @@
  *    CompuServe Incorporated."
  */
 
-#include "cdjpeg.h"		/* Common decls for cjpeg/djpeg applications */
+#include "cdjpeg.h"        /* Common decls for cjpeg/djpeg applications */
 
 #ifdef GIF_SUPPORTED
 

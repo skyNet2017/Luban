@@ -32,10 +32,10 @@
 #include "./turbojpeg.h"
 
 int loadbmp(char *filename, unsigned char **buf, int *w, int *h, int pf,
-	int bottomup);
+            int bottomup);
 
 int savebmp(char *filename, unsigned char *buf, int w, int h, int pf,
-	int bottomup);
+            int bottomup);
 
 const char *bmpgeterr(void);
 

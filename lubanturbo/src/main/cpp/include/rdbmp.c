@@ -23,7 +23,7 @@
  * This code contributed by James Arthur Boucher.
  */
 
-#include "cdjpeg.h"		/* Common decls for cjpeg/djpeg applications */
+#include "cdjpeg.h"        /* Common decls for cjpeg/djpeg applications */
 
 #ifdef BMP_SUPPORTED
 
@@ -279,11 +279,11 @@ start_input_bmp (j_compress_ptr cinfo, cjpeg_source_ptr sinfo)
   U_CHAR bmpfileheader[14];
   U_CHAR bmpinfoheader[64];
 #define GET_2B(array,offset)  ((unsigned int) UCH(array[offset]) + \
-			       (((unsigned int) UCH(array[offset+1])) << 8))
+                   (((unsigned int) UCH(array[offset+1])) << 8))
 #define GET_4B(array,offset)  ((INT32) UCH(array[offset]) + \
-			       (((INT32) UCH(array[offset+1])) << 8) + \
-			       (((INT32) UCH(array[offset+2])) << 16) + \
-			       (((INT32) UCH(array[offset+3])) << 24))
+                   (((INT32) UCH(array[offset+1])) << 8) + \
+                   (((INT32) UCH(array[offset+2])) << 16) + \
+                   (((INT32) UCH(array[offset+3])) << 24))
   INT32 bfOffBits;
   INT32 headerSize;
   INT32 biWidth;
@@ -468,7 +468,7 @@ jinit_read_bmp (j_compress_ptr cinfo)
   /* Create module interface object */
   source = (bmp_source_ptr)
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				  SIZEOF(bmp_source_struct));
+                  SIZEOF(bmp_source_struct));
   source->cinfo = cinfo;	/* make back link for subroutines */
   /* Fill in method ptrs, except get_pixel_rows which start_input sets */
   source->pub.start_input = start_input_bmp;

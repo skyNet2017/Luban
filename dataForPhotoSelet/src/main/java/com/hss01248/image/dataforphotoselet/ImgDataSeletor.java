@@ -37,7 +37,6 @@ import java.util.List;
 public class ImgDataSeletor {
 
 
-
     public static void startPickOneWitchDialog(final FragmentActivity activity, final TakeOnePhotoListener listener) {
         try {
             final Dialog dialog = new Dialog(activity);
@@ -71,7 +70,7 @@ public class ImgDataSeletor {
                     if (dialog != null) {
                         dialog.dismiss();
                     }
-                    selectAssertFile(activity,listener);
+                    selectAssertFile(activity, listener);
                 }
             });
             dialog.getWindow().findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
@@ -89,16 +88,11 @@ public class ImgDataSeletor {
     }
 
 
+    volatile static List<File> files = new ArrayList<>();
 
-
-
-
-
-
-   volatile static List<File> files = new ArrayList<>();
-     static void selectAssertFile(Context context,TakeOnePhotoListener listener){
-        if(files.isEmpty()){
-            Toast.makeText(context,"wait until the files copyed to sd card",Toast.LENGTH_SHORT).show();
+    static void selectAssertFile(Context context, TakeOnePhotoListener listener) {
+        if (files.isEmpty()) {
+            Toast.makeText(context, "wait until the files copyed to sd card", Toast.LENGTH_SHORT).show();
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -106,15 +100,14 @@ public class ImgDataSeletor {
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            showDialog(context,listener);
+                            showDialog(context, listener);
                         }
-                    },1000);
+                    }, 1000);
                 }
             }).start();
-        }else {
-            showDialog(context,listener);
+        } else {
+            showDialog(context, listener);
         }
-
 
 
     }
@@ -127,7 +120,7 @@ public class ImgDataSeletor {
 
         RecyclerView recyclerView = new RecyclerView(context);
         dialog.setContentView(recyclerView);
-        initRecycler(recyclerView,dialog,listener);
+        initRecycler(recyclerView, dialog, listener);
         dialog.show();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             attributes.width = getAppScreenWidth(context);
@@ -146,18 +139,18 @@ public class ImgDataSeletor {
     private static void fillFiles(Context context) {
         try {
             String[] imgs = context.getAssets().list("imgsluban");
-            File dir = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),"0lubanTestImgs");
+            File dir = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "0lubanTestImgs");
             dir.mkdirs();
             Log.d("imgsdata", Arrays.toString(imgs));
-            if(imgs==null || imgs.length ==0){
-                Toast.makeText(context,"imgs is null in assets/imgsluban",Toast.LENGTH_LONG).show();
+            if (imgs == null || imgs.length == 0) {
+                Toast.makeText(context, "imgs is null in assets/imgsluban", Toast.LENGTH_LONG).show();
                 return;
             }
             for (String img : imgs) {
-                File target = new File(dir,img);
+                File target = new File(dir, img);
                 files.add(target);
-                FileIOUtils.writeFileFromIS(target,context.getAssets().open("imgsluban/"+img));
-                refreshMediaCenter(context.getApplicationContext(),target.getAbsolutePath());
+                FileIOUtils.writeFileFromIS(target, context.getAssets().open("imgsluban/" + img));
+                refreshMediaCenter(context.getApplicationContext(), target.getAbsolutePath());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -166,7 +159,7 @@ public class ImgDataSeletor {
 
     private static void initRecycler(RecyclerView recyclerView, final Dialog dialog, TakeOnePhotoListener listener) {
         BaseQuickAdapter adapter = new ImgAdapter2(R.layout.data_src_item_img);
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter(adapter);
         adapter.setNewData(files);
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
@@ -181,14 +174,7 @@ public class ImgDataSeletor {
     }
 
 
-
-
-
-
-
-
-
-     static  void refreshMediaCenter(Context activity, String filePath){
+    static void refreshMediaCenter(Context activity, String filePath) {
        /* File file  = new File(filePath);
         try {
             MediaStore.Images.Media.insertImage(activity.getContentResolver(),file.getAbsolutePath(), file.getName(), null);
@@ -197,17 +183,17 @@ public class ImgDataSeletor {
         }*/
 
 
-        if (Build.VERSION.SDK_INT>19){
-            String mineType =getMineType(filePath);
+        if (Build.VERSION.SDK_INT > 19) {
+            String mineType = getMineType(filePath);
 
-            saveImageSendScanner(activity,new MyMediaScannerConnectionClient(filePath,mineType));
-        }else {
+            saveImageSendScanner(activity, new MyMediaScannerConnectionClient(filePath, mineType));
+        } else {
 
-            saveImageSendBroadcast(activity,filePath);
+            saveImageSendBroadcast(activity, filePath);
         }
     }
 
-     static String getMineType(String filePath) {
+    static String getMineType(String filePath) {
 
         String type = "text/plain";
         String extension = MimeTypeMap.getFileExtensionFromUrl(filePath);
@@ -237,17 +223,17 @@ public class ImgDataSeletor {
 
     /**
      * 保存后用广播扫描，Android4.4以下使用这个方法
+     *
      * @author YOLANDA
      */
-    private static void saveImageSendBroadcast(Context activity, String filePath){
+    private static void saveImageSendBroadcast(Context activity, String filePath) {
         activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + filePath)));
     }
 
     /**
      * 保存后用MediaScanner扫描，通用的方法
-     *
      */
-    private static void saveImageSendScanner (Context context, MyMediaScannerConnectionClient scannerClient) {
+    private static void saveImageSendScanner(Context context, MyMediaScannerConnectionClient scannerClient) {
 
         final MediaScannerConnection scanner = new MediaScannerConnection(context, scannerClient);
         scannerClient.setScanner(scanner);
@@ -255,8 +241,7 @@ public class ImgDataSeletor {
     }
 
 
-
-    private   static class MyMediaScannerConnectionClient implements MediaScannerConnection.MediaScannerConnectionClient {
+    private static class MyMediaScannerConnectionClient implements MediaScannerConnection.MediaScannerConnectionClient {
 
         private MediaScannerConnection mScanner;
 

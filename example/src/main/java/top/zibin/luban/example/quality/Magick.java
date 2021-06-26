@@ -93,7 +93,7 @@ public class Magick {
         int sum = 0;
         for (int i = 0; i < QuantTables.MAX_TABLE_COUNT; i++) {
             int[] table = qts.getTable(i);
-            if(table != null){
+            if (table != null) {
                 for (int j = 0; j < table.length; j++) {
                     sum += table[j];
                 }

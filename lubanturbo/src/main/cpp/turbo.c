@@ -16,7 +16,8 @@
 
 typedef uint8_t BYTE;
 
-int generateJpg(BYTE *data, int width, int height, int quality, const char *outfile,boolean isRgb565) {
+int
+generateJpg(BYTE *data, int width, int height, int quality, const char *outfile, boolean isRgb565) {
     int component = 3;
 
     struct jpeg_compress_struct jcs;
@@ -37,9 +38,9 @@ int generateJpg(BYTE *data, int width, int height, int quality, const char *outf
     jcs.image_height = (JDIMENSION) height;
     jcs.arith_code = FALSE;
     jcs.input_components = component;
-    if(isRgb565){
+    if (isRgb565) {
         jcs.in_color_space = JCS_RGB_565;
-    } else{
+    } else {
         jcs.in_color_space = JCS_RGB;
     }
 
@@ -66,8 +67,9 @@ int generateJpg(BYTE *data, int width, int height, int quality, const char *outf
 
 JNIEXPORT jboolean JNICALL
 Java_com_hss01248_lubanturbo_TurboCompressor_nativeCompress(JNIEnv *env, jclass type,
-                                                          jobject bitmap, jint quality,jboolean isRGB565,
-                                                          jstring outfile) {
+                                                            jobject bitmap, jint quality,
+                                                            jboolean isRGB565,
+                                                            jstring outfile) {
     AndroidBitmapInfo bitmapInfo;
     BYTE *pixelColor;
     BYTE *data;
@@ -99,14 +101,14 @@ Java_com_hss01248_lubanturbo_TurboCompressor_nativeCompress(JNIEnv *env, jclass 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             color = *((int *) pixelColor);
-            if(isRGB565){
+            if (isRGB565) {
                 r = (BYTE) ((color & 0xF800) >> 11 << 3);
                 g = (BYTE) ((color & 0x07E0) >> 5 << 2);
                 b = (BYTE) (color & 0x001F << 3);
                 pixelColor += 2;
-            } else{
-                r = (BYTE) ((color & 0x00FF0000) >> 16) ;
-                g = (BYTE) ((color & 0x0000FF00) >> 8) ;
+            } else {
+                r = (BYTE) ((color & 0x00FF0000) >> 16);
+                g = (BYTE) ((color & 0x0000FF00) >> 8);
                 b = (BYTE) (color & 0X000000FF);
                 pixelColor += 4;
             }
@@ -121,7 +123,7 @@ Java_com_hss01248_lubanturbo_TurboCompressor_nativeCompress(JNIEnv *env, jclass 
 
     AndroidBitmap_unlockPixels(env, bitmap);
 
-    int result = generateJpg(tempData, width, height, quality, filepath,isRGB565);
+    int result = generateJpg(tempData, width, height, quality, filepath, isRGB565);
     LOG_I("compress complete, result code is %d", result);
 
     free(tempData);

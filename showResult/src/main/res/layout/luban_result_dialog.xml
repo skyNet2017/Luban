@@ -1,41 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:fillViewport="true"
     android:layout_height="match_parent">
+
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical" android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:padding="5dp"
         android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
+
         <View
             android:layout_margin="5dp"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#999999"/>
+            android:background="#999999" />
+
         <TextView
             android:layout_width="match_parent"
             android:text="原图"
             android:id="@+id/tv_original"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
+
         <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
             android:layout_width="match_parent"
             android:id="@+id/iv_original"
-            android:layout_height="250dp"/>
+            android:layout_height="250dp" />
+
         <TextView
             android:layout_width="match_parent"
             android:text="压缩图"
             android:id="@+id/tv_compressed"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
+
         <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
             android:layout_width="match_parent"
             android:id="@+id/iv_compressed"
-            android:layout_height="250dp"/>
+            android:layout_height="250dp" />
 
     </LinearLayout>
 </ScrollView>

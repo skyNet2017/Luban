@@ -192,7 +192,7 @@
 #if __ARM_HAVE_PLD
 #  define  PLD(reg,offset)    pld    [reg, offset]
 #else
-#  define  PLD(reg,offset)    /* nothing */
+#  define  PLD(reg, offset)    /* nothing */
 #endif
 
 #endif /* _ARM_MACHINE_CPU_FEATURES_H */

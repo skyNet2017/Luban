@@ -4,9 +4,12 @@
 // Note: Some things are manually defined as they need to
 // be mapped to NASM types.
 
-;
-; Automatically generated include file from jsimdcfg.inc.h
-;
+;;
+Automatically generated
+include file
+from jsimdcfg
+.inc.
+h;
 
 #define JPEG_INTERNALS
 
@@ -17,17 +20,12 @@
 
 #define define(var) %define _cpp_protection_##var
 #define definev(var) %define _cpp_protection_##var var
-
-;
-; -- jpeglib.h
-;
+;; -- jpeglib.
+h;
 
 definev(DCTSIZE)
-definev(DCTSIZE2)
-
-;
-; -- jmorecfg.h
-;
+definev(DCTSIZE2);; -- jmorecfg.
+h;
 
 definev(RGB_RED)
 definev(RGB_GREEN)
@@ -64,76 +62,190 @@ definev(EXT_XRGB_GREEN)
 definev(EXT_XRGB_BLUE)
 definev(EXT_XRGB_PIXELSIZE)
 
-%define RGBX_FILLER_0XFF        1
+%
+define RGBX_FILLER_0XFF
+1;
+Representation of
+a single
+sample (pixel
+element value
+).; On this
+SIMD implementation,
+this
+must be
+'unsigned char'.;
 
-; Representation of a single sample (pixel element value).
-; On this SIMD implementation, this must be 'unsigned char'.
-;
+%
+define JSAMPLE
+byte;
+unsigned char
+%
+define SIZEOF_JSAMPLE
+SIZEOF_BYTE;
+sizeof(JSAMPLE)
 
-%define JSAMPLE                 byte          ; unsigned char
-%define SIZEOF_JSAMPLE          SIZEOF_BYTE   ; sizeof(JSAMPLE)
+definev(CENTERJSAMPLE);
+Representation of
+a DCT
+frequency coefficient
+.; On this
+SIMD implementation,
+this
+must be
+'short'.;
+%
+define JCOEF
+word;
+short
+%
+define SIZEOF_JCOEF
+SIZEOF_WORD;
+sizeof(JCOEF);
+Datatype used
+for
+image dimensions
+.; On this
+SIMD implementation,
+this
+must be
+'unsigned int'.;
+%
+define JDIMENSION
+dword;
+unsigned int
+%
+define SIZEOF_JDIMENSION
+SIZEOF_DWORD;
+sizeof(JDIMENSION)
 
-definev(CENTERJSAMPLE)
+%
+define JSAMPROW
+POINTER;
+JSAMPLE FAR *(jpeglib
+.h)
+%
+define JSAMPARRAY
+POINTER;
+JSAMPROW *(jpeglib
+.h)
+%
+define JSAMPIMAGE
+POINTER;
+JSAMPARRAY *(jpeglib
+.h)
+%
+define JCOEFPTR
+POINTER;
+JCOEF FAR *(jpeglib
+.h)
+%
+define SIZEOF_JSAMPROW
+SIZEOF_POINTER;
+sizeof(JSAMPROW)
+%
+define SIZEOF_JSAMPARRAY
+SIZEOF_POINTER;
+sizeof(JSAMPARRAY)
+%
+define SIZEOF_JSAMPIMAGE
+SIZEOF_POINTER;
+sizeof(JSAMPIMAGE)
+%
+define SIZEOF_JCOEFPTR
+SIZEOF_POINTER;
+sizeof(JCOEFPTR);; -- jdct.
+h;;
+A forward
+DCT routine
+is given
+a pointer
+to a
+work area
+of type
+DCTELEM[];;
+the DCT
+is to
+be performed
+in-
+place in
+that buffer
+.;
+To maximize
+parallelism,
+Type DCTELEM
+is changed
+to short (originally,
+int).;
+%
+define DCTELEM
+word;
+short
+%
+define SIZEOF_DCTELEM
+SIZEOF_WORD;
+sizeof(DCTELEM)
 
-; Representation of a DCT frequency coefficient.
-; On this SIMD implementation, this must be 'short'.
-;
-%define JCOEF                   word          ; short
-%define SIZEOF_JCOEF            SIZEOF_WORD   ; sizeof(JCOEF)
+%
+define FAST_FLOAT FP32;
+float
+%
+define SIZEOF_FAST_FLOAT
+SIZEOF_FP32;
+sizeof(FAST_FLOAT);
+To maximize
+parallelism,
+Type MULTIPLIER is
+changed to
+short.;
+%
+define ISLOW_MULT_TYPE
+word;
+must be
+short
+%
+define SIZEOF_ISLOW_MULT_TYPE
+SIZEOF_WORD;
+sizeof(ISLOW_MULT_TYPE)
 
-; Datatype used for image dimensions.
-; On this SIMD implementation, this must be 'unsigned int'.
-;
-%define JDIMENSION              dword         ; unsigned int
-%define SIZEOF_JDIMENSION       SIZEOF_DWORD  ; sizeof(JDIMENSION)
+%
+define IFAST_MULT_TYPE
+word;
+must be
+short
+%
+define SIZEOF_IFAST_MULT_TYPE
+SIZEOF_WORD;
+sizeof(IFAST_MULT_TYPE)
+%
+define IFAST_SCALE_BITS
+2;
+fractional bits
+in scale
+factors
 
-%define JSAMPROW                POINTER       ; JSAMPLE FAR * (jpeglib.h)
-%define JSAMPARRAY              POINTER       ; JSAMPROW *    (jpeglib.h)
-%define JSAMPIMAGE              POINTER       ; JSAMPARRAY *  (jpeglib.h)
-%define JCOEFPTR                POINTER       ; JCOEF FAR *   (jpeglib.h)
-%define SIZEOF_JSAMPROW         SIZEOF_POINTER  ; sizeof(JSAMPROW)
-%define SIZEOF_JSAMPARRAY       SIZEOF_POINTER  ; sizeof(JSAMPARRAY)
-%define SIZEOF_JSAMPIMAGE       SIZEOF_POINTER  ; sizeof(JSAMPIMAGE)
-%define SIZEOF_JCOEFPTR         SIZEOF_POINTER  ; sizeof(JCOEFPTR)
-
-;
-; -- jdct.h
-;
-
-; A forward DCT routine is given a pointer to a work area of type DCTELEM[];
-; the DCT is to be performed in-place in that buffer.
-; To maximize parallelism, Type DCTELEM is changed to short (originally, int).
-;
-%define DCTELEM                 word          ; short
-%define SIZEOF_DCTELEM          SIZEOF_WORD   ; sizeof(DCTELEM)
-
-%define FAST_FLOAT              FP32            ; float
-%define SIZEOF_FAST_FLOAT       SIZEOF_FP32     ; sizeof(FAST_FLOAT)
-
-; To maximize parallelism, Type MULTIPLIER is changed to short.
-;
-%define ISLOW_MULT_TYPE         word          ; must be short
-%define SIZEOF_ISLOW_MULT_TYPE  SIZEOF_WORD   ; sizeof(ISLOW_MULT_TYPE)
-
-%define IFAST_MULT_TYPE         word          ; must be short
-%define SIZEOF_IFAST_MULT_TYPE  SIZEOF_WORD   ; sizeof(IFAST_MULT_TYPE)
-%define IFAST_SCALE_BITS        2             ; fractional bits in scale factors
-
-%define FLOAT_MULT_TYPE         FP32          ; must be float
-%define SIZEOF_FLOAT_MULT_TYPE  SIZEOF_FP32   ; sizeof(FLOAT_MULT_TYPE)
-
-;
-; -- jsimd.h
-;
+%
+define FLOAT_MULT_TYPE
+FP32;
+must be
+float
+%
+define SIZEOF_FLOAT_MULT_TYPE
+SIZEOF_FP32;
+sizeof(FLOAT_MULT_TYPE);; -- jsimd.
+h;
 
 definev(JSIMD_NONE)
 definev(JSIMD_MMX)
 definev(JSIMD_3DNOW)
 definev(JSIMD_SSE)
-definev(JSIMD_SSE2)
-
-; Short forms of external names for systems with brain-damaged linkers.
-;
+definev(JSIMD_SSE2);
+Short forms
+of external
+names for
+systems with
+brain-
+damaged linkers
+.;
 #ifdef NEED_SHORT_EXTERNAL_NAMES
 definev(jpeg_simd_cpu_support)
 definev(jsimd_rgb_ycc_convert_mmx)

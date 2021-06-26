@@ -1,87 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-    android:padding="8dp"
-    android:background="#00ffff"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content">
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <Button
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:background="#00ffff"
         android:layout_width="match_parent"
-        android:text="拍照或者选图"
-        android:id="@+id/btn_choose"
-        android:layout_height="wrap_content"/>
-    <Button
-        android:layout_width="match_parent"
-        android:text="选图-内置典型图片"
-        android:id="@+id/btn_chooseself"
-        android:layout_height="wrap_content"/>
-    <Button
-        android:layout_width="match_parent"
-        android:text="api说明"
-        android:onClick="api"
-        android:id="@+id/btn_api"
-        android:layout_height="wrap_content"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:text="原图"
-        android:id="@+id/tv_original"
-        android:layout_height="wrap_content"/>
-    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-        android:layout_width="match_parent"
-        android:id="@+id/iv_original"
-        android:layout_height="250dp"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:text="noresize"
-        android:id="@+id/tv_noresize"
-        android:layout_height="wrap_content"/>
-    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-        android:layout_width="match_parent"
-        android:id="@+id/iv_noresize"
-        android:layout_height="250dp"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:text="jpgturbo"
-        android:id="@+id/tv_jpgturbo"
-        android:layout_height="wrap_content"/>
-    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-        android:layout_width="match_parent"
-        android:id="@+id/iv_jpgturbo"
-        android:layout_height="250dp"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:text="luban"
-        android:id="@+id/tv_luban"
-        android:layout_height="wrap_content"/>
-    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-        android:layout_width="match_parent"
-        android:id="@+id/iv_luban"
-        android:layout_height="250dp"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:text="luban"
-        android:id="@+id/tv_webp"
-        android:layout_height="wrap_content"/>
-    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-        android:layout_width="match_parent"
-        android:id="@+id/iv_webp"
-        android:layout_height="250dp"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:text="luban-turbo"
-        android:id="@+id/tv_luban_turbo"
-        android:layout_height="wrap_content"/>
-    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-        android:layout_width="match_parent"
-        android:id="@+id/iv_luban_turbo"
-        android:layout_height="250dp"/>
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="match_parent"
+            android:text="拍照或者选图"
+            android:id="@+id/btn_choose"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:text="选图-内置典型图片"
+            android:id="@+id/btn_chooseself"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:text="api说明"
+            android:onClick="api"
+            android:id="@+id/btn_api"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:text="原图"
+            android:id="@+id/tv_original"
+            android:layout_height="wrap_content" />
+
+        <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+            android:layout_width="match_parent"
+            android:id="@+id/iv_original"
+            android:layout_height="250dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:text="noresize"
+            android:id="@+id/tv_noresize"
+            android:layout_height="wrap_content" />
+
+        <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+            android:layout_width="match_parent"
+            android:id="@+id/iv_noresize"
+            android:layout_height="250dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:text="jpgturbo"
+            android:id="@+id/tv_jpgturbo"
+            android:layout_height="wrap_content" />
+
+        <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+            android:layout_width="match_parent"
+            android:id="@+id/iv_jpgturbo"
+            android:layout_height="250dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:text="luban"
+            android:id="@+id/tv_luban"
+            android:layout_height="wrap_content" />
+
+        <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+            android:layout_width="match_parent"
+            android:id="@+id/iv_luban"
+            android:layout_height="250dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:text="luban"
+            android:id="@+id/tv_webp"
+            android:layout_height="wrap_content" />
+
+        <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+            android:layout_width="match_parent"
+            android:id="@+id/iv_webp"
+            android:layout_height="250dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:text="luban-turbo"
+            android:id="@+id/tv_luban_turbo"
+            android:layout_height="wrap_content" />
+
+        <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+            android:layout_width="match_parent"
+            android:id="@+id/iv_luban_turbo"
+            android:layout_height="250dp" />
 
 
-
-</LinearLayout>
+    </LinearLayout>
 </ScrollView>
