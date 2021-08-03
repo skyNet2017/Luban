@@ -17,6 +17,7 @@ import android.os.StrictMode;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -166,7 +167,7 @@ public class CompareActivity extends AppCompatActivity {
         ImgDataSeletor.startPickOneWitchDialog(this, new TakeOnePhotoListener() {
             @Override
             public void onSuccess(final String path) {
-                LubanUtil.compressOriginal(path, 88);
+                //LubanUtil.compressOriginal(path, 88);
 
                 compress(path);
             }
@@ -227,6 +228,9 @@ public class CompareActivity extends AppCompatActivity {
                     .get();
           String compress = files.get(0).getAbsolutePath();*/
             final String compress = LubanUtil.compressForMaterialUpload(path).getAbsolutePath();
+
+
+
             ivLuban.setImage(ImageSource.uri(Uri.fromFile(new File(compress))));
             tvLuban.setText("compressForMaterialUpload(点击显示exif):\n" + getImgInfo(compress));
             tvLuban.setOnClickListener(new View.OnClickListener() {
@@ -238,6 +242,14 @@ public class CompareActivity extends AppCompatActivity {
             });
 
             final String compress0 = LubanUtil.compressForMaterialUploadWebp(path).getAbsolutePath();
+
+            //todo webp被ExifInterface操作后,图片被部分损坏,无法显示在glide中,无法被chrome正确显示,无法被Image.io读取
+            ExifInterface exifInterface = new ExifInterface(compress0);
+            exifInterface.setAttribute(ExifInterface.TAG_SOFTWARE,"dddd");
+            exifInterface.setAttribute(ExifInterface.TAG_MAKE,"77777");
+            exifInterface.saveAttributes();
+
+
             ivwebp.setImage(ImageSource.uri(Uri.fromFile(new File(compress0))));
             tvwebp.setText("webp(点击显示exif):\n" + getImgInfo(compress0));
             tvwebp.setOnClickListener(new View.OnClickListener() {
