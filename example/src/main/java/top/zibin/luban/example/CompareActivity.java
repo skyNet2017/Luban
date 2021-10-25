@@ -247,7 +247,12 @@ public class CompareActivity extends AppCompatActivity {
             ExifInterface exifInterface = new ExifInterface(compress0);
             exifInterface.setAttribute(ExifInterface.TAG_SOFTWARE,"dddd");
             exifInterface.setAttribute(ExifInterface.TAG_MAKE,"77777");
-            exifInterface.saveAttributes();
+            try {
+                exifInterface.saveAttributes();
+            }catch (Throwable throwable){
+                throwable.printStackTrace();
+            }
+
 
 
             ivwebp.setImage(ImageSource.uri(Uri.fromFile(new File(compress0))));

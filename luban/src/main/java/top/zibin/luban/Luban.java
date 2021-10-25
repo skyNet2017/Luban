@@ -270,18 +270,21 @@ public class Luban implements Handler.Callback {
         long start = System.currentTimeMillis();
 
         try {
+            File file =  new File(path.getPath());
+            boolean canWrite = file.canWrite();
             if (mCompressionPredicate != null) {
                 if (mCompressionPredicate.apply(path.getPath())
-                        && Checker.SINGLE.needCompress(mLeastCompressSize, quality, path.getPath(), maxShortDimension, noResize)) {
+                        && needCompress(file,path)) {
                     result = new Engine(path, outFile, focusAlpha, bitmapToFile, quality, this).compress();
                 } else {
                     result = new File(path.getPath());
                 }
             } else {
-                result = Checker.SINGLE.needCompress(mLeastCompressSize, quality, path.getPath(), maxShortDimension, noResize) ?
+                result = needCompress(file,path) ?
                         new Engine(path, outFile, focusAlpha, bitmapToFile, quality, this).compress() :
                         new File(path.getPath());
             }
+            //Log.w("filexx","file can write:"+canWrite+" , can read:"+file.canRead()+", "+path.getPath());
             //修改exif
             editExif(result);
 
@@ -320,6 +323,17 @@ public class Luban implements Handler.Callback {
             LubanUtil.w("compressByLuban cost " + duration + " ms, throws exception:" + throwable.getClass() + " " + throwable.getMessage());
         }
         return result;
+    }
+
+    private boolean needCompress(File file, InputStreamProvider path) {
+        boolean need = Checker.SINGLE.needCompress(mLeastCompressSize, quality, path.getPath(), maxShortDimension, noResize);
+        if(!need){
+            if(file.exists() && !file.canWrite()){
+                //兼容Android11
+                return true;
+            }
+        }
+        return need;
     }
 
     private void editExif(File result) {
