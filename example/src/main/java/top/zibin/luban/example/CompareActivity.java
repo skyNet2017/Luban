@@ -244,7 +244,7 @@ public class CompareActivity extends AppCompatActivity {
             final String compress0 = LubanUtil.compressForMaterialUploadWebp(path).getAbsolutePath();
 
             //todo webp被ExifInterface操作后,图片被部分损坏,无法显示在glide中,无法被chrome正确显示,无法被Image.io读取
-           /* ExifInterface exifInterface = new ExifInterface(compress0);
+          /*  ExifInterface exifInterface = new ExifInterface(compress0);
             exifInterface.setAttribute(ExifInterface.TAG_SOFTWARE,"dddd");
             exifInterface.setAttribute(ExifInterface.TAG_MAKE,"77777");
             try {
@@ -256,7 +256,7 @@ public class CompareActivity extends AppCompatActivity {
 
 
             ivwebp.setImage(ImageSource.uri(Uri.fromFile(new File(compress0))));
-            tvwebp.setText("webp(点击显示exif):\n" + getImgInfo(compress0));
+            tvwebp.setText("webp(点击显示exif,被编辑,可能导致图片损坏):\n" + getImgInfo(compress0));
             tvwebp.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

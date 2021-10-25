@@ -61,3 +61,10 @@ dependencies {
 
     api 'it.sephiroth.android.exif:library:1.0.1'
 }
+configurations {
+    all {
+        resolutionStrategy {
+            force "androidx.exifinterface:exifinterface:1.3.3"
+        }
+    }
+}

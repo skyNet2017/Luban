@@ -271,7 +271,7 @@ public class Luban implements Handler.Callback {
 
         try {
             File file =  new File(path.getPath());
-            boolean canWrite = file.canWrite();
+           // boolean canWrite = file.canWrite();
             if (mCompressionPredicate != null) {
                 if (mCompressionPredicate.apply(path.getPath())
                         && needCompress(file,path)) {
