@@ -96,7 +96,7 @@
             android:id="@+id/iv_luban_turbo"
             android:layout_height="250dp" />
 
-        <TextView
+        <!--<TextView
             android:layout_width="match_parent"
             android:text="jpeg-turbo"
             android:id="@+id/tv_real_turbo"
@@ -105,7 +105,7 @@
         <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
             android:layout_width="match_parent"
             android:id="@+id/iv_real_turbo"
-            android:layout_height="250dp" />
+            android:layout_height="250dp" />-->
 
 
     </LinearLayout>

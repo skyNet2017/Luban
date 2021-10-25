@@ -338,11 +338,15 @@ public class Luban implements Handler.Callback {
 
     private void editExif(File result) {
         try {
-            if (LubanUtil.config.editExif(null)) {
-                ExifInterface exif = new ExifInterface(result);
-                LubanUtil.config.editExif(exif);
-                exif.saveAttributes();
+            if(result.getName().endsWith(".jpg") || result.getName().endsWith(".jpeg")
+            || result.getName().endsWith(".JPG") || result.getName().endsWith(".JPEG")){
+                if (LubanUtil.config.editExif(null)) {
+                    ExifInterface exif = new ExifInterface(result);
+                    LubanUtil.config.editExif(exif);
+                    exif.saveAttributes();
+                }
             }
+
         } catch (Throwable throwable) {
             LubanUtil.config.reportException(throwable);
         }
