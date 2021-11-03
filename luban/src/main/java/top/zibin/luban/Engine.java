@@ -83,7 +83,7 @@ public class Engine {
             //webp也有exif
             if (exifs != null) {
                 String ori = exifs.get("Orientation");
-                if (TextUtils.isEmpty(ori)) {
+                if (!TextUtils.isEmpty(ori)) {
                     try {
                         int o = Integer.parseInt(ori);
                         if (o != 0) {
