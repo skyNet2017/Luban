@@ -82,14 +82,14 @@ public class Engine {
 
             //webp也有exif
             if (exifs != null) {
-                String ori = exifs.get("Orientation");
+                String ori = exifs.get(ExifInterface.TAG_ORIENTATION);
                 if (!TextUtils.isEmpty(ori)) {
                     try {
                         int o = Integer.parseInt(ori);
                         if (o != 0) {
                             rotation = o;
                             //可能oom. 万一oom了,图片还是留着,但是exif丽保留原旋转角度.
-                            tagBitmap = rotatingImage(tagBitmap, o);
+                            tagBitmap = rotatingImage(tagBitmap, getRealRotation(o));
                             rotateSuccess = true;
                         }
                     } catch (Throwable throwable) {
@@ -109,7 +109,7 @@ public class Engine {
                         //rotation回写:
                         try {
                             ExifInterface exif = new ExifInterface(tagImg);
-                            exif.setAttribute("Orientation", rotation + "");
+                            exif.setAttribute(ExifInterface.TAG_ORIENTATION, rotation + "");
                             exif.saveAttributes();
                         } catch (Throwable throwable) {
                             LubanUtil.config.reportException(throwable);
@@ -125,6 +125,19 @@ public class Engine {
             tagImg = new File(srcImg.getPath());
         }
         return tagImg;
+    }
+
+    private int getRealRotation(int o) {
+        switch (o){
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                return 90;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                return 180;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                return 270;
+
+        }
+        return 0;
     }
 
 
