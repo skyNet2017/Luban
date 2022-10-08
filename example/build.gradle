@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 32
 
     defaultConfig {
         applicationId "top.zibin.luban.example"
         minSdkVersion 16
-        targetSdkVersion 30
+        targetSdkVersion 32
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -60,6 +60,9 @@ dependencies {
     //implementation 'jp.co.link_u.library.glideavif:glideavif-8bpc:0.8.1'
 
     api 'it.sephiroth.android.exif:library:1.0.1'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    //适配Android 12崩溃问题
+    implementation 'androidx.work:work-runtime-ktx:2.7.0'
 }
 configurations {
     all {
