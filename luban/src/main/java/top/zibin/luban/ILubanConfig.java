@@ -32,6 +32,11 @@ public interface ILubanConfig {
                 + sizeAfterCompressInK + "kB , 减少掉:" + percent + "%,  wh:" + width + "x" + height);
     }
 
+    /**
+     *
+     * @param exif null时返回要不要编辑的判断,不为null时则正式编辑内容.
+     * @return
+     */
     default boolean editExif(@Nullable ExifInterface exif) {
         return false;
     }

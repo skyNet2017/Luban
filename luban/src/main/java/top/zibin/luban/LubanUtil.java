@@ -2,6 +2,9 @@ package top.zibin.luban;
 
 import android.app.Application;
 import android.content.ContentResolver;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -46,13 +49,30 @@ public class LubanUtil {
     static boolean enableLog;
     public static int quality_material = 85;//默认质量85.
     public static int quality_normal = 70;
+    static String envInfo = "";
 
     public static void init(Application app, boolean enableLog, @Nullable ILubanConfig config) {
         LubanUtil.app = app;
+        getEnv(app);
+        //获取app名字,版本号,系统版本
         LubanUtil.enableLog = enableLog;
         LubanUtil.config = config;
         if (config == null) {
             LubanUtil.config = new BaseLubanConfig();
+        }
+    }
+
+    private static void getEnv(Application app) {
+        PackageManager manager = app.getPackageManager();
+        String name = null;
+        try {
+            PackageInfo info = manager.getPackageInfo(app.getPackageName(), 0);
+            name = info.versionName;
+            ApplicationInfo applicationInfo = manager.getApplicationInfo(app.getPackageName(), 0);
+            String applicationName = (String) manager.getApplicationLabel(applicationInfo);
+            envInfo = applicationName+"/"+name+"/android";
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

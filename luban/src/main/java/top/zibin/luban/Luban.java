@@ -12,6 +12,8 @@ import android.util.Log;
 
 import androidx.exifinterface.media.ExifInterface;
 
+import com.hss01248.media.metadata.FileTypeUtil;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -256,73 +258,78 @@ public class Luban implements Handler.Callback {
             LubanUtil.w("compressByLuban file is empty: " + file0.getAbsolutePath());
             return file0;
         }
-        File result;
+        //根据文件路径加锁,防止极端情况下并发修改同一个文件导致图片文件损坏的情况
+        synchronized (path.getPath()){
+            long size0  = file0.length();
+            File result;
 
-        File outFile = getImageCustomFile(context, new File(path.getPath()).getName());
-        //getImageCacheFile(context, Checker.SINGLE.extSuffix(path));
-        if (mRenameListener != null) {
-            String filename = mRenameListener.rename(path.getPath());
-            outFile = getImageCustomFile(context, filename);
-        }
-
-        //加上日志:
-        LubanUtil.logFile("compressByLuban begin", path.getPath());
-        long start = System.currentTimeMillis();
-
-        try {
-            File file =  new File(path.getPath());
-           // boolean canWrite = file.canWrite();
-            if (mCompressionPredicate != null) {
-                if (mCompressionPredicate.apply(path.getPath())
-                        && needCompress(file,path)) {
-                    result = new Engine(path, outFile, focusAlpha, bitmapToFile, quality, this).compress();
-                } else {
-                    result = new File(path.getPath());
-                }
-            } else {
-                result = needCompress(file,path) ?
-                        new Engine(path, outFile, focusAlpha, bitmapToFile, quality, this).compress() :
-                        new File(path.getPath());
-            }
-            //Log.w("filexx","file can write:"+canWrite+" , can read:"+file.canRead()+", "+path.getPath());
-            //修改exif
-            editExif(result);
-
-
-            //压缩完成后,判断压缩文件是否存在,是否为空文件,如果是,就返回原文件
-            if (!result.exists()) {
-                LubanUtil.w("compressed file not exist: " + result.getAbsolutePath());
-                LubanUtil.config.reportException(new CompressFailException("compressed file not exist"));
-                result = file0;
-            } else if (result.length() == 0) {
-                LubanUtil.w("compressed file is empty: " + result.getAbsolutePath());
-                LubanUtil.config.reportException(new CompressFailException("compressed file is empty:size =0"));
-                result = file0;
+            File outFile = getImageCustomFile(context, new File(path.getPath()).getName());
+            //getImageCacheFile(context, Checker.SINGLE.extSuffix(path));
+            if (mRenameListener != null) {
+                String filename = mRenameListener.rename(path.getPath());
+                outFile = getImageCustomFile(context, filename);
             }
 
             //加上日志:
+            LubanUtil.logFile("compressByLuban begin", path.getPath());
+            long start = System.currentTimeMillis();
 
-            long duration = System.currentTimeMillis() - start;
-            LubanUtil.logFile("compressByLuban end", result.getAbsolutePath());
-            LubanUtil.i("compressByLuban cost " + duration + " ms");
+            try {
+                File file =  new File(path.getPath());
+                // boolean canWrite = file.canWrite();
+                if (mCompressionPredicate != null) {
+                    if (mCompressionPredicate.apply(path.getPath())
+                            && needCompress(file,path)) {
+                        result = new Engine(path, outFile, focusAlpha, bitmapToFile, quality, this).compress();
+                    } else {
+                        result = new File(path.getPath());
+                    }
+                } else {
+                    result = needCompress(file,path) ?
+                            new Engine(path, outFile, focusAlpha, bitmapToFile, quality, this).compress() :
+                            new File(path.getPath());
+                }
+                //Log.w("filexx","file can write:"+canWrite+" , can read:"+file.canRead()+", "+path.getPath());
+                //修改exif
+                editExif(result,size0 != result.length());
 
-            int percent = 0;
 
-            if (file0.exists() && result.exists() && file0.length() > 0) {
-                percent = (int) ((file0.length() - result.length()) * 100 / file0.length());
+                //压缩完成后,判断压缩文件是否存在,是否为空文件,如果是,就返回原文件
+                if (!result.exists()) {
+                    LubanUtil.w("compressed file not exist: " + result.getAbsolutePath());
+                    LubanUtil.config.reportException(new CompressFailException("compressed file not exist"));
+                    result = file0;
+                } else if (result.length() == 0) {
+                    LubanUtil.w("compressed file is empty: " + result.getAbsolutePath());
+                    LubanUtil.config.reportException(new CompressFailException("compressed file is empty:size =0"));
+                    result = file0;
+                }
+
+                //加上日志:
+
+                long duration = System.currentTimeMillis() - start;
+                LubanUtil.logFile("compressByLuban end", result.getAbsolutePath());
+                LubanUtil.i("compressByLuban cost " + duration + " ms");
+
+                int percent = 0;
+
+                if (file0.exists() && result.exists() && file0.length() > 0) {
+                    percent = (int) ((file0.length() - result.length()) * 100 / file0.length());
+                }
+                int[] wh = LubanUtil.getImageWidthHeight(result.getAbsolutePath());
+                LubanUtil.config.trace(file0.getAbsolutePath(), result.getAbsolutePath(), duration, percent, result.length() / 1024, wh[0], wh[1]);
+
+            } catch (Throwable throwable) {
+                LubanUtil.config.reportException(new CompressFailException(throwable));
+                result = file0;
+                //修改exif
+                editExif(result,false);
+                long duration = System.currentTimeMillis() - start;
+                LubanUtil.w("compressByLuban cost " + duration + " ms, throws exception:" + throwable.getClass() + " " + throwable.getMessage());
             }
-            int[] wh = LubanUtil.getImageWidthHeight(result.getAbsolutePath());
-            LubanUtil.config.trace(file0.getAbsolutePath(), result.getAbsolutePath(), duration, percent, result.length() / 1024, wh[0], wh[1]);
-
-        } catch (Throwable throwable) {
-            LubanUtil.config.reportException(new CompressFailException(throwable));
-            result = file0;
-            //修改exif
-            editExif(result);
-            long duration = System.currentTimeMillis() - start;
-            LubanUtil.w("compressByLuban cost " + duration + " ms, throws exception:" + throwable.getClass() + " " + throwable.getMessage());
+            return result;
         }
-        return result;
+
     }
 
     private boolean needCompress(File file, InputStreamProvider path) {
@@ -336,17 +343,27 @@ public class Luban implements Handler.Callback {
         return need;
     }
 
-    private void editExif(File result) {
+    private void editExif(File result,boolean hasCompressThisTime) {
         try {
-            if(result.getName().endsWith(".jpg") || result.getName().endsWith(".jpeg")
-            || result.getName().endsWith(".JPG") || result.getName().endsWith(".JPEG")){
-                if (LubanUtil.config.editExif(null)) {
-                    ExifInterface exif = new ExifInterface(result);
-                    LubanUtil.config.editExif(exif);
-                    exif.saveAttributes();
+            String type = FileTypeUtil.getTypeByPath(result.getAbsolutePath());
+            if(!TextUtils.isEmpty(type)&& type.contains("jpg")){
+                //webp不能编辑exif,会导致图片损坏
+                ExifInterface exif = new ExifInterface(result);
+                String softWare = exif.getAttribute(ExifInterface.TAG_SOFTWARE);
+                //通过这里可以看到是否被压缩多次
+                if(hasCompressThisTime){
+                    //获取app的信息:用于线上图片追踪debug
+                    String appInfo =LubanUtil.envInfo+"_by_lubanx";
+                    exif.setAttribute(ExifInterface.TAG_SOFTWARE,softWare+"_"+appInfo);
                 }
-            }
 
+                if (LubanUtil.config.editExif(null)) {
+                    LubanUtil.config.editExif(exif);
+                }
+                exif.saveAttributes();
+            }else {
+                LubanUtil.i("图片不是jpg,不修改exif:"+ result.getAbsolutePath());
+            }
         } catch (Throwable throwable) {
             LubanUtil.config.reportException(throwable);
         }
