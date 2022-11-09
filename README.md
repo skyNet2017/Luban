@@ -578,6 +578,32 @@ public void trace(long timeCost, int percent, long sizeAfterCompressInK, long wi
 
 
 
+压到1080p,  性能线上数据:
+
+调用的是此方法:
+
+```java
+public static File compressForMaterialUpload(String imgPath) {
+        return Luban.with(app)
+                .ignoreBy(MIN_IMAGE_COMPRESS_SIZE)
+                .targetQuality(quality_material)
+                .keepExif(true)
+                .maxShortDimension(1080)
+                .setTargetDir(config.getSaveDir().getAbsolutePath())
+                .get(imgPath);
+    }
+```
+
+
+
+![image-20221109161011492](https://cdn.jsdelivr.net/gh/shuiniuhss/myimages@main/imagemac2/image-20221109161011492.png)
+
+
+
+
+
+
+
 # 完善的日志系统:
 
 ![image-20210207161741481](https://gitee.com/hss012489/picbed/raw/master/picgo/1612685861587-image-20210207161741481.jpg)
