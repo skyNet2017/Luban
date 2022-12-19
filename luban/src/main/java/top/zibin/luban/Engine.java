@@ -2,10 +2,8 @@ package top.zibin.luban;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.exifinterface.media.ExifInterface;
 
@@ -13,10 +11,7 @@ import com.hss01248.media.metadata.ExifUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Map;
-
-import javax.xml.transform.sax.TemplatesHandler;
 
 /**
  * Responsible for starting compress and managing active and cached resources.
@@ -63,7 +58,7 @@ public class Engine {
 
         try {
             //先使用双线性采样,oom了再使用单线性采样,还oom就强制压缩到720p, 但最后还是可能抛出oom
-            Bitmap tagBitmap = compressBitmap();
+            Bitmap tagBitmap = decodeToBitmap();
 
             //it.sephiroth.android.library.exif2.ExifInterface exifInterface = null;
             Map<String, String> exifs = null;
@@ -71,7 +66,7 @@ public class Engine {
             try {
                 //是否能读webp的exif?
                 //还是用原生的api吧,兼容性好点?
-                //原生在Android10后 读经纬度还有定位权限要求,否则崩溃.
+                //原生在Android10后 读经纬度还有定位权限要求,否则崩溃.--> 使用特定api才有
                 exifs = ExifUtil.readExif(new FileInputStream(srcImg.getPath()));
                 //exifInterface = new it.sephiroth.android.library.exif2.ExifInterface();
                 // exifInterface.readExif(srcImg.getPath(), it.sephiroth.android.library.exif2.ExifInterface.Options.OPTION_ALL);
@@ -99,6 +94,10 @@ public class Engine {
             }
             bitmapToFile.compressToFile(tagBitmap, tagImg, focusAlpha, quality, luban, this);
 
+            //todo 压缩后比源文件还大? 是要压缩的文件还是源文件?
+
+            //todo 限制大小
+
             if (exifs != null) {
                 if (luban.keepExif) {
                     //最后一个参数代表是否要复写Orientation参数为0. 旋转成功就复写,没有成功就维持原先的
@@ -107,6 +106,7 @@ public class Engine {
                 } else {
                     if (!rotateSuccess && rotation != 0) {
                         //rotation回写:
+                        //todo 减少io
                         try {
                             ExifInterface exif = new ExifInterface(tagImg);
                             exif.setAttribute(ExifInterface.TAG_ORIENTATION, rotation + "");
@@ -142,7 +142,7 @@ public class Engine {
 
 
     //先使用双线性采样,oom了再使用单线性采样,还oom就强制压缩到720p
-    private Bitmap compressBitmap() {
+    private Bitmap decodeToBitmap() {
 
         float scale = 1f;
         if (!luban.noResize) {
@@ -168,7 +168,7 @@ public class Engine {
         //计算个毛线,直接申请内存,oom了就降级:
         //压缩插值算法效果见: https://cloud.tencent.com/developer/article/1006352
         try {
-            //使用双线性插值
+            //使用双线性插值  filter=true
             Bitmap tagBitmap = BitmapFactory.decodeFile(srcImg.getPath());
             if (scale != 1f) {
                 tagBitmap2 = Bitmap.createScaledBitmap(tagBitmap, (int) (srcWidth / scale), (int) (srcHeight / scale), true);

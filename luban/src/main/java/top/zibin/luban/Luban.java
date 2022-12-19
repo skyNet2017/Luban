@@ -37,6 +37,7 @@ public class Luban implements Handler.Callback {
     boolean focusAlpha;
     boolean keepExif;
     int mLeastCompressSize;
+    long maxFileSize = -1;
     int tintBgColorIfHasTransInAlpha;
     OnRenameListener mRenameListener;
     OnCompressListener mCompressListener;
@@ -62,6 +63,7 @@ public class Luban implements Handler.Callback {
         this.mLeastCompressSize = builder.mLeastCompressSize;
         this.mCompressionPredicate = builder.mCompressionPredicate;
         this.bitmapToFile = builder.bitmapToFile;
+        this.maxFileSize = builder.maxFileSize;
         this.quality = builder.quality;
         if (bitmapToFile == null) {
             bitmapToFile = engine;
@@ -401,6 +403,7 @@ public class Luban implements Handler.Callback {
         private Bitmap.CompressFormat targetFormat = Bitmap.CompressFormat.JPEG;
         boolean keepExif = true;
         boolean noResize = false;
+        long maxFileSize = -1;
         int tintBgColorIfHasTransInAlpha = 0x00ffffff;
         private int maxShortDimension;
 
@@ -440,6 +443,17 @@ public class Luban implements Handler.Callback {
          */
         public Builder maxShortDimension(int maxShortDimension) {
             this.maxShortDimension = maxShortDimension;
+            return this;
+        }
+
+        /**
+         * 限定最大文件大小.
+         * 默认不限定
+         * @param maxFileSize
+         * @return
+         */
+        public Builder maxFileSize(long  maxFileSize) {
+            this.maxFileSize = maxFileSize;
             return this;
         }
 

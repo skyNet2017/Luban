@@ -206,10 +206,15 @@ public class LubanUtil {
                 .get(imgPath);
     }
 
+    /**
+     * webp: 默认质量75, 不接受指定.
+     * @param imgPath
+     * @return
+     */
     public static File compressForMaterialUploadWebp(String imgPath) {
         return Luban.with(app)
                 .ignoreBy(MIN_IMAGE_COMPRESS_SIZE)
-                .targetQuality(quality_material)
+                .targetQuality(75)
                 .keepExif(true)
                 .targetFormat(Bitmap.CompressFormat.WEBP)
                 .maxShortDimension(1080)
