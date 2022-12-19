@@ -11,5 +11,9 @@ import java.io.IOException;
 
 public interface IBitmapToFile {
 
-    File compressToFile(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality, Luban luban, Engine engine) throws IOException;
+    File compressToJpg(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality, Luban luban, Engine engine) throws IOException;
+
+   default File compressToWebP(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality, Luban luban, Engine engine) throws IOException{
+       return null;
+   }
 }

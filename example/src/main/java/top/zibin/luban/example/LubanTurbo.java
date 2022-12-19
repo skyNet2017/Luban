@@ -13,7 +13,7 @@ import top.zibin.luban.Luban;
 
 public class LubanTurbo implements IBitmapToFile {
     @Override
-    public File compressToFile(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality, Luban luban, Engine engine) throws IOException {
+    public File compressToJpg(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality, Luban luban, Engine engine) throws IOException {
         boolean success = TurboCompressor.compressToFile(tagBitmap, tagImg, quality);
         if (success) {
             return tagImg;

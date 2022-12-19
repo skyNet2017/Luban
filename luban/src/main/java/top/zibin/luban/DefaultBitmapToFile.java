@@ -15,7 +15,7 @@ public class DefaultBitmapToFile implements IBitmapToFile {
 
 
     @Override
-    public File compressToFile(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality, Luban luban, Engine engine) throws IOException {
+    public File compressToJpg(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality, Luban luban, Engine engine) throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         if (luban.targetFormat.equals(Bitmap.CompressFormat.WEBP)) {
             //https://developer.android.com/reference/android/graphics/Bitmap.CompressFormat
@@ -26,6 +26,7 @@ public class DefaultBitmapToFile implements IBitmapToFile {
             //100的会比99大很多,非常不划算.
             //webp可用于算法模型分析.因为jpg格式压缩会损失非常多的精度,极大影响图像相似度比对的结果
             //quality = 99;
+
         }
         int w = tagBitmap.getWidth();
         int h = tagBitmap.getHeight();

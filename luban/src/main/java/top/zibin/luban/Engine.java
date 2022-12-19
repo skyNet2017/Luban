@@ -92,7 +92,7 @@ public class Engine {
                     }
                 }
             }
-            bitmapToFile.compressToFile(tagBitmap, tagImg, focusAlpha, quality, luban, this);
+            bitmapToFile.compressToJpg(tagBitmap, tagImg, focusAlpha, quality, luban, this);
 
             //todo 压缩后比源文件还大? 是要压缩的文件还是源文件?
 
