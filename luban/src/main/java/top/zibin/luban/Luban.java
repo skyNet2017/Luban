@@ -348,24 +348,27 @@ public class Luban implements Handler.Callback {
     private void editExif(File result,boolean hasCompressThisTime) {
         try {
             String type = FileTypeUtil.getTypeByPath(result.getAbsolutePath());
-            if(!TextUtils.isEmpty(type)&& type.contains("jpg")){
+            //if(!TextUtils.isEmpty(type)&& type.contains("jpg")){
                 //webp不能编辑exif,会导致图片损坏
                 ExifInterface exif = new ExifInterface(result);
                 String softWare = exif.getAttribute(ExifInterface.TAG_SOFTWARE);
+                if(TextUtils.isEmpty(softWare) || "null".equals(softWare)){
+                    softWare = "";
+                }
                 //通过这里可以看到是否被压缩多次
                 if(hasCompressThisTime){
                     //获取app的信息:用于线上图片追踪debug
                     String appInfo =LubanUtil.envInfo+"_by_lubanx";
-                    exif.setAttribute(ExifInterface.TAG_SOFTWARE,softWare+"_"+appInfo);
+                    exif.setAttribute(ExifInterface.TAG_SOFTWARE,TextUtils.isEmpty(softWare) ? appInfo: softWare+"_"+appInfo);
                 }
 
                 if (LubanUtil.config.editExif(null)) {
                     LubanUtil.config.editExif(exif);
                 }
                 exif.saveAttributes();
-            }else {
-                LubanUtil.i("图片不是jpg,不修改exif:"+ result.getAbsolutePath());
-            }
+            //}else {
+             //   LubanUtil.i("图片不是jpg,不修改exif:"+ result.getAbsolutePath());
+            //}
         } catch (Throwable throwable) {
             LubanUtil.config.reportException(throwable);
         }

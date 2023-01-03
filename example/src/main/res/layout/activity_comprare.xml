@@ -54,6 +54,17 @@
 
         <TextView
             android:layout_width="match_parent"
+            android:text="webp_no_resize"
+            android:id="@+id/tv_webp_no_resize"
+            android:layout_height="wrap_content" />
+
+        <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+            android:layout_width="match_parent"
+            android:id="@+id/iv_webp_noresize"
+            android:layout_height="250dp" />
+
+        <TextView
+            android:layout_width="match_parent"
             android:text="jpgturbo"
             android:id="@+id/tv_jpgturbo"
             android:layout_height="wrap_content" />

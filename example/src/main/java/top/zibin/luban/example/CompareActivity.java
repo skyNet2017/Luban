@@ -3,6 +3,7 @@ package top.zibin.luban.example;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -84,6 +85,10 @@ public class CompareActivity extends AppCompatActivity {
     private TextView tvwebp;
 
     private SubsamplingScaleImageView ivwebp;
+
+    private TextView tvwebpNoResize;
+
+    private SubsamplingScaleImageView ivwebpNoResize;
     private TextView tvturbo;
     private SubsamplingScaleImageView ivTurbo;
     List<File> files = new ArrayList<>();
@@ -256,7 +261,7 @@ public class CompareActivity extends AppCompatActivity {
 
 
             ivwebp.setImage(ImageSource.uri(Uri.fromFile(new File(compress0))));
-            tvwebp.setText("webp(点击显示exif,被编辑,可能导致图片损坏):\n" + getImgInfo(compress0));
+            tvwebp.setText("webp(点击显示exif):\n" + getImgInfo(compress0));
             tvwebp.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -266,9 +271,29 @@ public class CompareActivity extends AppCompatActivity {
             });
 
 
+            final String compress3 = Luban.with(getApplicationContext())
+                    //.ignoreBy(MIN_IMAGE_COMPRESS_SIZE)
+                    .targetQuality(75)
+                    .keepExif(true)
+                    .targetFormat(Bitmap.CompressFormat.WEBP)
+                    .noResize(true)
+                    .get(path).getAbsolutePath();
+
+
+            ivwebpNoResize.setImage(ImageSource.uri(Uri.fromFile(new File(compress3))));
+            tvwebpNoResize.setText("webp(点击显示exif):\n" + getImgInfo(compress3));
+            tvwebpNoResize.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showExif(compress3);
+
+                }
+            });
+
+
             final String compress2 = LubanUtil.compressForNormalUsage(path).getAbsolutePath();
             ivLubanTurbo.setImage(ImageSource.uri(Uri.fromFile(new File(compress2))));
-            tvLubanTurbo.setText("compressForNormalUsage(点击显示exif):\n" + getImgInfo(compress2));
+            tvLubanTurbo.setText("compressForNormalUsage(75-点击显示exif):\n" + getImgInfo(compress2));
             tvLubanTurbo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -277,13 +302,18 @@ public class CompareActivity extends AppCompatActivity {
                 }
             });
 
-            final String compress3 = LubanUtil.compressWithNoResize(path).getAbsolutePath();
-            ivNoResize.setImage(ImageSource.uri(Uri.fromFile(new File(compress3))));
-            tvNoResize.setText("compressWithNoResize(点击显示exif):\n" + getImgInfo(compress3));
+            final String compress4 = Luban.with(getApplicationContext())
+                    .targetQuality(75)
+                    .keepExif(true)
+                    .noResize(true)
+                   // .setTargetDir(config.getSaveDir().getAbsolutePath())
+                    .get(path).getAbsolutePath();
+            ivNoResize.setImage(ImageSource.uri(Uri.fromFile(new File(compress4))));
+            tvNoResize.setText("compressWithNoResize(点击显示exif):\n" + getImgInfo(compress4));
             tvNoResize.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showExif(compress3);
+                    showExif(compress4);
 
                 }
             });
@@ -392,6 +422,9 @@ public class CompareActivity extends AppCompatActivity {
         ivwebp = (SubsamplingScaleImageView) findViewById(R.id.iv_webp);
         tvturbo = findViewById(R.id.tv_jpgturbo);
         ivTurbo = findViewById(R.id.iv_jpgturbo);
+
+        tvwebpNoResize = (TextView) findViewById(R.id.tv_webp_no_resize);
+        ivwebpNoResize = (SubsamplingScaleImageView) findViewById(R.id.iv_webp_noresize);
     }
 
     public static String formatFileSize(long size) {

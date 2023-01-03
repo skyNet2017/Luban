@@ -64,7 +64,7 @@ public class LubanUtil {
 
     private static void getEnv(Application app) {
         PackageManager manager = app.getPackageManager();
-        String name = null;
+        String name = "";
         try {
             PackageInfo info = manager.getPackageInfo(app.getPackageName(), 0);
             name = info.versionName;
@@ -179,7 +179,7 @@ public class LubanUtil {
     public static File compressWithNoResize(String imgPath) {
         return Luban.with(app)
                 .ignoreBy(MIN_IMAGE_COMPRESS_SIZE)
-                .targetQuality(quality_normal)
+                .targetQuality(quality_material)
                 .keepExif(true)
                 .noResize(true)
                 .setTargetDir(config.getSaveDir().getAbsolutePath())
