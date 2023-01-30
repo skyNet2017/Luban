@@ -16,6 +16,9 @@ import androidx.exifinterface.media.ExifInterface;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.blankj.utilcode.util.AppUtils;
+import com.blankj.utilcode.util.Utils;
+import com.hss01248.luban.showresult.ShowResultUtil;
 import com.hss01248.media.metadata.ExifUtil;
 import com.hss01248.media.metadata.quality.Magick;
 
@@ -44,13 +47,33 @@ public class LubanUtil {
 
     private static final int MIN_IMAGE_COMPRESS_SIZE = 80;//80k以下,不压缩
 
-    static Application app;
-    static ILubanConfig config;
-    static boolean enableLog;
+    static Application app = Utils.getApp();
+
+    public static void setConfig(ILubanConfig config) {
+        LubanUtil.config = config;
+    }
+
+    static ILubanConfig config = new BaseLubanConfig();
+
+    public static void setEnableLog(boolean enableLog,boolean showResultCompareInDialog) {
+        LubanUtil.enableLog = enableLog;
+        ShowResultUtil.showCompressResult = showResultCompareInDialog;
+    }
+
+    static boolean enableLog = AppUtils.isAppDebug();
     public static int quality_material = 85;//默认质量85.
     public static int quality_normal = 70;
+
+    public static String getEnvInfo() {
+        if(TextUtils.isEmpty(envInfo)){
+            getEnv(app);
+        }
+        return envInfo;
+    }
+
     static String envInfo = "";
 
+    @Deprecated
     public static void init(Application app, boolean enableLog, @Nullable ILubanConfig config) {
         LubanUtil.app = app;
         getEnv(app);

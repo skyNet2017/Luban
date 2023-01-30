@@ -37,5 +37,5 @@ dependencies {
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
 
     //api 'it.sephiroth.android.exif:library:1.0.1'
-    api 'com.github.hss01248.metadata:metadata:1.1.1'
+    api 'com.github.hss01248.metadata:metadata:1.2.3'
 }

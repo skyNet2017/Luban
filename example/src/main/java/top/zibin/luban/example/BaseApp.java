@@ -22,23 +22,7 @@ public class BaseApp extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        ShowResultUtil.showCompressResult = false;
-        LubanUtil.init(this, true, new BaseLubanConfig() {
-            @Override
-            public void trace(String inputPath, String outputPath, long timeCost, int percent, long sizeAfterCompressInK, long width, long height) {
-                ShowResultUtil.showResult(top, inputPath, outputPath, timeCost, percent, sizeAfterCompressInK, width, height);
-            }
 
-            @Override
-            public boolean editExif(@Nullable ExifInterface exif) {
-                if (exif == null) {
-                    return true;
-                }
-                exif.setAttribute(ExifInterface.TAG_ARTIST, "sb");
-                return true;
-            }
-        });
-        Utils.init(this);
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {

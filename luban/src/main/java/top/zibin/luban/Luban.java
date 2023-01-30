@@ -358,7 +358,7 @@ public class Luban implements Handler.Callback {
                 //通过这里可以看到是否被压缩多次
                 if(hasCompressThisTime){
                     //获取app的信息:用于线上图片追踪debug
-                    String appInfo =LubanUtil.envInfo+"_by_lubanx";
+                    String appInfo =LubanUtil.getEnvInfo()+"_by_lubanx";
                     exif.setAttribute(ExifInterface.TAG_SOFTWARE,TextUtils.isEmpty(softWare) ? appInfo: softWare+"_"+appInfo);
                 }
 
