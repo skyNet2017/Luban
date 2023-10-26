@@ -32,6 +32,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.FileIOUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -43,6 +44,7 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.image.dataforphotoselet.ImgAdapter2;
 import com.hss01248.image.dataforphotoselet.ImgDataSeletor;
 import com.hss01248.media.metadata.ExifUtil;
+import com.hss01248.media.metadata.FileTypeUtil;
 
 import org.devio.takephoto.wrap.TakeOnePhotoListener;
 import org.devio.takephoto.wrap.TakePhotoUtil;
@@ -53,8 +55,10 @@ import top.zibin.luban.Luban;
 import top.zibin.luban.LubanUtil;
 import top.zibin.luban.example.quality.Magick;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -174,6 +178,26 @@ public class CompareActivity extends AppCompatActivity {
             public void onSuccess(final String path) {
                 //LubanUtil.compressOriginal(path, 88);
 
+                ExifInterface exifInterface = null;
+                try {
+                    exifInterface = new ExifInterface(path);
+                    byte[] thumbnailBytes = exifInterface.getThumbnailBytes();
+                    if(thumbnailBytes != null){
+                        String type = "uknonwn";
+                        try {
+                            type = FileTypeUtil.getType(new ByteArrayInputStream(thumbnailBytes));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        LogUtils.w("thumbnailBytes:"+thumbnailBytes.length+",type: "+type);
+                    }else{
+                        LogUtils.w("no thumbnail:");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
                 compress(path);
             }
 
@@ -252,6 +276,11 @@ public class CompareActivity extends AppCompatActivity {
             ExifInterface exifInterface = new ExifInterface(compress0);
             exifInterface.setAttribute(ExifInterface.TAG_SOFTWARE,"dddd");
             exifInterface.setAttribute(ExifInterface.TAG_MAKE,"77777");
+            byte[] thumbnailBytes = exifInterface.getThumbnailBytes();
+            if(thumbnailBytes != null){
+                LogUtils.w("thumbnailBytes:"+thumbnailBytes.length);
+            }
+
             try {
                 exifInterface.saveAttributes();
             }catch (Throwable throwable){

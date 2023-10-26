@@ -1,6 +1,8 @@
 package com.hss01248.image.dataforphotoselet;
 
+import android.Manifest;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -19,23 +21,40 @@ import android.view.WindowManager;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.blankj.utilcode.util.FileIOUtils;
 
+import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.PermissionUtils;
+import com.blankj.utilcode.util.ThreadUtils;
+import com.blankj.utilcode.util.ToastUtils;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.FutureTarget;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.github.gzuliyujiang.filepicker.ExplorerConfig;
+import com.github.gzuliyujiang.filepicker.FilePicker;
+import com.github.gzuliyujiang.filepicker.annotation.ExplorerMode;
+import com.github.gzuliyujiang.filepicker.contract.OnFilePickedListener;
 
 import org.devio.takephoto.wrap.TakeOnePhotoListener;
 import org.devio.takephoto.wrap.TakePhotoUtil;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import cn.qqtheme.framework.picker.FilePicker;
 
 public class ImgDataSeletor {
 
@@ -55,7 +74,18 @@ public class ImgDataSeletor {
                     if (dialog != null) {
                         dialog.dismiss();
                     }
-                    TakePhotoUtil.startPickOne(activity, true, listener);
+                    CaptureImageUtilInner.takePicture(false, new MyCommonCallbackInner<String>() {
+                        @Override
+                        public void onSuccess(String s) {
+                            listener.onSuccess(s);
+                        }
+
+                        @Override
+                        public void onError(String msg) {
+                            MyCommonCallbackInner.super.onError(msg);
+                            listener.onFail("",msg);
+                        }
+                    });
                 }
             });
             dialog.getWindow().findViewById(R.id.btn_pick_photo).setOnClickListener(new View.OnClickListener() {
@@ -64,7 +94,22 @@ public class ImgDataSeletor {
                     if (dialog != null) {
                         dialog.dismiss();
                     }
-                    TakePhotoUtil.startPickOne(activity, false, listener);
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+                        PermissionUtils.permission(Manifest.permission.READ_MEDIA_IMAGES,Manifest.permission.READ_MEDIA_VIDEO)
+                                .callback(new PermissionUtils.SimpleCallback() {
+                                    @Override
+                                    public void onGranted() {
+                                        TakePhotoUtil.startPickOne(activity, false, listener);
+                                    }
+
+                                    @Override
+                                    public void onDenied() {
+                                        ToastUtils.showLong("请允许读取多媒体/照片/视频的权限");
+                                    }
+                                }).request();
+                    }else {
+                        TakePhotoUtil.startPickOne(activity, false, listener);
+                    }
                 }
             });
             dialog.getWindow().findViewById(R.id.btn_pick_photo_from_assets).setOnClickListener(new View.OnClickListener() {
@@ -109,21 +154,42 @@ public class ImgDataSeletor {
     }
 
     private static void selectFile(FragmentActivity activity,boolean isFile, TakeOnePhotoListener listener) {
-        FilePicker filePicker =    new FilePicker(activity,isFile ? FilePicker.FILE : FilePicker.DIRECTORY);
-        String path = activity.getSharedPreferences("select",Context.MODE_PRIVATE).getString("lastpath","");
-        if(!TextUtils.isEmpty(path)){
-            filePicker.setRootPath(path);
-        }
 
-        filePicker.setOnFilePickListener(new FilePicker.OnFilePickListener() {
-            @Override
-            public void onFilePicked(String currentPath) {
-                activity.getSharedPreferences("select",Context.MODE_PRIVATE).edit().putString("lastpath",
-                        isFile ? new File(currentPath).getParentFile().getAbsolutePath() : currentPath).apply();
-                listener.onSuccess(currentPath);
-            }
-        });
-        filePicker.show();
+
+        PermissionUtils.permission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                .callback(new PermissionUtils.SimpleCallback() {
+                    @Override
+                    public void onGranted() {
+                        String path = activity.getSharedPreferences("select",Context.MODE_PRIVATE).getString("lastpath","");
+                        ExplorerConfig config = new ExplorerConfig(activity);
+                        config.setShowHideDir(true);
+                        config.setLoadAsync(true);
+                        config.setExplorerMode(isFile ? ExplorerMode.FILE : ExplorerMode.DIRECTORY);
+                        if(!TextUtils.isEmpty(path)){
+                            config.setRootDir(new File(path));
+                        }
+
+                        config.setOnFilePickedListener(new OnFilePickedListener() {
+                            @Override
+                            public void onFilePicked(@NonNull File file) {
+                                String currentPath = file.getAbsolutePath();
+                                activity.getSharedPreferences("select",Context.MODE_PRIVATE).edit().putString("lastpath",
+                                        isFile ? new File(currentPath).getParentFile().getAbsolutePath() : currentPath).apply();
+                                listener.onSuccess(currentPath);
+
+                            }
+                        });
+                        FilePicker filePicker = new FilePicker(activity);
+                        filePicker.setExplorerConfig(config);
+                        filePicker.show();
+                    }
+
+                    @Override
+                    public void onDenied() {
+                        ToastUtils.showLong("需要允许读存储权限");
+                    }
+                }).request();
+
     }
 
 
@@ -131,24 +197,10 @@ public class ImgDataSeletor {
 
     static void selectAssertFile(Context context, TakeOnePhotoListener listener) {
         if (files.isEmpty()) {
-            Toast.makeText(context, "wait until the files copyed to sd card", Toast.LENGTH_SHORT).show();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    fillFiles(context);
-                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            showDialog(context, listener);
-                        }
-                    }, 1000);
-                }
-            }).start();
+            fillFiles(context,listener);
         } else {
             showDialog(context, listener);
         }
-
-
     }
 
     private static void showDialog(Context context, TakeOnePhotoListener listener) {
@@ -175,22 +227,111 @@ public class ImgDataSeletor {
         return point.x;
     }
 
-    private static void fillFiles(Context context) {
+    static AtomicInteger count = new AtomicInteger(0);
+    private static void fillFiles(Context context, TakeOnePhotoListener listener) {
         try {
-            String[] imgs = context.getAssets().list("imgsluban");
-            File dir = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "0lubanTestImgs");
-            dir.mkdirs();
-            Log.d("imgsdata", Arrays.toString(imgs));
-            if (imgs == null || imgs.length == 0) {
-                Toast.makeText(context, "imgs is null in assets/imgsluban", Toast.LENGTH_LONG).show();
-                return;
+            ProgressDialog dialog = new ProgressDialog(context);
+            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            dialog.setIndeterminate(false);
+            dialog.setTitle("下载图片中");
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+            String host = "http://kodo.hss01248.tech/testimg/";
+            List<String> paths = new ArrayList<>();
+            paths.add("");
+            paths.add("1600862676552-54801d6475b29239e55e90cf9666e388c3feef09464efcbea9a8593ff4f27321.gif");
+            paths.add("0470f5d504444e4093c109939aa77b03_tplv-k3u1fbpfcp-zoom-1.gif");
+            paths.add("2020-08-31-19-51-59-guihuada.gif");
+            paths.add("20210331_105603_q_70.jpg");
+            paths.add("342071-106.jpg");
+            paths.add("QQ图片20180516180323.jpg");
+            paths.add("Xnip2019-11-29_11-57-54.jpg");
+            paths.add("b29b2e3e3a71835f241be55ba718b320.webp");
+            paths.add("default_wallpaper.jpg");
+            paths.add("documentimage_102722_30_03_2021_14_21_24.avif");
+            paths.add("documentimage_104043_30_03_2021_11_55_00.avif");
+            paths.add("f0a160c48cd0aad18f4610c9c799ac6.jpg");
+            paths.add("fox.profile0.10bpc.yuv420.avif");
+            paths.add("gif_雨.gif");
+            paths.add("hato.profile0.10bpc.yuv420.avif");
+            paths.add("jpg_10000x11852_一亿像素-麦田.jpg");
+            paths.add("jpg_1231x800_思维导图.jpg");
+            paths.add("jpg_2730x1536_鞋.jpg");
+            paths.add("jpg_3600x1887_大图小字_地图.jpg");
+            paths.add("jpg_5946x2258_喀纳斯广角.jpg");
+            paths.add("jpg_720x236_广告条.jpg");
+            paths.add("jpg_750x750_地图.jpg");
+            paths.add("kimono.mirror-horizontal.avif");
+            paths.add("png_5256x3324_logs-explorer-ui.png");
+            paths.add("real_webp_fake_jpg.jpg");
+            paths.add("splash_stars.jpeg");
+            paths.add("test1.avif");
+            paths.add("tmp-splash_stars.jpeg");
+            paths.add("webp_724x408_鞋子.webp");
+            paths.add("webp_大图小字-思维导图-增长黑客_2944x5434.webp");
+            paths.add("webp_大图小字-思维导图2-领导力_2916x2233.webp");
+            paths.add("婺源2.jpeg");
+            paths.add("文件系统.jpg");
+
+
+            paths.add("20210331_105603_q_70.jpg");
+            paths.add("QQ图片20180516180323.jpg");
+            paths.add("default_wallpaper.jpg");
+            dialog.setMax(paths.size());
+            count = new AtomicInteger(paths.size());
+
+            for (String path : paths) {
+                ThreadUtils.executeByIo(new ThreadUtils.SimpleTask<File>() {
+                    @Override
+                    public File doInBackground() throws Throwable {
+                        String url = host + path;
+
+                            FutureTarget<File> submit = Glide.with(context)
+                                    //.load(url)
+                                    .downloadOnly()
+                                    .load(Uri.parse(url))
+                                    .submit();
+                            File file = submit.get();
+
+                            //拷贝到目录
+                            File dir = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "0lubanTestImgs");
+                            dir.mkdirs();
+                            File target = new File(dir, path);
+                            FileIOUtils.writeFileFromIS(target, new FileInputStream(file));
+                            //refreshMediaCenter(context.getApplicationContext(), target.getAbsolutePath());
+                        return target;
+                    }
+
+                    @Override
+                    public void onSuccess(File result) {
+                        LogUtils.d("文件下载并拷贝成功",host+path,result);
+                        int i = count.decrementAndGet();
+                        files.add(result);
+                        dialog.setProgress(paths.size() -i);
+                        if(i ==0){
+                            dialog.dismiss();
+                            showDialog(context, listener);
+                        }
+                    }
+
+                    @Override
+                    public void onFail(Throwable t) {
+                        LogUtils.d("文件下载失败",host+path,t);
+                        int i = count.decrementAndGet();
+                        dialog.setProgress(paths.size() -i);
+                        if(i ==0){
+                            dialog.dismiss();
+                            if(files.size() ==0){
+                                ToastUtils.showLong("所有图片都下载失败了\n"+t.getCause().getMessage());
+                                return;
+                            }
+
+                            showDialog(context, listener);
+                        }
+                    }
+                });
             }
-            for (String img : imgs) {
-                File target = new File(dir, img);
-                files.add(target);
-                FileIOUtils.writeFileFromIS(target, context.getAssets().open("imgsluban/" + img));
-                refreshMediaCenter(context.getApplicationContext(), target.getAbsolutePath());
-            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
