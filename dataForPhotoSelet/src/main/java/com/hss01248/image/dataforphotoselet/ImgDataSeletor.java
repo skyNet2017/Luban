@@ -279,11 +279,18 @@ public class ImgDataSeletor {
             paths.add("default_wallpaper.jpg");
             dialog.setMax(paths.size());
             count = new AtomicInteger(paths.size());
-
+            File dir = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "0lubanTestImgs");
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
             for (String path : paths) {
                 ThreadUtils.executeByIo(new ThreadUtils.SimpleTask<File>() {
                     @Override
                     public File doInBackground() throws Throwable {
+                        File target = new File(dir, path);
+                        if(target.exists() && target.length()>0){
+                            return target;
+                        }
                         String url = host + path;
 
                             FutureTarget<File> submit = Glide.with(context)
@@ -292,11 +299,6 @@ public class ImgDataSeletor {
                                     .load(Uri.parse(url))
                                     .submit();
                             File file = submit.get();
-
-                            //拷贝到目录
-                            File dir = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "0lubanTestImgs");
-                            dir.mkdirs();
-                            File target = new File(dir, path);
                             FileIOUtils.writeFileFromIS(target, new FileInputStream(file));
                             //refreshMediaCenter(context.getApplicationContext(), target.getAbsolutePath());
                         return target;

@@ -33,6 +33,7 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.FileIOUtils;
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -204,6 +205,7 @@ public class CompareActivity extends AppCompatActivity {
             @Override
             public void onFail(String path, String msg) {
                 Log.d("d", msg);
+                ToastUtils.showLong(msg);
             }
 
             @Override

@@ -27,6 +27,7 @@ public class ShowResultUtil {
     public static boolean showCompressResult = false;
 
 
+
     public static void showResult(Activity activity, String inputPath, String outputPath, long timeCost, int percent, long sizeAfterCompressInK, long width, long height) {
         if (!showCompressResult) {
             return;
