@@ -70,4 +70,6 @@ configurations {
             force "androidx.exifinterface:exifinterface:1.3.5"
         }
     }
+    all*.exclude group: 'com.davemorrissey.labs', module: 'subsampling-scale-image-view-androidx'
+    //com.davemorrissey.labs:subsampling-scale-image-view
 }

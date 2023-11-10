@@ -74,15 +74,17 @@ public class LubanUtil {
     static String envInfo = "";
 
     @Deprecated
-    public static void init(Application app, boolean enableLog, @Nullable ILubanConfig config) {
+    public static void init(Application app, boolean enableLog, @Nullable ILubanConfig config0) {
         LubanUtil.app = app;
         getEnv(app);
         //获取app名字,版本号,系统版本
         LubanUtil.enableLog = enableLog;
-        LubanUtil.config = config;
-        if (config == null) {
-            LubanUtil.config = new BaseLubanConfig();
+        if(config0 != null){
+            LubanUtil.config = config0;
+        }else {
+            //LubanUtil.config = new BaseLubanConfig();
         }
+
     }
 
     private static void getEnv(Application app) {

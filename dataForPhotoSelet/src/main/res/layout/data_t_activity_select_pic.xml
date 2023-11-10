@@ -30,7 +30,7 @@
         android:background="#f6f6f6" />
 
     <TextView
-        android:id="@+id/btn_pick_photo"
+        android:id="@+id/btn_pick_photo2"
         android:background="@drawable/t_item_normal_bg_selector"
         android:layout_width="match_parent"
         android:layout_height="48dp"

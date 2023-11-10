@@ -44,6 +44,9 @@ import com.github.gzuliyujiang.filepicker.ExplorerConfig;
 import com.github.gzuliyujiang.filepicker.FilePicker;
 import com.github.gzuliyujiang.filepicker.annotation.ExplorerMode;
 import com.github.gzuliyujiang.filepicker.contract.OnFilePickedListener;
+import com.hss.utils.enhance.api.MyCommonCallback;
+import com.hss01248.media.pick.MediaPickUtil;
+import com.hss01248.media.uri.ContentUriUtil;
 
 import org.devio.takephoto.wrap.TakeOnePhotoListener;
 import org.devio.takephoto.wrap.TakePhotoUtil;
@@ -88,28 +91,23 @@ public class ImgDataSeletor {
                     });
                 }
             });
-            dialog.getWindow().findViewById(R.id.btn_pick_photo).setOnClickListener(new View.OnClickListener() {
+            dialog.getWindow().findViewById(R.id.btn_pick_photo2).setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
 
                     if (dialog != null) {
                         dialog.dismiss();
                     }
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-                        PermissionUtils.permission(Manifest.permission.READ_MEDIA_IMAGES,Manifest.permission.READ_MEDIA_VIDEO)
-                                .callback(new PermissionUtils.SimpleCallback() {
-                                    @Override
-                                    public void onGranted() {
-                                        TakePhotoUtil.startPickOne(activity, false, listener);
-                                    }
+                    MediaPickUtil.pickImage(new MyCommonCallback<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            listener.onSuccess(ContentUriUtil.getRealPath(uri));
+                        }
 
-                                    @Override
-                                    public void onDenied() {
-                                        ToastUtils.showLong("请允许读取多媒体/照片/视频的权限");
-                                    }
-                                }).request();
-                    }else {
-                        TakePhotoUtil.startPickOne(activity, false, listener);
-                    }
+                        @Override
+                        public void onError(String msg) {
+                            listener.onFail("",msg);
+                        }
+                    });
                 }
             });
             dialog.getWindow().findViewById(R.id.btn_pick_photo_from_assets).setOnClickListener(new View.OnClickListener() {
