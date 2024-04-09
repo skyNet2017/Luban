@@ -1,9 +1,10 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    apply from: 'https://raw.githubusercontent.com/hss01248/flipperUtil/gradle7_5/remote3.gradle?q=2'
     repositories {
         google()
-        jcenter()
+       // jcenter()
         mavenCentral()
     }
     dependencies {
@@ -17,7 +18,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+      //  jcenter()
         mavenCentral()
         maven { url 'https://jitpack.io' }
         maven { url 'https://github.com/link-u/AndroidGlideAvifDecoder/raw/master/repository' }
