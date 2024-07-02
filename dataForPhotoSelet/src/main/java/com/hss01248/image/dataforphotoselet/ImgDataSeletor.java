@@ -97,6 +97,7 @@ public class ImgDataSeletor {
                     if (dialog != null) {
                         dialog.dismiss();
                     }
+                    //todo  选图后无权限
                     MediaPickUtil.pickImage(new MyCommonCallback<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {

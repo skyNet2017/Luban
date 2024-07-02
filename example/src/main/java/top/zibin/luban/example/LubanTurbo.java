@@ -1,4 +1,4 @@
-package top.zibin.luban.example;
+/*package top.zibin.luban.example;
 
 import android.graphics.Bitmap;
 
@@ -20,4 +20,4 @@ public class LubanTurbo implements IBitmapToFile {
         }
         throw new IOException("compressed by turbo failed");
     }
-}
+}*/

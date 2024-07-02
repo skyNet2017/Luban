@@ -362,10 +362,14 @@ public class CompareActivity extends AppCompatActivity {
                     .get();*/
             File files66 = Luban.with(this)
                     .ignoreBy(50)
-                    .setCompressor(new LubanTurbo())
+                    .setCompressor(new AvifComressor())
                     .targetQuality(70)
                     .noResize(true)
                     .get(path);
+
+
+
+
             String compress66 = files66.getAbsolutePath();
             ivTurbo.setImage(ImageSource.uri(Uri.fromFile(new File(compress66))));
             tvturbo.setText("libjpegturbo(点击显示exif):\n" + getImgInfo(compress66));
