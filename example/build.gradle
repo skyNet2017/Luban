@@ -63,6 +63,8 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     //适配Android 12崩溃问题
     implementation 'androidx.work:work-runtime-ktx:2.7.0'
+
+    //api "com.github.skyNet2017:mozjpeg-android:2.0.1"
 }
 configurations {
     all {
@@ -71,5 +73,6 @@ configurations {
         }
     }
     all*.exclude group: 'com.davemorrissey.labs', module: 'subsampling-scale-image-view-androidx'
+    all*.exclude group: 'com.github.skyNet2017.Luban', module: 'luban'
     //com.davemorrissey.labs:subsampling-scale-image-view
 }
