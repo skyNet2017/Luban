@@ -725,6 +725,21 @@ Glide.with(CompareActivity.this)
 
 
 
+第二个:
+
+https://github.com/skyNet2017/avif-coder-glide
+
+```groovy
+ implementation 'com.github.awxkee:avif-coder-glide:2.0.2'
+```
+
+直接崩溃:
+
+terminating due to uncaught exception of type std::length_error: vector
+2024-07-03 11:43:55.384 20731-21618 libc                    top.zibin.luban.example              A  Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 21618 (glide-source-th), pid 20731 (n.luban.example)
+2024-07-03 11:43:55.533 21622-21622 DEBUG                   crash_dump64                         A  pid: 20731, tid: 21618, name: glide-source-th  >>> top.zibin.luban.example <<<
+2024-07-03 11:43:55.535 21622-21622 DEBUG                   crash_dump64                         A        #01 pc 0000000000a66dc4  /data/app/top.zibin.luban.example-vd2tlb3nfADRG_NilvQZbQ==/lib/arm64/libcoder.so (BuildId: 4aeb5c3d3c5f189b9a040cce708ff2c12ce92f49)
+
 
 
 # 参考

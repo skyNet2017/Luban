@@ -57,6 +57,11 @@ dependencies {
     api 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.47'
 
     implementation 'jp.co.link_u.library.glideavif:glideavif:0.8.1'
+    implementation 'com.github.awxkee:avif-coder-glide:2.0.2'
+
+    /*groupId = "com.github.awxkee"
+                artifactId = "avif-coder-glide"
+                version = "2.0.0"*/
     //implementation 'jp.co.link_u.library.glideavif:glideavif-8bpc:0.8.1'
 
     api 'it.sephiroth.android.exif:library:1.0.1'

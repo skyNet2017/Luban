@@ -1,6 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    apply from: 'https://raw.githubusercontent.com/hss01248/flipperUtil/gradle7_5/z_config/pack.gradle?q=3'
     apply from: 'https://raw.githubusercontent.com/hss01248/flipperUtil/gradle7_5/remote3.gradle?q=2'
     repositories {
         google()

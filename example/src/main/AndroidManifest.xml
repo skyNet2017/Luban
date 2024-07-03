@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="top.zibin.luban.example">
 
-    <uses-sdk tools:overrideLibrary="com.hss01248.crash,com.github.awxkee.mozjpeg"/>
+    <uses-sdk tools:overrideLibrary="com.hss01248.crash,com.github.awxkee.mozjpeg,com.awxkee.avif.glide"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
