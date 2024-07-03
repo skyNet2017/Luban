@@ -1,3 +1,3 @@
 include ':dataForPhotoSelet'
 include ':showResult'
-include ':example', ':luban'//, ':lubanturbo'
+include ':example', ':luban', ':avif-compressor'

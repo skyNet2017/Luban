@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import androidx.exifinterface.media.ExifInterface;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.hss01248.media.metadata.ExifUtil;
 
 import java.io.File;
@@ -98,23 +99,27 @@ public class Engine {
 
             //todo 限制大小
 
-            if (exifs != null) {
-                if (luban.keepExif) {
-                    //最后一个参数代表是否要复写Orientation参数为0. 旋转成功就复写,没有成功就维持原先的
-                    ExifUtil.resetImageWHToMap(exifs, new FileInputStream(new File(tagImg.getAbsolutePath())), rotateSuccess);
-                    ExifUtil.writeExif(exifs, tagImg.getAbsolutePath());
-                } else {
-                    if (!rotateSuccess && rotation != 0) {
-                        //rotation回写:
-                        //todo 减少io
-                        try {
-                            ExifInterface exif = new ExifInterface(tagImg);
-                            exif.setAttribute(ExifInterface.TAG_ORIENTATION, rotation + "");
-                            exif.saveAttributes();
-                        } catch (Throwable throwable) {
-                            LubanUtil.config.reportException(throwable);
+            if (exifs != null && !luban.toAvif) {
+                try{
+                    if (luban.keepExif) {
+                        //最后一个参数代表是否要复写Orientation参数为0. 旋转成功就复写,没有成功就维持原先的
+                        ExifUtil.resetImageWHToMap(exifs, new FileInputStream(new File(tagImg.getAbsolutePath())), rotateSuccess);
+                        ExifUtil.writeExif(exifs, tagImg.getAbsolutePath());
+                    } else {
+                        if (!rotateSuccess && rotation != 0) {
+                            //rotation回写:
+                            //todo 减少io
+                            try {
+                                ExifInterface exif = new ExifInterface(tagImg);
+                                exif.setAttribute(ExifInterface.TAG_ORIENTATION, rotation + "");
+                                exif.saveAttributes();
+                            } catch (Throwable throwable) {
+                                LubanUtil.config.reportException(throwable);
+                            }
                         }
                     }
+                }catch (Throwable throwable){
+                    LogUtils.w(throwable);
                 }
             }
         } catch (Throwable throwable) {

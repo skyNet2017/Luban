@@ -622,6 +622,107 @@ public static File compressForMaterialUpload(String imgPath) {
 
 
 
+# avif支持
+
+2024.07
+
+## encode-压缩
+
+```java
+ File files66 = Luban.with(CompareActivity.this)
+                            .ignoreBy(50)
+   												//告诉框架要压缩成avif,内部就: 将文件后缀改成avif,且不处理exif
+                            .toAvif()
+                           //必须指定,依赖于avif-compressor
+                            .setCompressor(new AvifComressor())
+                            .targetQuality(80)
+                            .noResize(true)
+                            .get(path);
+```
+
+
+
+avif相对于jpg,在工程实践上,目前仍然有很多劣势,不推荐使用
+
+* **压缩耗时很长**,大图压缩约为jpg压缩时间的5-10倍,比如,一张1200万像素的拍照图(3000x4000),
+
+  只压缩质量,不改变尺寸时,jpg压缩耗时3s,avif压缩耗时25s.  25s的耗时基本不能用于实际生产环境.  
+
+  等比压缩到短边为1080时.jpg耗时300ms, 279kB, avif耗时1.6s,245kB, webp则为175KB,750ms
+
+* 无法保留exif. 目前Android exif库仅支持jpg,png,webp
+
+* 生态不完善,各平台,除新浏览器,Android12以上版本外,均不支持avif.需引入第三方库.原生库比较大.
+
+* 大图的解析/加载时间很长
+
+## decode-解析成bitmap
+
+
+
+有两个glide-avif的库可以用
+
+### 第一个:
+
+```groovy
+allprojects {
+    repositories {
+        maven { url 'https://github.com/link-u/AndroidGlideAvifDecoder/raw/master/repository'   }
+ }
+}
+
+//app module中:
+implementation 'jp.co.link_u.library.glideavif:glideavif:0.8.1'
+implementation 'com.github.bumptech.glide:glide:4.11.0'
+annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0' //注意要加上注解处理器
+```
+
+声明glide mode:
+
+```java
+@GlideModule
+public class AvifModule extends AppGlideModule {
+
+    @Override
+    public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
+        super.registerComponents(context, glide, registry);
+        registry.prepend(ByteBuffer.class, Bitmap.class, new AvifDecoderFromByteBuffer());
+        Log.w("dd", "glide init.......");
+    }
+
+    // Disable manifest parsing to avoid adding similar modules twice.
+
+    @Override
+    public boolean isManifestParsingEnabled() {
+        return false;
+    }
+}
+```
+
+然后使用glide加载文件为bitmap即可:
+
+```java
+
+
+
+
+Glide.with(CompareActivity.this)
+                            .asBitmap()
+                            .load(result)
+                            .into(new CustomTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                    ivTurbo.setImage(ImageSource.bitmap(resource));
+                                    
+                                }
+
+                                @Override
+                                public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                                }
+                            });
+```
+
 
 
 

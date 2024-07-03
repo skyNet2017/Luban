@@ -1,4 +1,4 @@
-package top.zibin.luban.example;
+package com.hss01248.luban.avif;
 
 import android.graphics.Bitmap;
 
@@ -20,13 +20,13 @@ import top.zibin.luban.Luban;
  * @Date 7/2/24 3:57 PM
  * @Version 1.0
  */
-public class AvifComressor  implements IBitmapToFile {
+public class AvifComressor implements IBitmapToFile {
     @Override
     public File compressToJpg(Bitmap tagBitmap, File tagImg, boolean focusAlpha,
                               int quality, Luban luban, Engine engine) throws IOException {
 
 
-        byte[] bytes = new HeifCoder().encodeAvif(tagBitmap,quality, PreciseMode.LOSSY, AvifSpeed.FIVE);
+        byte[] bytes = new HeifCoder().encodeAvif(tagBitmap,quality, PreciseMode.LOSSY, AvifSpeed.SIX);
         FileOutputStream fileOutputStream = new FileOutputStream(tagImg);
         fileOutputStream.write(bytes);
         fileOutputStream.flush();

@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,17 +34,21 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.FileIOUtils;
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ThreadUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.image.dataforphotoselet.ImgAdapter2;
 import com.hss01248.image.dataforphotoselet.ImgDataSeletor;
+import com.hss01248.luban.avif.AvifComressor;
 import com.hss01248.media.metadata.ExifUtil;
 import com.hss01248.media.metadata.FileTypeUtil;
 
@@ -289,8 +294,6 @@ public class CompareActivity extends AppCompatActivity {
                 throwable.printStackTrace();
             }
 
-
-
             ivwebp.setImage(ImageSource.uri(Uri.fromFile(new File(compress0))));
             tvwebp.setText("webp(点击显示exif):\n" + getImgInfo(compress0));
             tvwebp.setOnClickListener(new View.OnClickListener() {
@@ -360,26 +363,50 @@ public class CompareActivity extends AppCompatActivity {
                    // .ignoreBy(40)
                     //.saver(TurboCompressor.getTurboCompressor())//rgb565会导致crash
                     .get();*/
-            File files66 = Luban.with(this)
-                    .ignoreBy(50)
-                    .setCompressor(new AvifComressor())
-                    .targetQuality(70)
-                    .noResize(true)
-                    .get(path);
-
-
-
-
-            String compress66 = files66.getAbsolutePath();
-            ivTurbo.setImage(ImageSource.uri(Uri.fromFile(new File(compress66))));
-            tvturbo.setText("libjpegturbo(点击显示exif):\n" + getImgInfo(compress66));
-            tvturbo.setOnClickListener(new View.OnClickListener() {
+            ThreadUtils.executeByCpu(new ThreadUtils.SimpleTask<File>() {
                 @Override
-                public void onClick(View v) {
-                    showExif(compress66);
+                public File doInBackground() throws Throwable {
+                    File files66 = Luban.with(CompareActivity.this)
+                            .ignoreBy(50)
+                            .toAvif()
+                            .setCompressor(new AvifComressor())
+                            .targetQuality(80)
+                            .maxShortDimension(1080)
+                            //.noResize(true)
+                            .get(path);
+                    return files66;
+                }
 
+                @Override
+                public void onSuccess(File result) {
+                    Glide.with(CompareActivity.this)
+                            .asBitmap()
+                            .load(result)
+                            .into(new CustomTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                    ivTurbo.setImage(ImageSource.bitmap(resource));
+                                    tvturbo.setText("Avif (点击显示exif):\n" + getImgInfo(result.getAbsolutePath()));
+                                    tvturbo.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            showExif(result.getAbsolutePath());
+
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                                }
+                            });
                 }
             });
+
+
+           // ivTurbo.setImage(ImageSource.uri(Uri.fromFile(new File(compress66))));
+
 
         } catch (Throwable e) {
             e.printStackTrace();

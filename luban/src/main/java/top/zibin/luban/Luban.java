@@ -35,7 +35,13 @@ public class Luban implements Handler.Callback {
 
     String mTargetDir;
     boolean focusAlpha;
-    boolean keepExif;
+      boolean keepExif;
+
+    /**
+     * for avif.
+     * ExifInterface only supports saving attributes for JPEG, PNG, and WebP formats.
+     */
+    public boolean skipExifEdit;
     int mLeastCompressSize;
     long maxFileSize = -1;
     int tintBgColorIfHasTransInAlpha;
@@ -48,6 +54,8 @@ public class Luban implements Handler.Callback {
     Bitmap.CompressFormat targetFormat;
     int maxShortDimension;
     boolean noResize = false;
+
+    boolean toAvif;
     /**
      * 压缩的目标质量
      */
@@ -65,6 +73,10 @@ public class Luban implements Handler.Callback {
         this.bitmapToFile = builder.bitmapToFile;
         this.maxFileSize = builder.maxFileSize;
         this.quality = builder.quality;
+        this.toAvif = builder.toAvif;
+        if(toAvif){
+            skipExifEdit = true;
+        }
         if (bitmapToFile == null) {
             bitmapToFile = engine;
         }
@@ -74,6 +86,7 @@ public class Luban implements Handler.Callback {
         mHandler = new Handler(Looper.getMainLooper(), this);
         this.targetFormat = builder.targetFormat;
         this.keepExif = builder.keepExif;
+        this.skipExifEdit = builder.skipExifEdit;
         this.tintBgColorIfHasTransInAlpha = builder.tintBgColorIfHasTransInAlpha;
         this.maxShortDimension = builder.maxShortDimension;
         this.noResize = builder.noResize;
@@ -137,6 +150,9 @@ public class Luban implements Handler.Callback {
         } else if (targetFormat == Bitmap.CompressFormat.PNG) {
             suffix = ".png";
         }
+        if (toAvif) {
+            suffix = ".avif";
+        }
 
         String cacheBuilder = mTargetDir + "/" +
                 System.currentTimeMillis() +
@@ -156,6 +172,9 @@ public class Luban implements Handler.Callback {
             filename = filename.substring(0, filename.lastIndexOf(".")) + ".webp";
         } else if (targetFormat == Bitmap.CompressFormat.PNG) {
             filename = filename.substring(0, filename.lastIndexOf(".")) + ".png";
+        }
+        if (toAvif) {
+            filename = filename.substring(0, filename.lastIndexOf(".")) + ".avif";
         }
         String cacheBuilder = mTargetDir + "/" + filename;
 
@@ -347,6 +366,9 @@ public class Luban implements Handler.Callback {
 
     private void editExif(File result,boolean hasCompressThisTime) {
         try {
+            if(toAvif){
+                return;
+            }
             String type = FileTypeUtil.getTypeByPath(result.getAbsolutePath());
             //if(!TextUtils.isEmpty(type)&& type.contains("jpg")){
                 //webp不能编辑exif,会导致图片损坏
@@ -393,6 +415,8 @@ public class Luban implements Handler.Callback {
     }
 
     public static class Builder {
+        public boolean toAvif;
+        private boolean skipExifEdit = false;
         private Context context;
         private String mTargetDir;
         private boolean focusAlpha;
@@ -421,6 +445,11 @@ public class Luban implements Handler.Callback {
 
         public Builder load(InputStreamProvider inputStreamProvider) {
             mStreamProviders.add(inputStreamProvider);
+            return this;
+        }
+        public Builder toAvif() {
+            this.toAvif = true;
+            //this.setCompressor(new AvifComressor())
             return this;
         }
 
@@ -484,6 +513,10 @@ public class Luban implements Handler.Callback {
 
         public Builder keepExif(boolean keepExif) {
             this.keepExif = keepExif;
+            return this;
+        }
+        public Builder skipExifEdit(boolean skipExifEdit) {
+            this.skipExifEdit = skipExifEdit;
             return this;
         }
 
