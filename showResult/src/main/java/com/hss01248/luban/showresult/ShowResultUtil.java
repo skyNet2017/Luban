@@ -8,11 +8,13 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.blankj.utilcode.util.ScreenUtils;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.media.metadata.ExifUtil;
@@ -69,6 +71,9 @@ public class ShowResultUtil {
                 .create();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         dialog.show();
+        WindowManager.LayoutParams attributes = dialog.getWindow().getAttributes();
+        attributes.width = ScreenUtils.getScreenWidth();
+        dialog.getWindow().setAttributes(attributes);
 
 
     }
@@ -84,7 +89,9 @@ public class ShowResultUtil {
                     .setPositiveButton("ok", null)
                     .create();
             dialog.show();
-
+            WindowManager.LayoutParams attributes = dialog.getWindow().getAttributes();
+            attributes.width = ScreenUtils.getScreenWidth();
+            dialog.getWindow().setAttributes(attributes);
         } catch (Throwable e) {
             e.printStackTrace();
         }

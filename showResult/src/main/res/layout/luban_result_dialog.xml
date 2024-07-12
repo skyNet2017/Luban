@@ -30,7 +30,7 @@
         <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
             android:layout_width="match_parent"
             android:id="@+id/iv_original"
-            android:layout_height="250dp" />
+            android:layout_height="300dp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -41,7 +41,7 @@
         <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
             android:layout_width="match_parent"
             android:id="@+id/iv_compressed"
-            android:layout_height="250dp" />
+            android:layout_height="300dp" />
 
     </LinearLayout>
 </ScrollView>

@@ -51,6 +51,7 @@ import com.hss01248.image.dataforphotoselet.ImgDataSeletor;
 import com.hss01248.luban.avif.AvifComressor;
 import com.hss01248.media.metadata.ExifUtil;
 import com.hss01248.media.metadata.FileTypeUtil;
+import com.hss01248.toast.MyToast;
 
 import org.devio.takephoto.wrap.TakeOnePhotoListener;
 import org.devio.takephoto.wrap.TakePhotoUtil;
@@ -183,28 +184,34 @@ public class CompareActivity extends AppCompatActivity {
             @Override
             public void onSuccess(final String path) {
                 //LubanUtil.compressOriginal(path, 88);
+               File file =  ImgDataSeletor.transUriToInnerFilePath(path);
+               if(file ==null){
+                   MyToast.error("文件不存在或拷贝文件失败");
+                   return;
+               }
+             String  path2 = file.getAbsolutePath();
 
-                ExifInterface exifInterface = null;
-                try {
-                    exifInterface = new ExifInterface(path);
-                    byte[] thumbnailBytes = exifInterface.getThumbnailBytes();
-                    if(thumbnailBytes != null){
-                        String type = "uknonwn";
-                        try {
-                            type = FileTypeUtil.getType(new ByteArrayInputStream(thumbnailBytes));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        LogUtils.w("thumbnailBytes:"+thumbnailBytes.length+",type: "+type);
-                    }else{
-                        LogUtils.w("no thumbnail:");
+            ExifInterface exifInterface = null;
+            try {
+                exifInterface = new ExifInterface(path2);
+                byte[] thumbnailBytes = exifInterface.getThumbnailBytes();
+                if(thumbnailBytes != null){
+                    String type = "uknonwn";
+                    try {
+                        type = FileTypeUtil.getType(new ByteArrayInputStream(thumbnailBytes));
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    LogUtils.w("thumbnailBytes:"+thumbnailBytes.length+",type: "+type);
+                }else{
+                    LogUtils.w("no thumbnail:");
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
 
-                compress(path);
+            compress(path2);
             }
 
             @Override

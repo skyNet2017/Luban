@@ -33,6 +33,7 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.PermissionUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.blankj.utilcode.util.Utils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -45,6 +46,7 @@ import com.github.gzuliyujiang.filepicker.FilePicker;
 import com.github.gzuliyujiang.filepicker.annotation.ExplorerMode;
 import com.github.gzuliyujiang.filepicker.contract.OnFilePickedListener;
 import com.hss.utils.enhance.api.MyCommonCallback;
+import com.hss01248.media.pick.CaptureImageUtil;
 import com.hss01248.media.pick.MediaPickUtil;
 import com.hss01248.media.uri.ContentUriUtil;
 
@@ -53,9 +55,12 @@ import org.devio.takephoto.wrap.TakePhotoUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -77,7 +82,7 @@ public class ImgDataSeletor {
                     if (dialog != null) {
                         dialog.dismiss();
                     }
-                    CaptureImageUtilInner.takePicture(false, new MyCommonCallbackInner<String>() {
+                    CaptureImageUtil.takePicture(false, new MyCommonCallback<String>() {
                         @Override
                         public void onSuccess(String s) {
                             listener.onSuccess(s);
@@ -85,7 +90,7 @@ public class ImgDataSeletor {
 
                         @Override
                         public void onError(String msg) {
-                            MyCommonCallbackInner.super.onError(msg);
+                            MyCommonCallback.super.onError(msg);
                             listener.onFail("",msg);
                         }
                     });
@@ -97,11 +102,17 @@ public class ImgDataSeletor {
                     if (dialog != null) {
                         dialog.dismiss();
                     }
-                    //todo  选图后无权限
                     MediaPickUtil.pickImage(new MyCommonCallback<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            listener.onSuccess(ContentUriUtil.getRealPath(uri));
+                            //使用文件路径,低版本需要读的权限,高版本无法使用
+                            //if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                                //ContentUriUtil.getRealPath(uri)
+                            //}
+
+                            //另一种方式: 拷贝到外部目录后,返回绝对路径. 如此可以使用bridge对接flutter,rn,无缝使用file path
+                            //transUriToFilePathCallback(uri, listener);
+                            listener.onSuccess(uri.toString());
                         }
 
                         @Override
@@ -143,52 +154,73 @@ public class ImgDataSeletor {
                     if (dialog != null) {
                         dialog.dismiss();
                     }
-
                 }
             });
         } catch (Exception var4) {
             var4.printStackTrace();
         }
+    }
 
+    public static @Nullable File transUriToInnerFilePath(String pathOrUriString) {
+        if(pathOrUriString.startsWith("content://")){
+            Uri uri = Uri.parse(pathOrUriString);
+            File dir  = Utils.getApp().getExternalFilesDir("pickCache");
+            dir.mkdirs();
+            Map<String, Object> infos = ContentUriUtil.getInfos(uri);
+            String name = System.currentTimeMillis()+".jpg";
+            if(infos.containsKey("_display_name")){
+                name = infos.get("_display_name")+"";
+            }
+            File file = new File(dir,name);
+
+            try {
+                boolean success = FileIOUtils.writeFileFromIS(file, Utils.getApp().getContentResolver().openInputStream(uri));
+                if(success && file.exists() && file.length() >0){
+                    return file;
+                }else {
+                   return null;
+                }
+            } catch (Throwable e) {
+                LogUtils.w(e);
+                return null;
+            }
+        }else {
+            File file = new File(pathOrUriString);
+            if(file.exists() && file.length() >0){
+                return file;
+            }
+            return null;
+        }
+    }
+
+    public static @Nullable InputStream transUriToInputStream(String pathOrUriString) throws Exception{
+        if(pathOrUriString.startsWith("content://")){
+            Uri uri = Uri.parse(pathOrUriString);
+           return Utils.getApp().getContentResolver().openInputStream(uri);
+        }else {
+            File file = new File(pathOrUriString);
+            if(file.exists() && file.length() >0){
+                return new FileInputStream(file);
+            }
+            return null;
+        }
     }
 
     private static void selectFile(FragmentActivity activity,boolean isFile, TakeOnePhotoListener listener) {
 
+        MediaPickUtil.pickMulti(new MyCommonCallback<List<Uri>>() {
+            @Override
+            public void onSuccess(List<Uri> uris) {
+                //transUriToFilePathCallback(uris.get(0), listener);
+                listener.onSuccess(uris.get(0).toString());
+            }
 
-        PermissionUtils.permission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                .callback(new PermissionUtils.SimpleCallback() {
-                    @Override
-                    public void onGranted() {
-                        String path = activity.getSharedPreferences("select",Context.MODE_PRIVATE).getString("lastpath","");
-                        ExplorerConfig config = new ExplorerConfig(activity);
-                        config.setShowHideDir(true);
-                        config.setLoadAsync(true);
-                        config.setExplorerMode(isFile ? ExplorerMode.FILE : ExplorerMode.DIRECTORY);
-                        if(!TextUtils.isEmpty(path)){
-                            config.setRootDir(new File(path));
-                        }
-
-                        config.setOnFilePickedListener(new OnFilePickedListener() {
-                            @Override
-                            public void onFilePicked(@NonNull File file) {
-                                String currentPath = file.getAbsolutePath();
-                                activity.getSharedPreferences("select",Context.MODE_PRIVATE).edit().putString("lastpath",
-                                        isFile ? new File(currentPath).getParentFile().getAbsolutePath() : currentPath).apply();
-                                listener.onSuccess(currentPath);
-
-                            }
-                        });
-                        FilePicker filePicker = new FilePicker(activity);
-                        filePicker.setExplorerConfig(config);
-                        filePicker.show();
-                    }
-
-                    @Override
-                    public void onDenied() {
-                        ToastUtils.showLong("需要允许读存储权限");
-                    }
-                }).request();
-
+            @Override
+            public void onError(String code, String msg, @Nullable Throwable throwable) {
+                MyCommonCallback.super.onError(code, msg, throwable);
+                listener.onFail("",msg);
+            }
+        },false,"*/*");
     }
 
 
