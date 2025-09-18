@@ -174,7 +174,9 @@ public class Engine {
         //压缩插值算法效果见: https://cloud.tencent.com/developer/article/1006352
         try {
             //使用双线性插值  filter=true
-            Bitmap tagBitmap = BitmapFactory.decodeFile(srcImg.getPath());
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap tagBitmap = BitmapFactory.decodeFile(srcImg.getPath(),options);
             if (scale != 1f) {
                 tagBitmap2 = Bitmap.createScaledBitmap(tagBitmap, (int) (srcWidth / scale), (int) (srcHeight / scale), true);
             } else {
