@@ -48,7 +48,7 @@ import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.image.dataforphotoselet.ImgAdapter2;
 import com.hss01248.image.dataforphotoselet.ImgDataSeletor;
-import com.hss01248.luban.avif.AvifComressor;
+//import com.hss01248.luban.avif.AvifComressor;
 import com.hss01248.media.metadata.ExifUtil;
 import com.hss01248.media.metadata.FileTypeUtil;
 import com.hss01248.toast.MyToast;
@@ -376,7 +376,7 @@ public class CompareActivity extends AppCompatActivity {
                     File files66 = Luban.with(CompareActivity.this)
                             .ignoreBy(50)
                             .toAvif()
-                            .setCompressor(new AvifComressor())
+                            //.setCompressor(new AvifComressor())
                             .targetQuality(80)
                             .maxShortDimension(1080)
                             //.noResize(true)
