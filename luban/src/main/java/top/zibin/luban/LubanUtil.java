@@ -231,6 +231,20 @@ public class LubanUtil {
                 .get(imgPath);
     }
 
+    public static File compressInMaxShortDimension(String imgPath,
+                                                   int maxShortDimension,
+                                                   boolean keepExif) {
+        return Luban.with(app)
+                .ignoreBy(MIN_IMAGE_COMPRESS_SIZE)
+                .targetQuality(quality_material)
+                .keepExif(keepExif)
+                .maxShortDimension(maxShortDimension)
+                .setTargetDir(config.getSaveDir().getAbsolutePath())
+                .get(imgPath);
+    }
+
+
+
     /**
      * webp: 默认质量75, 不接受指定.
      * @param imgPath
