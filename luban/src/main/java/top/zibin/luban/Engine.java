@@ -78,7 +78,15 @@ public class Engine {
             default:
                 return bitmap;
         }
-        Bitmap result = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        Bitmap result = null;
+        try {
+            result = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        } catch (OutOfMemoryError e) {
+            LubanUtil.config.reportException(e);
+        }
+        if (result == null) {
+            return bitmap;
+        }
         if (result != bitmap) {
             bitmap.recycle();
         }
@@ -94,15 +102,14 @@ public class Engine {
             //it.sephiroth.android.library.exif2.ExifInterface exifInterface = null;
             Map<String, String> exifs = null;
             int rotation = 0;
+            FileInputStream exifFis = null;
             try {
-                //是否能读webp的exif?
-                //还是用原生的api吧,兼容性好点?
-                //原生在Android10后 读经纬度还有定位权限要求,否则崩溃.--> 使用特定api才有
-                exifs = ExifUtil.readExif(new FileInputStream(srcImg.getPath()));
-                //exifInterface = new it.sephiroth.android.library.exif2.ExifInterface();
-                // exifInterface.readExif(srcImg.getPath(), it.sephiroth.android.library.exif2.ExifInterface.Options.OPTION_ALL);
+                exifFis = new FileInputStream(srcImg.getPath());
+                exifs = ExifUtil.readExif(exifFis);
             } catch (Throwable throwable) {
                 LubanUtil.config.reportException(throwable);
+            } finally {
+                LubanUtil.closeIO(exifFis);
             }
             boolean rotateSuccess = false;
 
@@ -195,6 +202,9 @@ public class Engine {
             Bitmap tagBitmap = BitmapFactory.decodeFile(srcImg.getPath(),options);
             if (scale != 1f) {
                 tagBitmap2 = Bitmap.createScaledBitmap(tagBitmap, (int) (srcWidth / scale), (int) (srcHeight / scale), true);
+                if (tagBitmap2 != tagBitmap) {
+                    tagBitmap.recycle();
+                }
             } else {
                 tagBitmap2 = tagBitmap;
             }

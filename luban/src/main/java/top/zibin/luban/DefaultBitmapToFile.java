@@ -2,7 +2,6 @@ package top.zibin.luban;
 
 import android.graphics.Bitmap;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,7 +15,6 @@ public class DefaultBitmapToFile implements IBitmapToFile {
 
     @Override
     public File compressToJpg(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality, Luban luban, Engine engine) throws IOException {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
         if (luban.targetFormat.equals(Bitmap.CompressFormat.WEBP)) {
             //https://developer.android.com/reference/android/graphics/Bitmap.CompressFormat
             //Compress to the WEBP format. quality of 0 means compress for the smallest size.
@@ -108,17 +106,14 @@ public class DefaultBitmapToFile implements IBitmapToFile {
         }
 
 
-        tagBitmap.compress(luban.targetFormat, quality, stream);//focusAlpha ? Bitmap.CompressFormat.PNG :
-        tagBitmap.recycle();
-
-        FileOutputStream fos = new FileOutputStream(tagImg);
-        fos.write(stream.toByteArray());
-        fos.flush();
+        FileOutputStream fos = null;
         try {
-            fos.close();
-            stream.close();
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            fos = new FileOutputStream(tagImg);
+            tagBitmap.compress(luban.targetFormat, quality, fos);
+            fos.flush();
+        } finally {
+            tagBitmap.recycle();
+            LubanUtil.closeIO(fos);
         }
 
         return tagImg;

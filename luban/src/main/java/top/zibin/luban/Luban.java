@@ -221,8 +221,11 @@ public class Luban implements Handler.Callback {
      * start asynchronous compress thread
      */
     private void launch(final Context context) {
-        if (mStreamProviders == null || mStreamProviders.size() == 0 && mCompressListener != null) {
-            mCompressListener.onError(new NullPointerException("image file cannot be null"));
+        if (mStreamProviders == null || mStreamProviders.size() == 0) {
+            if (mCompressListener != null) {
+                mCompressListener.onError(new NullPointerException("image file cannot be null"));
+            }
+            return;
         }
 
         Iterator<InputStreamProvider> iterator = mStreamProviders.iterator();
