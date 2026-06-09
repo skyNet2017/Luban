@@ -477,21 +477,17 @@ public class LubanUtil {
                     imageStream = resolver.openInputStream(imageUri);
                 }*/
 
-                int degree = getBitmapDegree(imageStream);
+                int orientation = getExifOrientation(imageStream);
                 imageStream = resolver.openInputStream(imageUri);
                 bmp = BitmapFactory.decodeStream(imageStream, null, options);
-                if (degree % 360 != 0) {
-                    bmp = rotateBitmapByDegree(bmp, degree);
-                }
+                bmp = transformBitmap(bmp, orientation);
                 if (imageStream != null) {
                     imageStream.close();
                 }
             } else {
                 bmp = BitmapFactory.decodeFile(imageUri.toString(), options);
-                int degree = getBitmapDegree(imageUri.getPath());
-                if (degree % 360 != 0) {
-                    bmp = rotateBitmapByDegree(bmp, degree);
-                }
+                int orientation = getExifOrientation(imageUri.getPath());
+                bmp = transformBitmap(bmp, orientation);
             }
             return bmp;
         } catch (Exception e) {
@@ -500,8 +496,63 @@ public class LubanUtil {
         }
     }
 
-    private static Bitmap rotateBitmapByDegree(Bitmap bm, int degree) {
-        return rotateBitmapByDegree(bm, degree, true);
+    /**
+     * 根据 EXIF orientation 对 Bitmap 进行变换（旋转 + 翻转），
+     * 支持全部 8 种 EXIF orientation 值。
+     * 变换成功后会 recycle 原始 Bitmap。
+     */
+    private static Bitmap transformBitmap(Bitmap bitmap, int orientation) {
+        if (bitmap == null || bitmap.isRecycled()) {
+            return null;
+        }
+        if (orientation == ExifInterface.ORIENTATION_NORMAL
+                || orientation == ExifInterface.ORIENTATION_UNDEFINED) {
+            return bitmap;
+        }
+
+        Matrix matrix = new Matrix();
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.postRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                matrix.postScale(1, -1);
+                break;
+            case ExifInterface.ORIENTATION_TRANSPOSE:
+                matrix.postScale(-1, 1);
+                matrix.postRotate(270);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.postRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_TRANSVERSE:
+                matrix.postScale(-1, 1);
+                matrix.postRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.postRotate(270);
+                break;
+            default:
+                return bitmap;
+        }
+
+        Bitmap result = null;
+        try {
+            result = Bitmap.createBitmap(bitmap, 0, 0,
+                    bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        } catch (OutOfMemoryError e) {
+            config.reportException(e);
+        }
+        if (result == null) {
+            return bitmap;
+        }
+        if (result != bitmap) {
+            bitmap.recycle();
+        }
+        return result;
     }
 
     public static int getJpegQuality(String path) {
@@ -513,97 +564,34 @@ public class LubanUtil {
         }
     }
 
-    private static Bitmap rotateBitmapByDegree(Bitmap bm, int degree, boolean recycle) {
-        if (bm == null || bm.isRecycled()) {
-            return null;
-        }
-
-        if (degree == 0) {
-            return bm;
-        }
-
-        Bitmap returnBm = null;
-
-        // 根据旋转角度，生成旋转矩阵
-        Matrix matrix = new Matrix();
-        matrix.postRotate(degree);
-        try {
-            // 将原始图片按照旋转矩阵进行旋转，并得到新的图片
-            returnBm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
-        } catch (OutOfMemoryError e) {
-            config.reportException(e);
-        }
-        if (returnBm == null) {
-            returnBm = bm;
-        }
-        if (bm != returnBm && recycle) {
-            bm.recycle();
-        }
-        return returnBm;
-    }
-
     /**
-     * 读取图片的旋转的角度
+     * 读取图片的 EXIF orientation 值
      *
      * @param path 图片绝对路径
-     * @return 图片的旋转角度
+     * @return ExifInterface.ORIENTATION_* 常量
      */
-    static int getBitmapDegree(String path) {
+    static int getExifOrientation(String path) {
         if (TextUtils.isEmpty(path)) {
-            return 0;
+            return ExifInterface.ORIENTATION_NORMAL;
         }
-
-        int degree = 0;
         try {
-            // 从指定路径下读取图片，并获取其EXIF信息
             ExifInterface exifInterface = new ExifInterface(path);
-            // 获取图片的旋转信息
-            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+            return exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION,
                     ExifInterface.ORIENTATION_NORMAL);
-            switch (orientation) {
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    degree = 90;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    degree = 180;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    degree = 270;
-                    break;
-                default:
-                    break;
-            }
         } catch (IOException e) {
             config.reportException(e);
         }
-        return degree;
+        return ExifInterface.ORIENTATION_NORMAL;
     }
 
-    private static int getBitmapDegree(InputStream inputStream) {
+    private static int getExifOrientation(InputStream inputStream) {
         if (inputStream == null) {
-            return 0;
+            return ExifInterface.ORIENTATION_NORMAL;
         }
-
-        int degree = 0;
         try {
-            // 从指定路径下读取图片，并获取其EXIF信息
             ExifInterface exifInterface = new ExifInterface(inputStream);
-            // 获取图片的旋转信息
-            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+            return exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION,
                     ExifInterface.ORIENTATION_NORMAL);
-            switch (orientation) {
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    degree = 90;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    degree = 180;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    degree = 270;
-                    break;
-                default:
-                    break;
-            }
         } catch (IOException e) {
             config.reportException(e);
         } finally {
@@ -613,7 +601,7 @@ public class LubanUtil {
                 e.printStackTrace();
             }
         }
-        return degree;
+        return ExifInterface.ORIENTATION_NORMAL;
     }
 
     public static String readExif(String path) {

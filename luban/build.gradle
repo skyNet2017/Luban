@@ -33,7 +33,8 @@ android {
 dependencies {
     //api 'it.sephiroth.android.exif:library:1.0.1'
     api 'androidx.exifinterface:exifinterface:1.3.5'
-    api 'com.github.hss01248.metadata:metadata:1.2.3'
+    //api 'com.github.hss01248.metadata:metadata:1.2.3'
+    api "com.hss01248.utilcodeEnhanceX:metadata:2.2.58"
     api project(':showResult')
     api 'com.blankj:utilcodex:1.30.0'
 

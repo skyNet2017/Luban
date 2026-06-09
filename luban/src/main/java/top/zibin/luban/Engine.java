@@ -49,10 +49,40 @@ public class Engine {
     }
 
 
-    private Bitmap rotatingImage(Bitmap bitmap, int angle) {
+    private Bitmap transformImage(Bitmap bitmap, int orientation) {
         Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.postRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                matrix.postScale(1, -1);
+                break;
+            case ExifInterface.ORIENTATION_TRANSPOSE:
+                matrix.postRotate(90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.postRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_TRANSVERSE:
+                matrix.postRotate(270);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.postRotate(270);
+                break;
+            default:
+                return bitmap;
+        }
+        Bitmap result = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        if (result != bitmap) {
+            bitmap.recycle();
+        }
+        return result;
     }
 
     File compress() {
@@ -82,11 +112,11 @@ public class Engine {
                 if (!TextUtils.isEmpty(ori)) {
                     try {
                         int o = Integer.parseInt(ori);
-                        if (o != 0) {
+                        if (o != ExifInterface.ORIENTATION_NORMAL && o != ExifInterface.ORIENTATION_UNDEFINED) {
                             rotation = o;
-                            //可能oom. 万一oom了,图片还是留着,但是exif丽保留原旋转角度.
-                            tagBitmap = rotatingImage(tagBitmap, getRealRotation(o));
-                            rotateSuccess = true;
+                            Bitmap transformed = transformImage(tagBitmap, o);
+                            rotateSuccess = (transformed != tagBitmap);
+                            tagBitmap = transformed;
                         }
                     } catch (Throwable throwable) {
                         LubanUtil.config.reportException(throwable);
@@ -131,20 +161,6 @@ public class Engine {
         }
         return tagImg;
     }
-
-    private int getRealRotation(int o) {
-        switch (o){
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                return 90;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                return 180;
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                return 270;
-
-        }
-        return 0;
-    }
-
 
     //先使用双线性采样,oom了再使用单线性采样,还oom就强制压缩到720p
     private Bitmap decodeToBitmap() {

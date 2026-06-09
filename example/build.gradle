@@ -77,11 +77,12 @@ dependencies {
 configurations {
     all {
         resolutionStrategy {
-            force "androidx.exifinterface:exifinterface:1.3.5"
+            //force "androidx.exifinterface:exifinterface:1.3.5"
         }
     }
     all*.exclude group: 'com.davemorrissey.labs', module: 'subsampling-scale-image-view-androidx'
     all*.exclude group: 'com.github.skyNet2017.Luban', module: 'luban'
     all*.exclude group: 'androidx.annotation', module: 'annotation-jvm'
+    all*.exclude group: 'com.github.hss01248.metadata', module: 'metadata'
     //com.davemorrissey.labs:subsampling-scale-image-view
 }
