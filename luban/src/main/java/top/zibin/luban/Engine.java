@@ -139,20 +139,23 @@ public class Engine {
             if (exifs != null && !luban.toAvif) {
                 try{
                     if (luban.keepExif) {
-                        //最后一个参数代表是否要复写Orientation参数为0. 旋转成功就复写,没有成功就维持原先的
                         ExifUtil.resetImageWHToMap(exifs, new FileInputStream(new File(tagImg.getAbsolutePath())), rotateSuccess);
+                        if (rotateSuccess) {
+                            exifs.put(ExifInterface.TAG_ORIENTATION, String.valueOf(ExifInterface.ORIENTATION_NORMAL));
+                        }
                         ExifUtil.writeExif(exifs, tagImg.getAbsolutePath());
                     } else {
-                        if (!rotateSuccess && rotation != 0) {
-                            //rotation回写:
-                            //todo 减少io
-                            try {
-                                ExifInterface exif = new ExifInterface(tagImg);
-                                exif.setAttribute(ExifInterface.TAG_ORIENTATION, rotation + "");
+                        try {
+                            ExifInterface exif = new ExifInterface(tagImg);
+                            if (rotateSuccess) {
+                                exif.setAttribute(ExifInterface.TAG_ORIENTATION, String.valueOf(ExifInterface.ORIENTATION_NORMAL));
                                 exif.saveAttributes();
-                            } catch (Throwable throwable) {
-                                LubanUtil.config.reportException(throwable);
+                            } else if (rotation != 0) {
+                                exif.setAttribute(ExifInterface.TAG_ORIENTATION, String.valueOf(rotation));
+                                exif.saveAttributes();
                             }
+                        } catch (Throwable throwable) {
+                            LubanUtil.config.reportException(throwable);
                         }
                     }
                 }catch (Throwable throwable){
