@@ -139,7 +139,13 @@ public class Engine {
             if (exifs != null && !luban.toAvif) {
                 try{
                     if (luban.keepExif) {
-                        ExifUtil.resetImageWHToMap(exifs, new FileInputStream(new File(tagImg.getAbsolutePath())), rotateSuccess);
+                        FileInputStream whFis = null;
+                        try {
+                            whFis = new FileInputStream(tagImg);
+                            ExifUtil.resetImageWHToMap(exifs, whFis, rotateSuccess);
+                        } finally {
+                            LubanUtil.closeIO(whFis);
+                        }
                         if (rotateSuccess) {
                             exifs.put(ExifInterface.TAG_ORIENTATION, String.valueOf(ExifInterface.ORIENTATION_NORMAL));
                         }
